@@ -1,0 +1,161 @@
+<div class="row justify-content-center my-5">
+  <div class="col-md-6">
+    <div class="card shadow-lg rounded-3">
+      <div class="card-body p-4">
+        <h3 class="text-center mb-4 text-success fw-bold">Créer un compte</h3>
+
+        <form (ngSubmit)="register()">
+
+          <!-- Nom -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Nom complet</label>
+            <input
+              type="text"
+              class="form-control shadow-sm"
+              [(ngModel)]="nom"
+              name="nom"
+              placeholder="Votre nom complet"
+              required
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              class="form-control shadow-sm"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="ex: exemple@email.com"
+              required
+            />
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mot de passe</label>
+            <input
+              type="password"
+              class="form-control shadow-sm"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="********"
+              required
+            />
+          </div>
+
+          <!-- Role -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Rôle</label>
+            <select
+              class="form-select shadow-sm"
+              [(ngModel)]="role"
+              name="role"
+            >
+              <option value="etudiant">Étudiant</option>
+              <option value="formateur">Formateur</option>
+            </select>
+          </div>
+
+          <!-- 🔥 CHAMPS ETUDIANT -->
+          <div *ngIf="role === 'etudiant'">
+
+            <!-- CIN -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">CIN</label>
+              <input
+                type="text"
+                class="form-control shadow-sm"
+                [(ngModel)]="cin"
+                name="cin"
+                placeholder="Numéro CIN"
+                required
+              />
+            </div>
+<div class="mb-3">
+  <label class="form-label fw-semibold">Département</label>
+  <select
+    [(ngModel)]="departement"
+    name="departement"
+    class="form-select shadow-sm"
+    required
+  >
+    <option value="">-- Département --</option>
+    <option value="Informatique">Informatique</option>
+    <option value="Génie Civil">Génie Civil</option>
+    <option value="Génie Mécanique">Génie Mécanique</option>
+    <option value="Génie Électrique">Génie Électrique</option>
+  </select>
+</div>
+
+            <!-- Niveau -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Niveau</label>
+              <select
+                class="form-select shadow-sm"
+                [(ngModel)]="niveau"
+                name="niveau"
+                required
+              >
+                <option value="">-- Choisir niveau --</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+                <option value="L3">L3</option>
+              </select>
+            </div>
+
+            <!-- Spécialité -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Spécialité</label>
+              <input
+                type="text"
+                class="form-control shadow-sm"
+                [(ngModel)]="specialite"
+                name="specialite"
+                placeholder="Ex: Développement Web"
+                required
+              />
+            </div>
+
+          </div>
+
+          <!-- 🔥 CHAMP FORMATEUR -->
+          <div *ngIf="role === 'formateur'">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Spécialité</label>
+              <input
+                type="text"
+                class="form-control shadow-sm"
+                [(ngModel)]="specialite"
+                name="specialite_formateur"
+                placeholder="Ex: Angular, Node.js..."
+              />
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="d-grid mt-3">
+            <button class="btn btn-success btn-lg shadow-sm">
+              S’inscrire
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Message -->
+        <p *ngIf="message" class="text-success text-center mt-3">
+          {{ message }}
+        </p>
+
+        <!-- Login link -->
+        <div class="text-center mt-3">
+          <a routerLink="/login" class="text-decoration-none">
+            Déjà un compte ? Se connecter
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

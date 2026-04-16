@@ -1,0 +1,59 @@
+
+<div class="row justify-content-center my-5">
+  <div class="col-md-5">
+
+    <div class="card shadow-lg rounded-3">
+
+      <div class="card-body p-4">
+
+        <h3 class="text-center mb-4 text-primary fw-bold">
+          👑 Connexion Admin
+        </h3>
+
+        <form (ngSubmit)="login()">
+
+          <!-- EMAIL -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input
+              type="email"
+              class="form-control shadow-sm"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="admin@email.com"
+              required
+            />
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mot de passe</label>
+            <input
+              type="password"
+              class="form-control shadow-sm"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="********"
+              required
+            />
+          </div>
+
+          <!-- BUTTON -->
+          <div class="d-grid mt-3">
+            <button class="btn btn-primary btn-lg shadow-sm">
+              🚀 Se connecter
+            </button>
+          </div>
+
+        </form>
+
+        <!-- ERROR -->
+        <p *ngIf="error" class="text-danger text-center mt-3">
+          {{ error }}
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,231 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+
+    <!-- ASIDE -->
+    <aside class="col-md-3 col-lg-2 bg-light p-3 shadow-sm">
+      <h5 class="mb-4 text-primary fw-bold">👑 Menu Admin</h5>
+
+      <button class="btn btn-outline-danger mb-3 w-100" (click)="logout()">
+        🔒 Déconnexion
+      </button>
+
+      <ul class="nav flex-column">
+
+        <li class="nav-item mb-2">
+          <a class="nav-link"
+             [class.active]="activeSection === 'accueil'"
+             (click)="setSection('accueil')">
+            🏠 Accueil
+          </a>
+        </li>
+
+        <li class="nav-item mb-2">
+          <a class="nav-link"
+             [class.active]="activeSection === 'utilisateurs'"
+             (click)="setSection('utilisateurs')">
+            👥 Utilisateurs
+          </a>
+        </li>
+
+        <li class="nav-item mb-2">
+          <a class="nav-link"
+             [class.active]="activeSection === 'formations'"
+             (click)="setSection('formations')">
+            📚 Formations
+          </a>
+        </li>
+
+      </ul>
+    </aside>
+
+    <!-- CONTENU -->
+    <main class="col-md-9 col-lg-10">
+
+      <h2 class="mb-4 text-primary fw-bold">👑 Tableau de bord Admin</h2>
+
+      <!-- ACCUEIL -->
+      <section *ngIf="activeSection === 'accueil'">
+        <div class="alert alert-info">
+          👋 Bienvenue Admin ! Gérez utilisateurs et formations depuis ce dashboard.
+        </div>
+      </section>
+
+      <!-- UTILISATEURS -->
+      <section *ngIf="activeSection === 'utilisateurs'">
+        <h4 class="mb-3">👥 Liste des utilisateurs</h4>
+
+        <table class="table table-bordered table-striped" *ngIf="users.length">
+          <thead class="table-dark">
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let u of users">
+              <td>{{ u.nom }}</td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span class="badge bg-primary">{{ u.role }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p *ngIf="!users.length" class="text-muted">
+          Aucun utilisateur disponible.
+        </p>
+      </section>
+
+      <!-- FORMATIONS -->
+      <!-- FORMATIONS -->
+<section *ngIf="activeSection === 'formations'">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>📚 Liste des formations</h4>
+
+    <button class="btn btn-success" (click)="openAddForm()">
+      ➕ Ajouter formation
+    </button>
+  </div>
+
+  <table class="table table-bordered table-striped" *ngIf="formations.length">
+    <thead class="table-dark">
+      <tr>
+        <th>Titre</th>
+        <th>Description</th>
+        <th>Date début</th>
+        <th>Mode</th>
+        <th>Département</th>
+        <th>Formateur</th>
+        <th>Prix</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let f of formations">
+        <td>{{ f.titre }}</td>
+        <td>{{ f.description }}</td>
+        <td>{{ f.date_debut | date:'dd/MM/yyyy' }}</td>
+
+        <td>{{ f.mode }}</td>
+        <td>{{ f.departement }}</td>
+        <td>{{ f.formateur }}</td>
+        <td>{{ f.prix }} DT</td>
+
+        <td>
+          <button class="btn btn-warning btn-sm me-2"
+                  (click)="editFormation(f)">
+            ✏️
+          </button>
+
+          <button class="btn btn-danger btn-sm"
+                  (click)="deleteFormation(f.id)">
+            ❌
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!formations.length" class="text-muted">
+    Aucune formation disponible.
+  </p>
+
+  <!-- FORM AJOUT / EDIT -->
+  <div *ngIf="showForm" class="card p-4 mt-4 shadow border-0">
+
+    <h5 *ngIf="!editMode">➕ Ajouter formation</h5>
+    <h5 *ngIf="editMode">✏️ Modifier formation</h5>
+
+    <!-- 📚 titre -->
+    <div class="mb-2">
+      <label class="form-label">📚 Titre</label>
+      <input class="form-control" [(ngModel)]="formData.titre">
+    </div>
+
+    <!-- 📝 description -->
+    <div class="mb-2">
+      <label class="form-label">📝 Description</label>
+      <textarea class="form-control" [(ngModel)]="formData.description"></textarea>
+    </div>
+
+    <div class="row">
+
+      <!-- 📅 date début -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">📅 Date début</label>
+        <input type="date" class="form-control" [(ngModel)]="formData.date_debut">
+      </div>
+
+      <!-- 📅 date fin -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">📅 Date fin</label>
+        <input type="date" class="form-control" [(ngModel)]="formData.date_fin">
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <!-- ⏱ durée -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">⏱ Durée (heures)</label>
+        <input type="number" class="form-control" [(ngModel)]="formData.duree">
+      </div>
+
+      <!-- 👨‍🏫 formateur -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">👨‍🏫 Formateur</label>
+        <input class="form-control" [(ngModel)]="formData.formateur">
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <!-- 🎯 département -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">🎯 Département</label>
+        <input class="form-control" [(ngModel)]="formData.departement">
+      </div>
+
+      <!-- 💰 prix -->
+      <div class="col-md-6 mb-2">
+        <label class="form-label">💰 Prix (DT)</label>
+        <input type="number" class="form-control" [(ngModel)]="formData.prix">
+      </div>
+
+    </div>
+
+    <!-- 📍 mode -->
+    <div class="mb-2">
+      <label class="form-label">📍 Mode</label>
+      <select class="form-control" [(ngModel)]="formData.mode">
+        <option>En ligne</option>
+        <option>Présentiel</option>
+      </select>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="d-flex gap-2 mt-3">
+
+      <button class="btn btn-primary" (click)="saveFormation()">
+        💾 Enregistrer
+      </button>
+
+      <button class="btn btn-secondary" (click)="closeForm()">
+        ❌ Annuler
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+    </main>
+  </div>
+</div>

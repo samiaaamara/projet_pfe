@@ -1,0 +1,38 @@
+/* You can add global styles to this file, and also import other style files */
+@import "bootstrap/dist/css/bootstrap.min.css";
+body {
+  background-color: #f5f7fa;
+}
+.card {
+  border-radius: 10px;
+}
+body {
+  background-color: #f5f7fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2, h3, h4 {
+  color: #343a40;
+}
+
+.card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.table th {
+  background-color: #343a40;
+  color: white;
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+.btn-primary, .btn-success, .btn-secondary {
+  border-radius: 6px;
+}
+
+.alert {
+  border-radius: 6px;
+}

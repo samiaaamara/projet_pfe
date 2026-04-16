@@ -1,0 +1,27 @@
+.hero-section {
+  background: linear-gradient(120deg, #e0f7fa, #ffffff);
+}
+
+.card.hover-shadow:hover {
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+.card-body h5 {
+  font-size: 1.25rem;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-outline-primary {
+  color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}

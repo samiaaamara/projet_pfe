@@ -1,0 +1,82 @@
+/* ===== Dashboard global ===== */
+.dashboard-container {
+  background-color: #f5f7fa;
+}
+
+.content-area {
+  padding: 30px;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  background-color: #ffffff;
+  padding: 25px 15px;
+}
+
+.sidebar-title {
+  font-weight: 700;
+  color: #0d6efd;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.sidebar-menu .nav-link {
+  color: #333;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  padding: 10px 15px;
+  transition: all 0.2s;
+}
+
+.sidebar-menu .nav-link:hover {
+  background-color: #e9f0ff;
+  color: #0d6efd;
+}
+
+.sidebar-menu .nav-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ===== Header ===== */
+.content-header h2 {
+  font-weight: 700;
+}
+
+.content-header p {
+  margin-bottom: 0;
+}
+
+/* ===== Sections ===== */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ===== Cards ===== */
+.formation-card {
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.formation-card:hover {
+  transform: translateY(-5px);
+}
+
+/* ===== Welcome ===== */
+.welcome-card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+}
+
+/* ===== Tables ===== */
+.table {
+  background: white;
+}
+
+/* ===== Progress ===== */
+.progress {
+  border-radius: 20px;
+}
