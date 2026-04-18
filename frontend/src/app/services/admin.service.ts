@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -11,16 +11,21 @@ export class AdminService {
 
   constructor(private http: HttpClient) { }
 
+  private getAuthHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { headers: new HttpHeaders({ Authorization: `Bearer ${token}` }) } : {};
+  }
+
   // ======================
   // USERS
   // ======================
 
   getUsers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/users`);
+    return this.http.get<any[]>(`${this.apiUrl}/users`, this.getAuthHeaders());
   }
 
   deleteUser(userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/users/${userId}`);
+    return this.http.delete(`${this.apiUrl}/users/${userId}`, this.getAuthHeaders());
   }
 
   // ======================
@@ -28,19 +33,58 @@ export class AdminService {
   // ======================
 
   getFormations(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/formations`);
+    return this.http.get<any[]>(`${this.apiUrl}/formations`, this.getAuthHeaders());
   }
 
   addFormation(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/formations`, data);
+    return this.http.post(`${this.apiUrl}/formations`, data, this.getAuthHeaders());
   }
 
   updateFormation(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/formations/${id}`, data);
+    return this.http.put(`${this.apiUrl}/formations/${id}`, data, this.getAuthHeaders());
   }
 
   deleteFormation(formationId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/formations/${formationId}`);
+    return this.http.delete(`${this.apiUrl}/formations/${formationId}`, this.getAuthHeaders());
+  }
+
+  publishFormation(id: number) {
+    return this.http.put(`${this.apiUrl}/formations/${id}/publish`, {}, this.getAuthHeaders());
+  }
+
+  // 🔔 Formations en attente d'approbation
+  getFormationsPending(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/formations-pending`, this.getAuthHeaders());
+  }
+
+  // ✅ Approuver et publier une formation
+  approveAndPublishFormation(formationId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/approve-and-publish`, {}, this.getAuthHeaders());
+  }
+
+  // ❌ Rejeter une formation
+  rejectFormation(formationId: number, reason: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/reject`, { reason }, this.getAuthHeaders());
+  }
+
+/* STATS */
+getStats() {
+  return this.http.get<any>(`${this.apiUrl}/stats`, this.getAuthHeaders());
+}
+getFormateurs(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/formateurs`, this.getAuthHeaders());
+}
+
+  addFormateur(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/formateurs`, data, this.getAuthHeaders());
+  }
+
+  updateFormateur(id: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formateurs/${id}`, data, this.getAuthHeaders());
+  }
+
+  deleteFormateur(formateurId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/formateurs/${formateurId}`, this.getAuthHeaders());
   }
 
 }

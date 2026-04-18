@@ -1,0 +1,183 @@
+:host {
+  display: block;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f4f7ff;
+}
+
+.container-fluid {
+  padding: 1rem 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: #0d6efd;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0.75rem 1.5rem rgba(13, 110, 253, 0.18);
+}
+
+.admin-sidebar {
+  min-height: calc(100vh - 3rem);
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 1rem;
+}
+
+.sidebar-card {
+  padding: 1.5rem;
+}
+
+.sidebar-card .nav-link {
+  border-radius: 1rem;
+  padding: 0.95rem 1rem;
+  color: #495057;
+  background-color: rgba(13, 110, 253, 0.05);
+  transition: all 0.2s ease;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.sidebar-card .nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+}
+
+.sidebar-card .nav-link.active {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+.section-card,
+.form-card,
+.table-card {
+  border-radius: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  box-shadow: 0 0.75rem 1.75rem rgba(15, 23, 42, 0.05);
+}
+
+.section-card {
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+  background: linear-gradient(180deg, rgba(245, 248, 255, 0.95), #ffffff);
+  border-color: rgba(13, 110, 253, 0.15);
+}
+
+.form-card {
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.dashboard-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  background-color: #ffffff;
+  box-shadow: 0 0.65rem 1.35rem rgba(15, 23, 42, 0.06);
+}
+
+.dashboard-card h3 {
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+.card.shadow-sm {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card.shadow-sm:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.95rem 1.6rem rgba(15, 23, 42, 0.08);
+}
+
+.btn {
+  border-radius: 0.9rem;
+}
+
+.btn-outline-primary,
+.btn-primary,
+.btn-outline-success,
+.btn-success,
+.btn-outline-warning,
+.btn-warning,
+.btn-outline-danger,
+.btn-danger,
+.btn-outline-secondary {
+  min-width: 140px;
+}
+
+.form-control,
+.form-select {
+  border-radius: 0.85rem;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+  border-color: #0d6efd;
+}
+
+.table-card {
+  padding: 1rem;
+}
+
+.table thead th {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.supports-list .card-body {
+  padding: 1rem;
+}
+
+.support-item {
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+}
+
+.support-item + .support-item {
+  margin-top: 0.9rem;
+}
+
+.text-muted.small {
+  opacity: 0.85;
+}
+
+.alert {
+  border-radius: 0.95rem;
+}
+
+@media (max-width: 991px) {
+  .admin-sidebar {
+    min-height: auto;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .brand-badge {
+    width: 100%;
+  }
+}

@@ -1,26 +1,129 @@
-/* Sidebar active link */
-.nav-link.active {
-  background-color: #0d6efd;
-  color: #fff !important;
-  border-radius: 0.5rem;
+/* Sidebar */
+.admin-sidebar {
+  min-height: calc(100vh - 2rem);
 }
 
-/* Cards */
-.card {
-  border-radius: 0.6rem;
-  border: none;
+.sidebar-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
   background-color: #ffffff;
 }
 
-.card:hover {
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+.nav-link {
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+  color: #495057;
+  background-color: rgba(13, 110, 253, 0.05);
+  transition: all 0.2s ease;
 }
 
-/* Buttons */
-.btn-outline-primary, .btn-outline-danger {
-  border-radius: 0.5rem;
+.nav-link:hover {
+  background-color: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
 }
 
-.table th, .table td {
-  vertical-align: middle;
+.nav-link.active {
+  background-color: #0d6efd;
+  color: #fff !important;
+  border-radius: 0.85rem;
+}
+
+.dashboard-card,
+.section-card,
+.sidebar-card,
+.table-card {
+  border-radius: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+}
+
+.dashboard-card {
+  min-height: 140px;
+}
+
+.section-card {
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.table-card {
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover,
+.dashboard-card:hover,
+.sidebar-card:hover,
+.table-card:hover {
+  box-shadow: 0 0.65rem 1.5rem rgba(15, 23, 42, 0.08);
+}
+
+.btn,
+.form-control,
+.form-select {
+  border-radius: 0.75rem;
+}
+
+.table thead th {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+.form-label {
+  font-weight: 600;
+}
+
+.text-muted.small {
+  opacity: 0.8;
+}
+
+.alert {
+  border-radius: 0.85rem;
+}
+
+.section-card {
+  padding: 1.75rem;
+  margin-bottom: 1.75rem;
+  border-radius: 1.5rem;
+  background: #f5f8ff;
+  border: 1px solid rgba(13, 110, 253, 0.12);
+}
+
+.form-card {
+  padding: 1.75rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 0.75rem 1.75rem rgba(15, 23, 42, 0.06);
+}
+
+.filters-row .form-control {
+  min-height: 46px;
+}
+
+.filters-row .form-control,
+.filters-row .btn {
+  border-radius: 0.85rem;
+}
+
+.section-card h4 {
+  margin-bottom: 0.25rem;
+}
+
+.section-card p {
+  margin-bottom: 0;
+}
+
+.table-card {
+  border-radius: 1.25rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+}
+
+@media (max-width: 991px) {
+  .admin-sidebar {
+    min-height: auto;
+  }
 }

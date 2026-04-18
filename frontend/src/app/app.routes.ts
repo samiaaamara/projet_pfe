@@ -4,6 +4,7 @@ import { EtudiantComponent } from './pages/etudiant/etudiant.component';
 import { FormateurComponent } from './pages/formateur/formateur.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { AdminGuard } from './guards/admin.guard';
+import { FormateurGuard } from './guards/formateur.guard';
 import { AdminLoginComponent } from './pages/admin-login/admin-login.component';
 import { HomeComponent } from './pages/home/home.component';
 import { InscriptionComponent } from './pages/inscription/inscription.component';
@@ -13,7 +14,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'inscription', component: InscriptionComponent },
   { path: 'etudiant', component: EtudiantComponent },
-  { path: 'formateur', component: FormateurComponent },
+  { path: 'formateur', component: FormateurComponent, canActivate: [FormateurGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
   { path: 'admin-login', component: AdminLoginComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' }

@@ -1,120 +1,508 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const bcrypt = require('bcrypt');
+const { verifyAdmin } = require('../middleware/auth.middleware');
 
-// Tous les utilisateurs
+const allowedNiveaux = ['Débutant', 'Intermédiaire', 'Avancé'];
+const allowedStatuses = ['draft', 'published'];
+
+const isValidDate = (value) => {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value));
+};
+
+const validateFormationPayload = ({ titre, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id, status }) => {
+  if (!titre || typeof titre !== 'string' || titre.trim().length === 0) {
+    return 'Le titre est obligatoire.';
+  }
+
+  if (!date_debut || !isValidDate(date_debut)) {
+    return 'La date de début est invalide.';
+  }
+
+  if (date_fin && !isValidDate(date_fin)) {
+    return 'La date de fin est invalide.';
+  }
+
+  if (date_fin && new Date(date_fin) < new Date(date_debut)) {
+    return 'La date de fin doit être postérieure ou égale à la date de début.';
+  }
+
+  if (!duree || Number(duree) <= 0) {
+    return 'La durée doit être un nombre positif.';
+  }
+
+  if (!nb_places || Number(nb_places) <= 0) {
+    return 'Le nombre de places doit être un nombre positif.';
+  }
+
+  if (!niveau || !allowedNiveaux.includes(niveau)) {
+    return 'Le niveau est invalide.';
+  }
+
+  if (!departement || typeof departement !== 'string' || departement.trim().length === 0) {
+    return 'Le département est obligatoire.';
+  }
+
+  if (!formateur_id || Number(formateur_id) <= 0) {
+    return 'Le formateur est obligatoire.';
+  }
+
+  if (status && !allowedStatuses.includes(status)) {
+    return 'Le statut est invalide.';
+  }
+
+  return null;
+};
+
+router.use(verifyAdmin);
+
+/* =========================
+   👥 USERS
+========================= */
 router.get('/users', (req, res) => {
-  db.query('SELECT id, nom, email, role FROM users', (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+  db.query(
+    'SELECT id, nom, email, role FROM users',
+    (err, results) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json(results);
+    }
+  );
 });
 
-// Étudiants
-router.get('/etudiants', (req, res) => {
-  const sql = `
-    SELECT u.nom, u.email, e.progression
-    FROM etudiants e
-    JOIN users u ON e.user_id = u.id
-  `;
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
-});
-
-// Formateurs
-router.get('/formateurs', (req, res) => {
-  const sql = `
-    SELECT u.nom, u.email, f.specialite
-    FROM formateurs f
-    JOIN users u ON f.user_id = u.id
-  `;
-  db.query(sql, (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
-});
-
-// Formations
+/* =========================
+   📚 FORMATIONS (ADMIN VIEW)
+========================= */
 router.get('/formations', (req, res) => {
+
   const sql = `
-    SELECT f.titre, f.description, u.nom AS formateur
+    SELECT 
+      f.id,
+      f.titre,
+      f.description,
+      f.date_debut,
+      f.date_fin,
+      f.duree,
+      f.niveau,
+      f.departement,
+      f.nb_places,
+      f.status,
+      f.formateur_id,
+      u.nom AS formateur
     FROM formations f
-    JOIN formateurs fo ON f.formateur_id = fo.id
-    JOIN users u ON fo.user_id = u.id
+    LEFT JOIN formateurs fo ON f.formateur_id = fo.id
+    LEFT JOIN users u ON fo.user_id = u.id
+    ORDER BY f.id DESC
   `;
+
   db.query(sql, (err, results) => {
-    if (err) return res.status(500).json(err);
+    if (err) return res.status(500).json({ error: err });
     res.json(results);
   });
 });
 
-module.exports = router;
-
-// ➕ Ajouter formation
+/* =========================
+   ➕ CREATE FORMATION
+========================= */
 router.post('/formations', (req, res) => {
-  const { titre, description, date_debut, formateur_id, specialite } = req.body;
+  const payload = req.body;
+  const validationError = validateFormationPayload(payload);
+  if (validationError) {
+    return res.status(400).json({ message: validationError });
+  }
 
-  const sql = `
-    INSERT INTO formations (titre, description, date_debut, formateur_id, specialite)
-    VALUES (?, ?, ?, ?, ?)
-  `;
+  const {
+    titre,
+    description,
+    date_debut,
+    date_fin,
+    duree,
+    niveau,
+    departement,
+    nb_places,
+    formateur_id
+  } = payload;
 
-  db.query(sql, [titre, description, date_debut, formateur_id, specialite], (err) => {
-    if (err) return res.status(500).json(err);
+  db.query('SELECT id FROM formateurs WHERE id = ?', [formateur_id], (err, formateurs) => {
+    if (err) return res.status(500).json({ error: err });
+    if (formateurs.length === 0) {
+      return res.status(400).json({ message: 'Formateur introuvable.' });
+    }
 
-    res.json({ message: 'Formation ajoutée avec succès ✅' });
+    const sql = `
+      INSERT INTO formations 
+      (titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')
+    `;
+
+    db.query(sql,
+      [titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id],
+      (insertErr, result) => {
+        if (insertErr) return res.status(500).json({ error: insertErr });
+        res.json({
+          message: 'Formation créée (draft) ✅',
+          id: result.insertId
+        });
+      }
+    );
   });
 });
 
-// ✏️ Modifier formation
+/* =========================
+   ✏️ UPDATE FORMATION
+========================= */
 router.put('/formations/:id', (req, res) => {
   const { id } = req.params;
-  const { titre, description, date_debut } = req.body;
+  const payload = req.body;
+  const validationError = validateFormationPayload(payload);
+  if (validationError) {
+    return res.status(400).json({ message: validationError });
+  }
+
+  const {
+    titre,
+    description,
+    date_debut,
+    date_fin,
+    duree,
+    niveau,
+    departement,
+    nb_places,
+    formateur_id,
+    status
+  } = payload;
+
+  db.query('SELECT id FROM formateurs WHERE id = ?', [formateur_id], (err, formateurs) => {
+    if (err) return res.status(500).json({ error: err });
+    if (formateurs.length === 0) {
+      return res.status(400).json({ message: 'Formateur introuvable.' });
+    }
+
+    const sql = `
+      UPDATE formations
+      SET 
+        titre=?,
+        description=?,
+        date_debut=?,
+        date_fin=?,
+        duree=?,
+        niveau=?,
+        departement=?,
+        nb_places=?,
+        formateur_id=?,
+        status=?
+      WHERE id=?
+    `;
+
+    db.query(sql,
+      [
+        titre,
+        description,
+        date_debut,
+        date_fin,
+        duree,
+        niveau,
+        departement,
+        nb_places,
+        formateur_id,
+        status,
+        id
+      ],
+      (updateErr) => {
+        if (updateErr) return res.status(500).json({ error: updateErr });
+        res.json({ message: 'Formation modifiée ✅' });
+      }
+    );
+  });
+});
+
+/* =========================
+   🚀 PUBLISH FORMATION
+========================= */
+router.put('/formations/:id/publish', (req, res) => {
+
+  db.query(
+    "UPDATE formations SET status='published' WHERE id=?",
+    [req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Formation publiée 🚀' });
+    }
+  );
+});
+
+/* =========================
+   ❌ DELETE FORMATION
+========================= */
+router.delete('/formations/:id', (req, res) => {
+
+  db.query(
+    'DELETE FROM formations WHERE id=?',
+    [req.params.id],
+    (err) => {
+      if (err) return res.status(500).json({ error: err });
+      res.json({ message: 'Formation supprimée ❌' });
+    }
+  );
+});
+
+/* =========================
+   👨‍🏫 FORMATEURS
+========================= */
+router.get('/formateurs', (req, res) => {
 
   const sql = `
-    UPDATE formations
-    SET titre = ?, description = ?, date_debut = ?
-    WHERE id = ?
+    SELECT 
+      f.id,
+      u.nom,
+      u.email,
+      f.specialite
+    FROM formateurs f
+    JOIN users u ON f.user_id = u.id
+    ORDER BY u.nom ASC
   `;
 
-  db.query(sql, [titre, description, date_debut, id], (err) => {
-    if (err) return res.status(500).json(err);
-
-    res.json({ message: 'Formation modifiée ✅' });
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
   });
 });
 
-// ❌ Supprimer formation
-router.delete('/formations/:id', (req, res) => {
+/* =========================
+   ➕ CREATE FORMATEUR
+========================= */
+router.post('/formateurs', async (req, res) => {
+  const { nom, email, mot_de_passe, specialite } = req.body;
+
+  if (!nom || !email || !mot_de_passe) {
+    return res.status(400).json({ message: 'Nom, email et mot de passe sont obligatoires.' });
+  }
+
+  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
+    if (err) return res.status(500).json({ error: err });
+    if (users.length > 0) {
+      return res.status(400).json({ message: 'Email déjà utilisé.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(mot_de_passe, 10);
+
+    db.query(
+      'INSERT INTO users (nom, email, mot_de_passe, role) VALUES (?, ?, ?, ?)',
+      [nom, email, hashedPassword, 'formateur'],
+      (insertErr, result) => {
+        if (insertErr) return res.status(500).json({ error: insertErr });
+
+        const userId = result.insertId;
+        db.query(
+          'INSERT INTO formateurs (user_id, specialite) VALUES (?, ?)',
+          [userId, specialite || null],
+          (formateurErr) => {
+            if (formateurErr) return res.status(500).json({ error: formateurErr });
+            res.status(201).json({ message: 'Formateur créé avec succès.' });
+          }
+        );
+      }
+    );
+  });
+});
+
+/* =========================
+   ✏️ UPDATE FORMATEUR
+========================= */
+router.put('/formateurs/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nom, email, mot_de_passe, specialite } = req.body;
+
+  if (!nom || !email) {
+    return res.status(400).json({ message: 'Nom et email sont obligatoires.' });
+  }
+
+  db.query('SELECT user_id FROM formateurs WHERE id = ?', [id], async (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Formateur introuvable.' });
+    }
+
+    const userId = results[0].user_id;
+
+    db.query('SELECT * FROM users WHERE email = ? AND id <> ?', [email, userId], (emailErr, existing) => {
+      if (emailErr) return res.status(500).json({ error: emailErr });
+      if (existing.length > 0) {
+        return res.status(400).json({ message: 'Email déjà utilisé par un autre compte.' });
+      }
+
+      const updateFormateurUser = (hashedPassword) => {
+        const userSql = mot_de_passe
+          ? 'UPDATE users SET nom = ?, email = ?, mot_de_passe = ? WHERE id = ?'
+          : 'UPDATE users SET nom = ?, email = ? WHERE id = ?';
+        const params = mot_de_passe
+          ? [nom, email, hashedPassword, userId]
+          : [nom, email, userId];
+
+        db.query(userSql, params, (userErr) => {
+          if (userErr) return res.status(500).json({ error: userErr });
+
+          db.query(
+            'UPDATE formateurs SET specialite = ? WHERE id = ?',
+            [specialite || null, id],
+            (formateurErr) => {
+              if (formateurErr) return res.status(500).json({ error: formateurErr });
+              res.json({ message: 'Formateur mis à jour avec succès.' });
+            }
+          );
+        });
+      };
+
+      if (mot_de_passe) {
+        bcrypt.hash(mot_de_passe, 10, (hashErr, hashedPassword) => {
+          if (hashErr) return res.status(500).json({ error: hashErr });
+          updateFormateurUser(hashedPassword);
+        });
+      } else {
+        updateFormateurUser(null);
+      }
+    });
+  });
+});
+
+/* =========================
+   ❌ DELETE FORMATEUR
+========================= */
+router.delete('/formateurs/:id', (req, res) => {
   const { id } = req.params;
 
-  db.query('DELETE FROM formations WHERE id = ?', [id], (err) => {
-    if (err) return res.status(500).json(err);
+  db.query('SELECT * FROM formations WHERE formateur_id = ?', [id], (err, formations) => {
+    if (err) return res.status(500).json({ error: err });
+    if (formations.length > 0) {
+      return res.status(400).json({ message: 'Impossible de supprimer un formateur lié à des formations.' });
+    }
 
-    res.json({ message: 'Formation supprimée ❌' });
-  });
-});
-// 📊 Stats
-router.get('/stats', (req, res) => {
-  const stats = {};
+    db.query('SELECT user_id FROM formateurs WHERE id = ?', [id], (formateurErr, results) => {
+      if (formateurErr) return res.status(500).json({ error: formateurErr });
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Formateur introuvable.' });
+      }
 
-  db.query('SELECT COUNT(*) AS total FROM etudiants', (err, e) => {
-    stats.etudiants = e[0].total;
+      const userId = results[0].user_id;
 
-    db.query('SELECT COUNT(*) AS total FROM formateurs', (err, f) => {
-      stats.formateurs = f[0].total;
+      db.query('DELETE FROM formateurs WHERE id = ?', [id], (deleteFormateurErr) => {
+        if (deleteFormateurErr) return res.status(500).json({ error: deleteFormateurErr });
 
-      db.query('SELECT COUNT(*) AS total FROM formations', (err, fo) => {
-        stats.formations = fo[0].total;
-
-        db.query('SELECT COUNT(*) AS total FROM inscriptions', (err, i) => {
-          stats.inscriptions = i[0].total;
-
-          res.json(stats);
+        db.query('DELETE FROM users WHERE id = ?', [userId], (deleteUserErr) => {
+          if (deleteUserErr) return res.status(500).json({ error: deleteUserErr });
+          res.json({ message: 'Formateur supprimé avec succès.' });
         });
       });
     });
   });
 });
+
+/* =========================
+   📊 STATS
+========================= */
+router.get('/stats', (req, res) => {
+
+  const sql = `
+    SELECT 
+      (SELECT COUNT(*) FROM users WHERE role='etudiant') AS etudiants,
+      (SELECT COUNT(*) FROM formateurs) AS formateurs,
+      (SELECT COUNT(*) FROM formations) AS formations,
+      (SELECT COUNT(*) FROM formations WHERE status='published') AS published
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results[0]);
+  });
+});
+
+/* =========================
+   🔔 FORMATIONS EN ATTENTE D'APPROBATION
+========================= */
+router.get('/formations-pending', (req, res) => {
+  const sql = `
+    SELECT 
+      f.id,
+      f.titre,
+      f.description,
+      f.date_debut,
+      f.date_fin,
+      f.duree,
+      f.niveau,
+      f.departement,
+      f.nb_places,
+      f.status,
+      f.formateur_id,
+      u.nom AS formateur,
+      u.email AS formateur_email
+    FROM formations f
+    LEFT JOIN formateurs fo ON f.formateur_id = fo.id
+    LEFT JOIN users u ON fo.user_id = u.id
+    WHERE f.status = 'pending_approval'
+    ORDER BY f.id DESC
+  `;
+
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+});
+
+/* =========================
+   ✅ APPROUVER & PUBLIER UNE FORMATION
+========================= */
+router.put('/formations/:id/approve-and-publish', (req, res) => {
+  const formationId = parseInt(req.params.id);
+
+  if (isNaN(formationId)) {
+    return res.status(400).json({ error: 'Formation ID invalide' });
+  }
+
+  const sql = `
+    UPDATE formations
+    SET status = 'published'
+    WHERE id = ? AND status = 'pending_approval'
+  `;
+
+  db.query(sql, [formationId], (err, result) => {
+    if (err) {
+      console.error('Erreur SQL /formations/:id/approve-and-publish:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Formation non trouvée ou déjà approuvée' });
+    }
+    res.json({ message: 'Formation approuvée et publiée 🚀' });
+  });
+});
+
+/* =========================
+   ❌ REJETER UNE FORMATION
+========================= */
+router.put('/formations/:id/reject', (req, res) => {
+  const formationId = parseInt(req.params.id);
+  const { reason } = req.body;
+
+  if (isNaN(formationId)) {
+    return res.status(400).json({ error: 'Formation ID invalide' });
+  }
+
+  const sql = `
+    UPDATE formations
+    SET status = 'draft'
+    WHERE id = ? AND status = 'pending_approval'
+  `;
+
+  db.query(sql, [formationId], (err, result) => {
+    if (err) {
+      console.error('Erreur SQL /formations/:id/reject:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Formation non trouvée ou déjà approuvée' });
+    }
+    res.json({ message: `Formation rejetée et remise en draft 🔙 Raison: ${reason || 'Non spécifiée'}` });
+  });
+});
+
+module.exports = router;

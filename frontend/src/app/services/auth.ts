@@ -14,7 +14,8 @@ register(data: any) {
   return this.http.post(`${this.apiUrl}/register`, data);
 }
 logout() {
-  localStorage.removeItem('token'); // أو userId
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
   localStorage.removeItem('role');
 }
 }

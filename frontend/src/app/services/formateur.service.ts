@@ -6,6 +6,12 @@ export interface Formation {
   titre: string;
   description: string;
   date_debut: string;
+  date_fin?: string;
+  duree?: number;
+  niveau?: string;
+  departement?: string;
+  nb_places?: number;
+  status?: 'draft' | 'published';
   formateur_id: number;
 }
 
@@ -23,14 +29,51 @@ export class FormateurService {
     return this.http.get<any[]>(`${this.api}/mes-formations/${formateurId}`);
   }
 
+  // 🔹 Récupérer le profil formateur à partir de l'utilisateur connecté
+  getProfil(userId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/profil/${userId}`);
+  }
+
   // 🔹 Récupérer les inscriptions pour une formation
   getInscriptions(formationId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/inscriptions/${formationId}`);
   }
 
+  // 🔹 Récupérer les supports d'une formation
+  getSupports(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/supports/${formationId}`);
+  }
+
   // 🔹 Créer une formation
   creerFormation(formation: Formation): Observable<any> {
     return this.http.post(`${this.api}/creer-formation`, formation);
+  }
+
+  // 🔹 Mettre à jour une formation
+  modifierFormation(formationId: number, formation: Partial<Formation>): Observable<any> {
+    return this.http.put(`${this.api}/formations/${formationId}`, formation);
+  }
+
+  // 🔹 Soumettre une formation à l'admin pour approbation
+  soumettreFormationPourApprobation(formationId: number, formateurId: number): Observable<any> {
+    return this.http.put(`${this.api}/formations/${formationId}/submit-for-approval`, { formateur_id: formateurId });
+  }
+
+  // 🔹 Supprimer une formation
+  supprimerFormation(formationId: number, formateurId: number): Observable<any> {
+    return this.http.delete(`${this.api}/formations/${formationId}`, {
+      body: { formateur_id: formateurId }
+    });
+  }
+
+  // 🔹 Récupérer les statistiques du formateur
+  getStats(formateurId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/stats/${formateurId}`);
+  }
+
+  // 🔹 Valider la présence d'un étudiant
+  mettreAJourStatutInscription(inscriptionId: number, statut: string): Observable<any> {
+    return this.http.put(`${this.api}/inscriptions/${inscriptionId}/status`, { statut });
   }
 
   // 🔹 Ajouter un support à une formation
@@ -40,5 +83,10 @@ export class FormateurService {
       type,
       fichier
     });
+  }
+
+  // 🔹 Supprimer un support
+  supprimerSupport(supportId: number): Observable<any> {
+    return this.http.delete(`${this.api}/supports/${supportId}`);
   }
 }

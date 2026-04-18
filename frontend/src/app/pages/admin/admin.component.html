@@ -1,231 +1,546 @@
 <div class="container-fluid mt-4">
-  <div class="row">
+  <div class="row gx-4">
 
-    <!-- ASIDE -->
-    <aside class="col-md-3 col-lg-2 bg-light p-3 shadow-sm">
-      <h5 class="mb-4 text-primary fw-bold">👑 Menu Admin</h5>
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="col-md-4 col-lg-3 mb-4 mb-md-0 admin-sidebar">
+      <div class="sidebar-card p-4 shadow-sm rounded-4 bg-white h-100">
+        <div class="mb-4">
+          <h5 class="mb-1 text-primary fw-bold">Admin Console</h5>
+          <p class="text-muted small mb-0">Gestion des utilisateurs, formations et formateurs</p>
+        </div>
 
-      <button class="btn btn-outline-danger mb-3 w-100" (click)="logout()">
-        🔒 Déconnexion
-      </button>
-
-      <ul class="nav flex-column">
-
-        <li class="nav-item mb-2">
+        <nav class="nav flex-column gap-2">
           <a class="nav-link"
              [class.active]="activeSection === 'accueil'"
              (click)="setSection('accueil')">
-            🏠 Accueil
+            🏠 Dashboard
           </a>
-        </li>
 
-        <li class="nav-item mb-2">
           <a class="nav-link"
              [class.active]="activeSection === 'utilisateurs'"
              (click)="setSection('utilisateurs')">
             👥 Utilisateurs
           </a>
-        </li>
 
-        <li class="nav-item mb-2">
           <a class="nav-link"
              [class.active]="activeSection === 'formations'"
              (click)="setSection('formations')">
             📚 Formations
           </a>
-        </li>
 
-      </ul>
+          <a class="nav-link"
+             [class.active]="activeSection === 'approvals'"
+             (click)="setSection('approvals')">
+            🔔 Approbations <span class="badge bg-warning" *ngIf="formationsPending.length">{{ formationsPending.length }}</span>
+          </a>
+
+          <a class="nav-link"
+             [class.active]="activeSection === 'formateurs'"
+             (click)="setSection('formateurs')">
+            👨‍🏫 Formateurs
+          </a>
+        </nav>
+
+        <div class="mt-4 pt-3 border-top">
+          <button class="btn btn-outline-danger w-100" (click)="logout()">Se déconnecter</button>
+        </div>
+      </div>
     </aside>
 
-    <!-- CONTENU -->
-    <main class="col-md-9 col-lg-10">
+    <!-- ===== MAIN ===== -->
+    <main class="col-md-8 col-lg-9">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+          <h2 class="mb-1 text-dark">Tableau de bord Admin</h2>
+          <p class="text-muted mb-0">Vue générale des activités et du contenu.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary" (click)="setSection('formations')">Voir les formations</button>
+        </div>
+      </div>
 
-      <h2 class="mb-4 text-primary fw-bold">👑 Tableau de bord Admin</h2>
+      <!-- ================= DASHBOARD ================= -->
+      <section *ngIf="activeSection === 'accueil'" class="section-card">
 
-      <!-- ACCUEIL -->
-      <section *ngIf="activeSection === 'accueil'">
-        <div class="alert alert-info">
-          👋 Bienvenue Admin ! Gérez utilisateurs et formations depuis ce dashboard.
+        <div class="row gy-3">
+          <div class="col-sm-6 col-xl-3">
+            <div class="dashboard-card p-4 shadow-sm rounded-4 bg-white h-100">
+              <div class="text-uppercase text-muted small mb-2">Utilisateurs</div>
+              <h3 class="mb-0">{{ stats.etudiants + stats.formateurs }}</h3>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-3">
+            <div class="dashboard-card p-4 shadow-sm rounded-4 bg-white h-100">
+              <div class="text-uppercase text-muted small mb-2">Formateurs</div>
+              <h3 class="mb-0">{{ stats.formateurs }}</h3>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-3">
+            <div class="dashboard-card p-4 shadow-sm rounded-4 bg-white h-100">
+              <div class="text-uppercase text-muted small mb-2">Formations</div>
+              <h3 class="mb-0">{{ stats.formations }}</h3>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-xl-3">
+            <div class="dashboard-card p-4 shadow-sm rounded-4 bg-white h-100">
+              <div class="text-uppercase text-muted small mb-2">Publiées</div>
+              <h3 class="mb-0">{{ stats.published }}</h3>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- UTILISATEURS -->
-      <section *ngIf="activeSection === 'utilisateurs'">
-        <h4 class="mb-3">👥 Liste des utilisateurs</h4>
+      <!-- ================= USERS (FIXED) ================= -->
+      <section *ngIf="activeSection === 'utilisateurs'" class="section-card">
 
-        <table class="table table-bordered table-striped" *ngIf="users.length">
-          <thead class="table-dark">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h4 class="mb-1">👥 Liste des utilisateurs</h4>
+            <p class="text-muted small mb-0">Gérez les comptes étudiant et formateur.</p>
+          </div>
+        </div>
+
+        <div class="table-card table-responsive p-3 shadow-sm mb-4">
+          <table class="table table-bordered table-striped mb-0" *ngIf="users.length">
+            <thead class="table-dark">
+              <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let u of users">
+                <td>{{ u.nom }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                  <span class="badge bg-primary">{{ u.role }}</span>
+                </td>
+                <td>
+                  <button class="btn btn-danger btn-sm"
+                          (click)="deleteUser(u.id)">
+                    ❌
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+      <!-- ================= FORMATIONS ================= -->
+      <section *ngIf="activeSection === 'formations'">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4>📚 Formations</h4>
+
+          <button class="btn btn-success" (click)="openAddForm()">
+            ➕ Ajouter
+          </button>
+        </div>
+
+
+         
+
+        <!-- TABLE -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-4">
+            <input type="search" class="form-control" placeholder="Rechercher un titre..."
+                   [(ngModel)]="searchTerm">
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" [(ngModel)]="statusFilter">
+              <option value="">Tous les statuts</option>
+              <option value="draft">Brouillon</option>
+              <option value="published">Publié</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <select class="form-control" [(ngModel)]="departmentFilter">
+              <option value="">Tous les départements</option>
+              <option>Informatique</option>
+              <option>Génie électrique</option>
+              <option>Mécanique</option>
+              <option>Génie civil</option>
+            </select>
+          </div>
+          <div class="col-md-2 text-end">
+            <small class="text-muted">{{ filteredFormations.length }} résultat(s)</small>
+          </div>
+        </div>
+
+        <div class="table-card table-responsive p-3 shadow-sm mb-4">
+          <table class="table table-bordered table-hover mb-0" *ngIf="filteredFormations.length">
+            <thead class="table-dark">
+              <tr>
+                <th>Titre</th>
+                <th>Formateur</th>
+                <th>Département</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let f of paginatedFormations">
+
+              <td>{{ f.titre }}</td>
+              <td>{{ f.formateur }}</td>
+              <td>{{ f.departement }}</td>
+              <td>{{ f.date_debut | date:'dd/MM/yyyy' }}</td>
+
+              <td>
+                <span class="badge bg-warning text-dark" *ngIf="f.status === 'draft'">
+                  Brouillon
+                </span>
+                <span class="badge bg-success" *ngIf="f.status === 'published'">
+                  Publié
+                </span>
+              </td>
+
+              <td>
+                <button class="btn btn-warning btn-sm me-1"
+                        (click)="editFormation(f)">✏️</button>
+
+                <button class="btn btn-danger btn-sm me-1"
+                        (click)="deleteFormation(f.id)">❌</button>
+
+                <button class="btn btn-success btn-sm"
+                        *ngIf="f.status !== 'published'"
+                        (click)="publishFormation(f.id)">🚀</button>
+              </td>
+
+            </tr>
+          </tbody>
+          </table>
+        </div>
+
+        <nav *ngIf="pageCount > 1" class="d-flex justify-content-end mb-4">
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" type="button" (click)="changePage(currentPage - 1)">Précédent</button>
+            </li>
+            <li class="page-item" *ngFor="let page of paginationPages" [class.active]="page === currentPage">
+              <button class="page-link" type="button" (click)="changePage(page)">{{ page }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === pageCount">
+              <button class="page-link" type="button" (click)="changePage(currentPage + 1)">Suivant</button>
+            </li>
+          </ul>
+        </nav>
+
+        <!-- EMPTY STATE -->
+        <div *ngIf="formations.length > 0 && filteredFormations.length === 0" class="text-center text-muted mt-4">
+          Aucun résultat correspondant
+        </div>
+        <div *ngIf="formations.length === 0" class="text-center text-muted mt-4">
+          Aucune formation disponible
+        </div>
+
+        <!-- ================= FORM ================= -->
+        <div *ngIf="showFormationForm" class="form-card mt-4">
+
+          <h4 *ngIf="!editFormationMode">➕ Ajouter une formation</h4>
+          <h4 *ngIf="editFormationMode">✏️ Modifier une formation</h4>
+
+          <div *ngIf="message" class="alert" [ngClass]="{
+            'alert-success': messageType === 'success',
+            'alert-warning': messageType === 'warning',
+            'alert-danger': messageType === 'danger',
+            'alert-info': messageType === 'info'
+          }" role="alert">
+            {{ message }}
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Titre</label>
+            <input class="form-control" name="titre" [(ngModel)]="formData.titre">
+            <small *ngIf="formDataErrors.titre" class="text-danger">{{ formDataErrors.titre }}</small>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" name="description"
+                      [(ngModel)]="formData.description"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <label>Date début</label>
+              <input type="date" class="form-control" name="date_debut"
+                     [(ngModel)]="formData.date_debut">
+              <small *ngIf="formDataErrors.date_debut" class="text-danger">{{ formDataErrors.date_debut }}</small>
+            </div>
+
+            <div class="col-md-6 mb-2">
+              <label>Date fin</label>
+              <input type="date" class="form-control" name="date_fin"
+                     [(ngModel)]="formData.date_fin">
+              <small *ngIf="formDataErrors.date_fin" class="text-danger">{{ formDataErrors.date_fin }}</small>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <label>Durée (h)</label>
+              <input type="number" class="form-control" name="duree"
+                     [(ngModel)]="formData.duree">
+              <small *ngIf="formDataErrors.duree" class="text-danger">{{ formDataErrors.duree }}</small>
+            </div>
+
+            <div class="col-md-6 mb-2">
+              <label>Niveau</label>
+              <select class="form-control" name="niveau"
+                      [(ngModel)]="formData.niveau">
+                <option value="">-- Choisir niveau --</option>
+                <option>Débutant</option>
+                <option>Intermédiaire</option>
+                <option>Avancé</option>
+              </select>
+              <small *ngIf="formDataErrors.niveau" class="text-danger">{{ formDataErrors.niveau }}</small>
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label>Département</label>
+            <select class="form-control" name="departement"
+                    [(ngModel)]="formData.departement">
+              <option value="">-- Choisir département --</option>
+              <option>Informatique</option>
+              <option>Génie électrique</option>
+              <option>Mécanique</option>
+              <option>Génie civil</option>
+            </select>
+            <small *ngIf="formDataErrors.departement" class="text-danger">{{ formDataErrors.departement }}</small>
+          </div>
+
+          <div class="mb-2">
+            <label>Formateur</label>
+            <select class="form-control" name="formateur_id"
+                    [(ngModel)]="formData.formateur_id">
+              <option value="">-- Choisir un formateur --</option>
+              <option *ngFor="let f of formateurs" [value]="f.id">
+                {{ f.nom }}
+              </option>
+            </select>
+            <small *ngIf="formDataErrors.formateur_id" class="text-danger">{{ formDataErrors.formateur_id }}</small>
+          </div>
+
+          <div class="mb-2">
+            <label>Places</label>
+            <input type="number" class="form-control" name="nb_places"
+                   [(ngModel)]="formData.nb_places">
+            <small *ngIf="formDataErrors.nb_places" class="text-danger">{{ formDataErrors.nb_places }}</small>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button type="button" class="btn btn-primary" (click)="saveFormation()" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              💾 Enregistrer
+            </button>
+
+            <button type="button" class="btn btn-secondary" (click)="closeForm()" [disabled]="loading">
+              ❌ Annuler
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================= FORMATEURS ================= -->
+      <section *ngIf="activeSection === 'formateurs'" class="section-card">
+
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-3">
+          <div>
+            <h4 class="mb-1">👨‍🏫 Formateurs</h4>
+            <p class="text-muted small mb-0">Recherchez, filtrez et gérez les formateurs.</p>
+          </div>
+
+          <button class="btn btn-success" (click)="openAddFormateur()">
+            ➕ Ajouter
+          </button>
+        </div>
+
+        <div class="row g-3 mb-4 filters-row">
+          <div class="col-md-4">
+            <input type="search" class="form-control" placeholder="Rechercher formateur..."
+                   [(ngModel)]="formateurSearch" (ngModelChange)="resetFormateurPage()">
+          </div>
+          <div class="col-md-4">
+            <select class="form-control" [(ngModel)]="formateurSpecialiteFilter" (ngModelChange)="resetFormateurPage()">
+              <option value="">Toutes spécialités</option>
+              <option *ngFor="let option of formateurSpecialiteOptions" [value]="option">{{ option }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <select class="form-control" [(ngModel)]="formateurSort">
+              <option value="nom">Trier par nom</option>
+              <option value="email">Trier par email</option>
+              <option value="specialite">Trier par spécialité</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <small class="text-muted">{{ filteredFormateurs.length }} formateur(s)</small>
+          <div *ngIf="formateurPageCount > 1" class="pagination-sm">
+            <nav>
+              <ul class="pagination mb-0">
+                <li class="page-item" [class.disabled]="formateurCurrentPage === 1">
+                  <button class="page-link" type="button" (click)="changeFormateurPage(formateurCurrentPage - 1)">Précédent</button>
+                </li>
+                <li class="page-item" *ngFor="let page of formateurPaginationPages" [class.active]="page === formateurCurrentPage">
+                  <button class="page-link" type="button" (click)="changeFormateurPage(page)">{{ page }}</button>
+                </li>
+                <li class="page-item" [class.disabled]="formateurCurrentPage === formateurPageCount">
+                  <button class="page-link" type="button" (click)="changeFormateurPage(formateurCurrentPage + 1)">Suivant</button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <div class="table-card table-responsive p-3 shadow-sm mb-4">
+          <table class="table table-bordered table-hover mb-0" *ngIf="paginatedFormateurs.length">
+            <thead class="table-dark">
             <tr>
               <th>Nom</th>
               <th>Email</th>
-              <th>Rôle</th>
+              <th>Spécialité</th>
+              <th>Actions</th>
             </tr>
           </thead>
-
           <tbody>
-            <tr *ngFor="let u of users">
-              <td>{{ u.nom }}</td>
-              <td>{{ u.email }}</td>
+            <tr *ngFor="let f of paginatedFormateurs">
+              <td>{{ f.nom }}</td>
+              <td>{{ f.email }}</td>
+              <td>{{ f.specialite || '-' }}</td>
               <td>
-                <span class="badge bg-primary">{{ u.role }}</span>
+                <button class="btn btn-warning btn-sm me-1" (click)="editFormateur(f)">✏️</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteFormateur(f.id)">❌</button>
               </td>
             </tr>
           </tbody>
         </table>
+        </div>
 
-        <p *ngIf="!users.length" class="text-muted">
-          Aucun utilisateur disponible.
-        </p>
+        <div *ngIf="formateurs.length > 0 && filteredFormateurs.length === 0" class="text-center text-muted mt-4">
+          Aucun résultat correspondant
+        </div>
+
+        <div *ngIf="formateurs.length === 0" class="text-center text-muted mt-4">
+          Aucun formateur disponible
+        </div>
+
+        <div *ngIf="showFormateurForm" class="form-card mt-4">
+          <h4 *ngIf="!editFormateurMode">➕ Ajouter un formateur</h4>
+          <h4 *ngIf="editFormateurMode">✏️ Modifier un formateur</h4>
+
+          <div class="mb-2">
+            <label class="form-label">Nom</label>
+            <input class="form-control" name="nom" [(ngModel)]="formateurForm.nom">
+            <small *ngIf="formateurErrors.nom" class="text-danger">{{ formateurErrors.nom }}</small>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" [(ngModel)]="formateurForm.email">
+            <small *ngIf="formateurErrors.email" class="text-danger">{{ formateurErrors.email }}</small>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" class="form-control" name="mot_de_passe" [(ngModel)]="formateurForm.mot_de_passe" placeholder="Laissez vide pour ne pas changer">
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Spécialité</label>
+            <select class="form-control" name="specialite" [(ngModel)]="formateurForm.specialite">
+              <option value="">-- Choisir spécialité --</option>
+              <option *ngFor="let option of formateurSpecialiteOptions" [value]="option">{{ option }}</option>
+            </select>
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button type="button" class="btn btn-primary" (click)="saveFormateur()" [disabled]="loading">
+              <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+              💾 Enregistrer
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="closeFormateurForm()" [disabled]="loading">
+              ❌ Annuler
+            </button>
+          </div>
+        </div>
+
       </section>
 
-      <!-- FORMATIONS -->
-      <!-- FORMATIONS -->
-<section *ngIf="activeSection === 'formations'">
+      <!-- ================= APPROBATIONS ================= -->
+      <section *ngIf="activeSection === 'approvals'">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>📚 Liste des formations</h4>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4>🔔 Formations en attente d'approbation</h4>
+            <p class="text-muted small mb-0">{{ formationsPending.length }} formation(s) en attente de votre approbation</p>
+          </div>
+        </div>
 
-    <button class="btn btn-success" (click)="openAddForm()">
-      ➕ Ajouter formation
-    </button>
-  </div>
+        <div *ngIf="formationsPending.length === 0" class="alert alert-info">
+          ✅ Aucune formation en attente d'approbation
+        </div>
 
-  <table class="table table-bordered table-striped" *ngIf="formations.length">
-    <thead class="table-dark">
-      <tr>
-        <th>Titre</th>
-        <th>Description</th>
-        <th>Date début</th>
-        <th>Mode</th>
-        <th>Département</th>
-        <th>Formateur</th>
-        <th>Prix</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
+        <div *ngIf="formationsPending.length > 0" class="row g-3">
+          <div *ngFor="let f of formationsPending" class="col-lg-6">
+            <div class="card shadow-sm h-100">
+              <div class="card-body">
+                <h6 class="card-title text-primary fw-bold">{{ f.titre }}</h6>
+                <p class="card-text small text-muted">{{ f.description }}</p>
 
-    <tbody>
-      <tr *ngFor="let f of formations">
-        <td>{{ f.titre }}</td>
-        <td>{{ f.description }}</td>
-        <td>{{ f.date_debut | date:'dd/MM/yyyy' }}</td>
+                <div class="row g-2 small mb-2">
+                  <div class="col-6">
+                    <strong>📅 Début:</strong> {{ f.date_debut | date:'dd/MM/yyyy' }}
+                  </div>
+                  <div class="col-6">
+                    <strong>📅 Fin:</strong> {{ f.date_fin ? (f.date_fin | date:'dd/MM/yyyy') : 'Non défini' }}
+                  </div>
+                  <div class="col-6">
+                    <strong>👨‍🏫 Formateur:</strong> {{ f.formateur }}
+                  </div>
+                  <div class="col-6">
+                    <strong>📧 Email:</strong> {{ f.formateur_email }}
+                  </div>
+                  <div class="col-6">
+                    <strong>🎯 Niveau:</strong> {{ f.niveau || 'Non défini' }}
+                  </div>
+                  <div class="col-6">
+                    <strong>🏢 Département:</strong> {{ f.departement || 'Non défini' }}
+                  </div>
+                </div>
 
-        <td>{{ f.mode }}</td>
-        <td>{{ f.departement }}</td>
-        <td>{{ f.formateur }}</td>
-        <td>{{ f.prix }} DT</td>
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+                  <button class="btn btn-success btn-sm" 
+                          (click)="approveAndPublishFormation(f.id)">
+                    ✅ Approuver & Publier
+                  </button>
+                  <button class="btn btn-danger btn-sm" 
+                          (click)="rejectFormation(f.id)">
+                    ❌ Rejeter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <td>
-          <button class="btn btn-warning btn-sm me-2"
-                  (click)="editFormation(f)">
-            ✏️
-          </button>
+      </section>
 
-          <button class="btn btn-danger btn-sm"
-                  (click)="deleteFormation(f.id)">
-            ❌
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p *ngIf="!formations.length" class="text-muted">
-    Aucune formation disponible.
-  </p>
-
-  <!-- FORM AJOUT / EDIT -->
-  <div *ngIf="showForm" class="card p-4 mt-4 shadow border-0">
-
-    <h5 *ngIf="!editMode">➕ Ajouter formation</h5>
-    <h5 *ngIf="editMode">✏️ Modifier formation</h5>
-
-    <!-- 📚 titre -->
-    <div class="mb-2">
-      <label class="form-label">📚 Titre</label>
-      <input class="form-control" [(ngModel)]="formData.titre">
-    </div>
-
-    <!-- 📝 description -->
-    <div class="mb-2">
-      <label class="form-label">📝 Description</label>
-      <textarea class="form-control" [(ngModel)]="formData.description"></textarea>
-    </div>
-
-    <div class="row">
-
-      <!-- 📅 date début -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">📅 Date début</label>
-        <input type="date" class="form-control" [(ngModel)]="formData.date_debut">
-      </div>
-
-      <!-- 📅 date fin -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">📅 Date fin</label>
-        <input type="date" class="form-control" [(ngModel)]="formData.date_fin">
-      </div>
-
-    </div>
-
-    <div class="row">
-
-      <!-- ⏱ durée -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">⏱ Durée (heures)</label>
-        <input type="number" class="form-control" [(ngModel)]="formData.duree">
-      </div>
-
-      <!-- 👨‍🏫 formateur -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">👨‍🏫 Formateur</label>
-        <input class="form-control" [(ngModel)]="formData.formateur">
-      </div>
-
-    </div>
-
-    <div class="row">
-
-      <!-- 🎯 département -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">🎯 Département</label>
-        <input class="form-control" [(ngModel)]="formData.departement">
-      </div>
-
-      <!-- 💰 prix -->
-      <div class="col-md-6 mb-2">
-        <label class="form-label">💰 Prix (DT)</label>
-        <input type="number" class="form-control" [(ngModel)]="formData.prix">
-      </div>
-
-    </div>
-
-    <!-- 📍 mode -->
-    <div class="mb-2">
-      <label class="form-label">📍 Mode</label>
-      <select class="form-control" [(ngModel)]="formData.mode">
-        <option>En ligne</option>
-        <option>Présentiel</option>
-      </select>
-    </div>
-
-    <!-- BUTTONS -->
-    <div class="d-flex gap-2 mt-3">
-
-      <button class="btn btn-primary" (click)="saveFormation()">
-        💾 Enregistrer
-      </button>
-
-      <button class="btn btn-secondary" (click)="closeForm()">
-        ❌ Annuler
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
     </main>
   </div>
 </div>
