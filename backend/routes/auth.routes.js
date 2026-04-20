@@ -18,29 +18,33 @@ router.post('/login', (req, res) => {
 
     const user = results[0];
 
-    // Vérification du mot de passe hashé
     const valid = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
     if (!valid) return res.status(401).json({ message: 'Identifiants incorrects' });
 
-    // 🔹 Création du token JWT
     const token = jwt.sign(
       { id: user.id, role: user.role },
-      process.env.JWT_SECRET || 'secret', // clé secrète par défaut
+      process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
 
-    // 🔹 Renvoi du token et infos utilisateur
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        nom: user.nom,
-        email: user.email,
-        role: user.role
-      }
-    });
+    const baseUser = { id: user.id, nom: user.nom, email: user.email, role: user.role };
+
+    if (user.role === 'etudiant') {
+      db.query('SELECT id FROM etudiants WHERE user_id = ?', [user.id], (err2, rows) => {
+        if (err2) return res.status(500).json(err2);
+        res.json({ token, user: { ...baseUser, etudiantId: rows[0]?.id || null } });
+      });
+    } else if (user.role === 'formateur') {
+      db.query('SELECT id FROM formateurs WHERE user_id = ?', [user.id], (err2, rows) => {
+        if (err2) return res.status(500).json(err2);
+        res.json({ token, user: { ...baseUser, formateurId: rows[0]?.id || null } });
+      });
+    } else {
+      res.json({ token, user: baseUser });
+    }
   });
 });
+
 
 router.post('/register', async (req, res) => {
   const { nom, email, mot_de_passe, role, specialite, departement, niveau, cin } = req.body;
