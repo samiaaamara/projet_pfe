@@ -1,393 +1,435 @@
-<div class="container-fluid mt-4">
-  <div class="row">
+<div class="dashboard-wrapper">
+ 
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+      <div class="sidebar-username">{{ user?.nom }}</div>
+      <div class="sidebar-role">Formateur</div>
+    </div>
 
-    <!-- ================= ASIDE ================= -->
-    <aside class="col-md-3 col-lg-2 p-4 admin-sidebar sidebar-card shadow-sm">
-      <div class="mb-4">
-        <h5 class="mb-1 text-primary fw-bold">👨‍🏫 Menu Formateur</h5>
-        <p class="text-muted small mb-0">Accès rapide à vos formations et supports.</p>
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeSection === 'accueil'" (click)="setSection('accueil')">
+        <span class="nav-icon">🏠</span> Accueil
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'creerFormation'" (click)="setSection('creerFormation')">
+        <span class="nav-icon">➕</span> {{ editMode ? 'Modifier formation' : 'Créer formation' }}
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'mesFormations'" (click)="setSection('mesFormations')">
+        <span class="nav-icon">📚</span> Mes formations
+        <span class="nav-badge" *ngIf="formations.length">{{ formations.length }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'supports'" (click)="setSection('supports')">
+        <span class="nav-icon">📎</span> Supports
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
+        <span class="nav-icon">👤</span> Mon profil
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'notifications'" (click)="openNotifications()">
+        <span class="nav-icon">🔔</span> Notifications
+        <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      🚪 Déconnexion
+    </button>
+  </aside>
+ 
+  <!-- CONTENU -->
+  <main class="main-content">
+ 
+    <!-- Alerte pending -->
+    <div *ngIf="pendingApprovalFormationsCount > 0" class="alert-banner alert-warning">
+      ⏳ {{ pendingApprovalFormationsCount }} formation(s) en attente d'approbation.
+    </div>
+ 
+    <!-- Message -->
+    <div *ngIf="message" class="alert-banner" [class.alert-success]="!message.startsWith('Erreur') && !message.startsWith('❌') && !message.startsWith('Impossible')" [class.alert-danger]="message.startsWith('Erreur') || message.startsWith('❌') || message.startsWith('Impossible')">
+      {{ message }}
+    </div>
+ 
+    <!-- ===== ACCUEIL ===== -->
+    <section *ngIf="activeSection === 'accueil'">
+      <div class="page-title">
+        <h2>Bonjour, {{ user?.nom }} 👨‍🏫</h2>
+        <p>Gérez vos formations et accompagnez vos étudiants</p>
       </div>
-
-      <ul class="nav flex-column">
-        <li class="nav-item mb-2">
-          <a class="nav-link"
-             [class.active]="activeSection === 'accueil'"
-             (click)="activeSection='accueil'">
-            🏠 Accueil
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link"
-             [class.active]="activeSection === 'creerFormation'"
-             (click)="activeSection='creerFormation'">
-            ➕ Créer formation
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link"
-             [class.active]="activeSection === 'mesFormations'"
-             (click)="activeSection='mesFormations'">
-            📚 Mes formations
-          </a>
-        </li>
-        <li class="nav-item mb-2">
-          <a class="nav-link"
-             [class.active]="activeSection === 'supports'"
-             (click)="activeSection='supports'">
-            📎 Supports pédagogiques
-          </a>
-        </li>
-      </ul>
-    </aside>
-
-    <!-- ================= CONTENU PRINCIPAL ================= -->
-    <main class="col-md-9 col-lg-10">
-
-      <div class="page-header mb-4">
-        <div>
-          <h2 class="mb-1 text-primary fw-bold">👨‍🏫 Tableau de bord Formateur</h2>
-          <p class="text-muted mb-0">ISET Tozeur — gestion universitaire moderne des formations, supports et inscriptions.</p>
+ 
+      <div class="stats-grid">
+        <div class="stat-card blue" (click)="setSection('mesFormations')">
+          <div class="stat-icon">📚</div>
+          <div class="stat-value">{{ stats.formations }}</div>
+          <div class="stat-label">Formations créées</div>
         </div>
-        <div class="brand-badge">ISET Tozeur</div>
+        <div class="stat-card green">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value">{{ stats.etudiants }}</div>
+          <div class="stat-label">Étudiants inscrits</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value">{{ publishedFormationsCount }}</div>
+          <div class="stat-label">Publiées</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value">{{ pendingApprovalFormationsCount }}</div>
+          <div class="stat-label">En attente d'approbation</div>
+        </div>
       </div>
-
-      <!-- Message général -->
-      <div *ngIf="message" class="alert alert-success shadow-sm">
-        {{ message }}
-      </div>
-
-      <!-- Notification formations en attente -->
-      <div *ngIf="pendingApprovalFormationsCount > 0" class="alert alert-warning shadow-sm">
-        ⚠️ Vous avez {{ pendingApprovalFormationsCount }} formation(s) en attente d'approbation par l'administrateur.
-        <a href="#" (click)="activeSection='mesFormations'">Voir mes formations</a>
-      </div>
-
-      <!-- 🏠 Accueil -->
-      <section *ngIf="activeSection === 'accueil'" class="section-card">
-        <div class="alert alert-info shadow-sm">
-          👋 Bienvenue sur votre espace Formateur.  
-          Créez de nouvelles formations et suivez vos étudiants.
-        </div>
-
-        <div class="row g-3 mt-3">
-          <div class="col-md-6 col-xl-3">
-            <div class="dashboard-card p-3 rounded shadow-sm bg-white">
-              <div class="small text-muted">Formations créées</div>
-              <h3 class="mb-0">{{ stats.formations }}</h3>
-            </div>
-          </div>
-          <div class="col-md-6 col-xl-3">
-            <div class="dashboard-card p-3 rounded shadow-sm bg-white">
-              <div class="small text-muted">Étudiants inscrits</div>
-              <h3 class="mb-0">{{ stats.etudiants }}</h3>
-            </div>
-          </div>
-          <div class="col-md-6 col-xl-3">
-            <div class="dashboard-card p-3 rounded shadow-sm bg-white">
-              <div class="small text-muted">Formations publiées</div>
-              <h3 class="mb-0 text-success">{{ publishedFormationsCount }}</h3>
-            </div>
-          </div>
-          <div class="col-md-6 col-xl-3">
-            <div class="dashboard-card p-3 rounded shadow-sm bg-white">
-              <div class="small text-muted">En attente d'approbation</div>
-              <h3 class="mb-0 text-warning">{{ pendingApprovalFormationsCount }}</h3>
-            </div>
-          </div>
-        </div>
-
-        <!-- Actions rapides -->
-        <div class="mt-4">
-          <h5>🚀 Actions rapides</h5>
-          <div class="d-flex gap-2 flex-wrap">
-            <button class="btn btn-primary" (click)="activeSection='creerFormation'">
-              ➕ Créer une formation
-            </button>
-            <button class="btn btn-outline-info" (click)="activeSection='mesFormations'">
-              📚 Voir mes formations
-            </button>
-            <button class="btn btn-outline-success" (click)="activeSection='supports'">
-              📎 Gérer les supports
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- ➕ Créer Formation -->
-      <section *ngIf="activeSection === 'creerFormation'" class="form-card">
-        <h4>{{ editMode ? '✏️ Mettre à jour la formation' : '➕ Créer une nouvelle formation' }}</h4>
-        <input type="text" class="form-control mb-2" placeholder="Titre" [(ngModel)]="titre">
-        <textarea class="form-control mb-2" placeholder="Description" [(ngModel)]="description"></textarea>
-
-        <div class="row g-2 mb-2">
-          <div class="col-md-6">
-            <label class="form-label small text-muted">Date de début</label>
-            <input type="date" class="form-control" [(ngModel)]="date_debut">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label small text-muted">Date de fin</label>
-            <input type="date" class="form-control" [(ngModel)]="date_fin">
-          </div>
-        </div>
-
-        <div class="row g-2 mb-2">
-          <div class="col-md-4">
-            <input type="number" class="form-control" placeholder="Durée (heures)" [(ngModel)]="duree">
-          </div>
-          <div class="col-md-4">
-            <select class="form-control" [(ngModel)]="niveau">
-              <option value="">Niveau</option>
-              <option *ngFor="let option of niveaux" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <select class="form-control" [(ngModel)]="departement">
-              <option value="">Département</option>
-              <option *ngFor="let option of departements" [value]="option">{{ option }}</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row g-2 mb-3">
-          <div class="col-md-6">
-            <input type="number" class="form-control" placeholder="Nombre de places" [(ngModel)]="nb_places">
-          </div>
-          <div class="col-md-6 d-flex align-items-end">
-            <div class="text-muted small">Statut initial : Brouillon</div>
-          </div>
-        </div>
-
-        <div class="d-flex gap-2">
-          <button class="btn btn-success" (click)="editMode ? modifierFormation() : creerFormation()">
-            {{ editMode ? 'Mettre à jour la formation' : 'Créer la formation' }}
+ 
+      <div class="card-section">
+        <h5 class="section-title">Actions rapides</h5>
+        <div class="actions-grid">
+          <button class="action-btn blue" (click)="setSection('creerFormation')">
+            <span>➕</span> Créer une formation
           </button>
-          <button class="btn btn-outline-secondary" *ngIf="editMode" (click)="annulerEditionFormation()">
+          <button class="action-btn green" (click)="setSection('mesFormations')">
+            <span>📚</span> Mes formations
+          </button>
+          <button class="action-btn purple" (click)="setSection('supports')">
+            <span>📎</span> Gérer les supports
+          </button>
+        </div>
+      </div>
+ 
+      <div class="card-section" *ngIf="formations.length > 0">
+        <h5 class="section-title">Dernières formations</h5>
+        <div class="recent-list">
+          <div class="recent-item" *ngFor="let f of formations.slice(0,3)">
+            <div class="recent-icon">📘</div>
+            <div class="recent-info">
+              <div class="recent-title">{{ f.titre }}</div>
+              <div class="recent-date">{{ f.date_debut | date:'dd/MM/yyyy' }} · {{ f.niveau || 'N/A' }}</div>
+            </div>
+            <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-published': f.status==='published'}">
+              {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ===== CRÉER / MODIFIER FORMATION ===== -->
+    <section *ngIf="activeSection === 'creerFormation'">
+      <div class="page-title">
+        <h2>{{ editMode ? '✏️ Modifier la formation' : '➕ Créer une formation' }}</h2>
+        <p>Remplissez les informations de la formation</p>
+      </div>
+ 
+      <div class="form-card">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Titre *</label>
+            <input type="text" [(ngModel)]="titre" placeholder="Titre de la formation">
+          </div>
+          <div class="form-group full">
+            <label>Description *</label>
+            <textarea [(ngModel)]="description" placeholder="Description détaillée" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Date de début *</label>
+            <input type="date" [(ngModel)]="date_debut">
+          </div>
+          <div class="form-group">
+            <label>Date de fin</label>
+            <input type="date" [(ngModel)]="date_fin">
+          </div>
+          <div class="form-group">
+            <label>Durée (heures)</label>
+            <input type="number" [(ngModel)]="duree" placeholder="Ex: 20">
+          </div>
+          <div class="form-group">
+            <label>Nombre de places</label>
+            <input type="number" [(ngModel)]="nb_places" placeholder="Ex: 30">
+          </div>
+          <div class="form-group">
+            <label>Niveau</label>
+            <select [(ngModel)]="niveau">
+              <option value="">-- Niveau --</option>
+              <option *ngFor="let n of niveaux" [value]="n">{{ n }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Département</label>
+            <select [(ngModel)]="departement">
+              <option value="">-- Département --</option>
+              <option *ngFor="let d of departements" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+        </div>
+ 
+        <div class="form-actions">
+          <button class="btn-save" (click)="editMode ? modifierFormation() : creerFormation()">
+            💾 {{ editMode ? 'Enregistrer les modifications' : 'Créer la formation' }}
+          </button>
+          <button class="btn-cancel" *ngIf="editMode" (click)="annulerEditionFormation(); setSection('mesFormations')">
             Annuler
           </button>
         </div>
-      </section>
-
-      <!-- 📚 Mes formations -->
-      <section *ngIf="activeSection === 'mesFormations'" class="section-card">
-        <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3 align-items-start">
-          <div>
-            <h4>📚 Mes formations</h4>
-            <p class="text-muted small mb-0">Cherchez, filtrez et publiez vos formations.</p>
-          </div>
-          <div class="d-flex gap-2 flex-wrap">
-            <input type="search" class="form-control" placeholder="Rechercher" [(ngModel)]="searchTerm">
-            <select class="form-control" [(ngModel)]="statusFilter">
-              <option value="">Tous les statuts</option>
-              <option value="draft">Brouillon</option>
-              <option value="pending_approval">En attente d'approbation</option>
-              <option value="published">Publié</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6 mb-3" *ngFor="let f of filteredFormations">
-            <div class="card shadow-sm h-100">
-              <div class="card-body d-flex flex-column">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="card-title mb-0">{{ f.titre }}</h5>
-                  <span class="badge" [ngClass]="{
-                    'bg-secondary': f.status === 'draft',
-                    'bg-warning': f.status === 'pending_approval',
-                    'bg-success': f.status === 'published'
-                  }">
-                    {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
-                  </span>
-                </div>
-                <p class="card-text text-muted">{{ f.description }}</p>
-                <div class="mb-2 text-muted small">
-                  Début : {{ f.date_debut | date:'dd/MM/yyyy' }}
-                  <span *ngIf="f.date_fin"> • Fin : {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
-                </div>
-                <div class="mb-2 text-muted small">
-                  {{ f.niveau || 'Niveau non défini' }} • {{ f.departement || 'Département non défini' }} • {{ f.nb_places || '0' }} places
-                </div>
-                <div class="d-flex gap-2 mt-auto flex-wrap">
-                  <button class="btn btn-outline-primary" (click)="voirInscriptions(f.id)">
-                    Voir inscriptions
-                  </button>
-                  <button class="btn btn-warning" (click)="ouvrirEditionFormation(f)" [disabled]="f.status === 'pending_approval'">
-                    ✏️ Modifier
-                  </button>
-                  <button class="btn btn-danger" (click)="supprimerFormation(f.id)" [disabled]="f.status === 'pending_approval'">
-                    ❌ Supprimer
-                  </button>
-                  <button class="btn btn-info" *ngIf="f.status === 'draft'" (click)="soumettreFormationPourApprobation(f.id)">
-                    ✉️ Soumettre à l'admin
-                  </button>
-                  <span class="badge bg-warning" *ngIf="f.status === 'pending_approval'">
-                    ⏳ En attente d'approbation
-                  </span>
-                  <span class="badge bg-success" *ngIf="f.status === 'published'">
-                    ✅ Publiée
-                  </span>
-                </div>
-              </div>
+      </div>
+    </section>
+ 
+    <!-- ===== MES FORMATIONS ===== -->
+    <section *ngIf="activeSection === 'mesFormations'">
+      <div class="page-title">
+        <h2>📚 Mes formations</h2>
+        <p>{{ formations.length }} formation(s) au total</p>
+      </div>
+ 
+      <!-- Filtres -->
+      <div class="filters-bar">
+        <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="🔍 Rechercher...">
+        <select class="filter-select" [(ngModel)]="statusFilter">
+          <option value="">Tous les statuts</option>
+          <option value="draft">Brouillon</option>
+          <option value="pending_approval">En attente</option>
+          <option value="published">Publié</option>
+        </select>
+      </div>
+ 
+      <div *ngIf="filteredFormations.length === 0" class="empty-state">
+        <span>📭</span>
+        <p>Aucune formation trouvée.</p>
+        <button class="btn-primary" (click)="setSection('creerFormation')">Créer une formation</button>
+      </div>
+ 
+      <div class="formations-list">
+        <div class="formation-item" *ngFor="let f of filteredFormations">
+          <div class="formation-item-header">
+            <div>
+              <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-published': f.status==='published'}">
+                {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
+              </span>
             </div>
           </div>
+          <h5 class="formation-item-title">{{ f.titre }}</h5>
+          <p class="formation-item-desc">{{ f.description }}</p>
+          <div class="formation-item-meta">
+            <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
+            <span *ngIf="f.niveau">🎓 {{ f.niveau }}</span>
+            <span *ngIf="f.nb_places">👥 {{ f.nb_places }} places</span>
+          </div>
+          <div class="formation-item-actions">
+            <button class="btn-action blue" (click)="voirInscriptions(f.id)">👥 Inscrits</button>
+            <button class="btn-action orange" (click)="ouvrirEditionFormation(f)" [disabled]="f.status === 'pending_approval'">✏️ Modifier</button>
+            <button class="btn-action purple" (click)="ajouterSupportDirect(f.id)">📎 Supports</button>
+            <button class="btn-action green" *ngIf="f.status === 'draft'" (click)="soumettreFormationPourApprobation(f.id)">✉️ Soumettre</button>
+            <button class="btn-action red" (click)="supprimerFormation(f.id)" [disabled]="f.status === 'pending_approval'">🗑️ Supprimer</button>
+          </div>
         </div>
-      </section>
-
-      <!-- ✅ Étudiants inscrits -->
-      <section *ngIf="inscriptions.length" class="mb-4">
-        <h5>✅ Étudiants inscrits à {{ formationSelectionnee?.titre }}</h5>
-        <table class="table table-bordered table-striped shadow-sm">
-          <thead class="table-dark">
-            <tr>
-              <th>Nom</th>
-              <th>Email</th>
-              <th>Statut</th>
-              <th>Date inscription</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let e of inscriptions">
-              <td>{{ e.nom }}</td>
-              <td>{{ e.email }}</td>
-              <td>
-                <span class="badge"
-                      [ngClass]="{
-                        'bg-success': e.statut === 'actif' || e.statut === 'présent',
-                        'bg-warning': e.statut === 'en attente',
-                        'bg-danger': e.statut === 'terminé' || e.statut === 'absent'
-                      }">
-                  {{ e.statut }}
+      </div>
+ 
+      <!-- Table inscriptions -->
+      <div class="card-section" *ngIf="inscriptions.length > 0">
+        <h5 class="section-title">👥 Étudiants inscrits — {{ formationSelectionnee?.titre }}</h5>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr><th>Nom</th><th>Email</th><th>Statut</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let e of inscriptions">
+                <td>{{ e.nom }}</td>
+                <td>{{ e.email }}</td>
+                <td><span class="status-badge" [ngClass]="{'status-published': e.statut==='présent', 'status-pending': e.statut==='en attente', 'status-draft': e.statut==='absent'}">{{ e.statut }}</span></td>
+                <td>{{ e.date_inscription | date:'dd/MM/yyyy' }}</td>
+                <td class="action-cell">
+                  <button class="btn-action green" *ngIf="e.statut !== 'présent'" (click)="validerPresence(e, 'présent')">Présent</button>
+                  <button class="btn-action red" *ngIf="e.statut !== 'absent'" (click)="validerPresence(e, 'absent')">Absent</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- ===== SUPPORTS ===== -->
+    <section *ngIf="activeSection === 'supports'">
+      <div class="page-title">
+        <h2>📎 Supports pédagogiques</h2>
+        <p *ngIf="!formationSelectionnee">Sélectionnez une formation pour gérer ses supports</p>
+        <p *ngIf="formationSelectionnee">Formation : <strong>{{ formationSelectionnee.titre }}</strong>
+          <button class="btn-back" (click)="formationSelectionnee = null">← Retour</button>
+        </p>
+      </div>
+ 
+      <!-- Liste formations pour choisir -->
+      <div *ngIf="!formationSelectionnee">
+        <div *ngIf="formations.length === 0" class="empty-state">
+          <span>📭</span><p>Aucune formation disponible.</p>
+        </div>
+        <div class="formations-grid-small" *ngIf="formations.length > 0">
+          <div class="formation-small-card" *ngFor="let f of formations" (click)="ajouterSupportDirect(f.id)">
+            <div class="formation-small-icon">📘</div>
+            <div class="formation-small-info">
+              <div class="formation-small-title">{{ f.titre }}</div>
+              <div class="formation-small-status">
+                <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-published': f.status==='published'}">
+                  {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
                 </span>
-              </td>
-              <td>{{ e.date_inscription | date:'dd/MM/yyyy' }}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-success me-1"
-                        *ngIf="e.statut !== 'présent'"
-                        (click)="validerPresence(e, 'présent')">
-                  Présent
-                </button>
-                <button class="btn btn-sm btn-outline-danger"
-                        *ngIf="e.statut !== 'absent'"
-                        (click)="validerPresence(e, 'absent')">
-                  Absent
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
-      <!-- 📎 Supports pédagogiques -->
-      <section *ngIf="activeSection === 'supports' && !formationSelectionnee" class="section-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h4>📎 Supports pédagogiques</h4>
-            <p class="text-muted small mb-0">Gérez les ressources pédagogiques de vos formations.</p>
-          </div>
-          <button class="btn btn-primary" (click)="activeSection='creerFormation'">
-            ➕ Nouvelle formation
-          </button>
-        </div>
-
-        <div *ngIf="formations.length === 0" class="alert alert-info">
-          Vous n'avez pas encore de formations. <a href="#" (click)="activeSection='creerFormation'">Créez-en une</a> pour ajouter des supports.
-        </div>
-
-        <div *ngIf="formations.length > 0" class="row">
-          <div class="col-md-4 mb-3" *ngFor="let f of formations">
-            <div class="card shadow-sm h-100">
-              <div class="card-body">
-                <h6 class="card-title text-primary">{{ f.titre }}</h6>
-                <p class="card-text small text-muted">{{ f.description | slice:0:80 }}...</p>
-
-                <div class="mb-2">
-                  <span class="badge" [ngClass]="{
-                    'bg-secondary': f.status === 'draft',
-                    'bg-warning': f.status === 'pending_approval',
-                    'bg-success': f.status === 'published'
-                  }">
-                    {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
-                  </span>
-                </div>
-
-                <div class="d-flex gap-2 flex-wrap">
-                  <button class="btn btn-outline-primary btn-sm" (click)="voirSupports(f.id)">
-                    📎 Voir supports ({{ f.supports?.length || 0 }})
-                  </button>
-                  <button class="btn btn-outline-success btn-sm" (click)="ajouterSupportDirect(f.id)">
-                    ➕ Ajouter support
-                  </button>
-                </div>
               </div>
+            </div>
+            <span class="chevron">›</span>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Gestion supports d'une formation -->
+      <div *ngIf="formationSelectionnee">
+        <!-- Formulaire ajout -->
+        <div class="form-card">
+          <h5 class="section-title">Ajouter un support</h5>
+          <div class="support-form-row">
+            <select class="filter-select" [(ngModel)]="supportType">
+              <option value="">Type de support</option>
+              <option value="PDF">📄 PDF</option>
+              <option value="Vidéo">🎬 Vidéo</option>
+              <option value="Présentation">📊 Présentation</option>
+              <option value="Exercice">✏️ Exercice</option>
+              <option value="Lien">🔗 Lien externe</option>
+              <option value="Autre">📎 Autre</option>
+            </select>
+ 
+            <div class="support-mode-toggle">
+              <button class="mode-btn" [class.active]="supportMode==='file'" (click)="supportMode='file'">📁 Fichier</button>
+              <button class="mode-btn" [class.active]="supportMode==='url'" (click)="supportMode='url'">🔗 URL</button>
+            </div>
+ 
+            <input *ngIf="supportMode==='url'" class="search-input" type="text" [(ngModel)]="supportFichier" placeholder="URL ou nom du fichier">
+            <input *ngIf="supportMode==='file'" class="search-input" type="file" (change)="onSupportFileChange($event)">
+ 
+            <button class="btn-save" style="white-space:nowrap" (click)="ajouterSupport()">Ajouter</button>
+          </div>
+        </div>
+ 
+        <!-- Liste supports -->
+        <div class="card-section">
+          <h5 class="section-title">Supports existants ({{ supports.length }})</h5>
+          <div *ngIf="supports.length === 0" class="empty-state">
+            <span>📭</span><p>Aucun support pour cette formation.</p>
+          </div>
+          <div class="supports-list">
+            <div class="support-item" *ngFor="let s of supports">
+              <div class="support-icon">
+                {{ s.type === 'PDF' ? '📄' : s.type === 'Vidéo' ? '🎬' : s.type === 'Présentation' ? '📊' : '📎' }}
+              </div>
+              <div class="support-info">
+                <div class="support-type">{{ s.type }}</div>
+                <div class="support-name">{{ s.fichier }}</div>
+              </div>
+              <button class="btn-action red" (click)="supprimerSupport(s.id ?? s.support_id)">🗑️</button>
             </div>
           </div>
         </div>
-      </section>
-
-      <!-- 📎 Ajouter support -->
-      <section *ngIf="activeSection === 'supports' && formationSelectionnee" class="section-card">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5>📎 Supports pour "{{ formationSelectionnee.titre }}"</h5>
-          <button class="btn btn-outline-secondary btn-sm" (click)="formationSelectionnee = null; activeSection = 'supports'">
-            ← Retour aux formations
-          </button>
+      </div>
+    </section>
+     <!-- ===== NOTIFICATIONS ===== -->
+    <section *ngIf="activeSection === 'notifications'">
+      <div class="page-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">
+        <div>
+          <h2>🔔 Notifications</h2>
+          <p>{{ unreadCount }} non lue(s) · {{ notifications.length }} au total</p>
         </div>
+        <button class="btn-mark-all" *ngIf="notifications.length > 0" (click)="marquerToutLu()">
+          ✅ Tout marquer comme lu
+        </button>
+      </div>
 
-        <!-- Formulaire ajout support -->
-        <div class="card mb-3">
-          <div class="card-body">
-            <h6 class="card-title">➕ Ajouter un nouveau support</h6>
-            <div class="row g-2">
-              <div class="col-md-4">
-                <select class="form-control" [(ngModel)]="supportType">
-                  <option value="">Type de support</option>
-                  <option value="PDF">📄 PDF</option>
-                  <option value="Vidéo">🎥 Vidéo</option>
-                  <option value="Présentation">📊 Présentation</option>
-                  <option value="Exercice">✏️ Exercice</option>
-                  <option value="Lien">🔗 Lien externe</option>
-                  <option value="Autre">📎 Autre</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <input type="text" class="form-control" placeholder="Nom du fichier ou URL" [(ngModel)]="supportFichier">
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-primary w-100" (click)="ajouterSupport()">
-                  Ajouter
-                </button>
-              </div>
+      <div *ngIf="notifications.length === 0" class="empty-state">
+        <span>🔔</span>
+        <p>Aucune notification pour le moment.</p>
+      </div>
+
+      <div class="notifications-list" *ngIf="notifications.length > 0">
+        <div class="notif-item" *ngFor="let n of notifications"
+             [class.unread]="!n.lu"
+             (click)="marquerLu(n)">
+          <div class="notif-dot" *ngIf="!n.lu"></div>
+          <div class="notif-icon-wrap">{{ getNotifIcon(n.type) }}</div>
+          <div class="notif-body">
+            <div class="notif-message">{{ n.message }}</div>
+            <div class="notif-time">{{ n.date_creation | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+          <button class="notif-close" (click)="supprimerNotif(n.id, $event)">×</button>
+        </div>
+      </div>
+    </section>
+  <!-- ===== PROFIL ===== -->
+    <section *ngIf="activeSection === 'profil'">
+      <div class="page-title">
+        <h2>👤 Mon profil</h2>
+        <p>Gérez vos informations personnelles</p>
+      </div>
+     <div class="profile-grid">
+        <!-- Informations personnelles -->
+        <div class="form-card">
+          <div class="profile-avatar-row">
+            <div class="avatar-lg">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div>
+              <div class="profile-name">{{ user?.nom }}</div>
+              <div class="profile-role-badge">Formateur</div>
             </div>
           </div>
-        </div>
-
-        <!-- Liste des supports existants -->
-        <div class="card">
-          <div class="card-body">
-            <h6 class="card-title">📚 Supports existants ({{ supports.length }})</h6>
-
-            <div *ngIf="supports.length === 0" class="text-muted">
-              Aucun support ajouté pour cette formation.
-            </div>
-
-            <div *ngIf="supports.length > 0" class="row supports-list">
-              <div class="col-md-6 mb-2" *ngFor="let s of supports">
-                <div class="support-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <span class="badge bg-info me-2">{{ s.type }}</span>
-                    <span>{{ s.fichier }}</span>
-                  </div>
-                  <button type="button" class="btn btn-outline-danger btn-sm" (click)="supprimerSupport(s.id ?? s.support_id)">
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </div>
+          <h5 class="section-title" style="margin-top:20px">Informations personnelles</h5>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Nom complet</label>
+            <input type="text" [(ngModel)]="profileNom" placeholder="Votre nom">
           </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Adresse email</label>
+            <input type="email" [(ngModel)]="profileEmail" placeholder="Votre email">
+          </div>
+          <button class="btn-save" (click)="sauvegarderProfil()">💾 Sauvegarder</button>
+        </div>   
+         <!-- Changer mot de passe -->
+        <div class="form-card">
+          <h5 class="section-title">🔒 Changer le mot de passe</h5>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Mot de passe actuel</label>
+            <input type="password" [(ngModel)]="ancienMdp" placeholder="••••••••">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Nouveau mot de passe</label>
+            <input type="password" [(ngModel)]="nouveauMdp" placeholder="••••••••">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Confirmer le mot de passe</label>
+            <input type="password" [(ngModel)]="confirmMdp" placeholder="••••••••">
+          </div>
+          <button class="btn-save" (click)="changerMotDePasse()">🔒 Changer le mot de passe</button>
         </div>
-      </section>
+      </div>
+ 
+      <!-- Stats profil -->
+      <div class="card-section">
+        <h5 class="section-title">📊 Résumé d'activité</h5>
+        <div class="profile-stats-row">
 
-    </main>
-  </div>
+          <div class="profile-stat">
+            <div class="ps-value">{{ stats.formations }}</div>
+            <div class="ps-label">Formations créées</div>
+          </div>
+          <div class="profile-stat">
+            <div class="ps-value">{{ stats.etudiants }}</div>
+            <div class="ps-label">Étudiants accompagnés</div>
+          </div>
+          <div class="profile-stat">
+            <div class="ps-value">{{ publishedFormationsCount }}</div>
+            <div class="ps-label">Formations publiées</div>
+          </div>
+          <div class="profile-stat">
+            <div class="ps-value">{{ pendingApprovalFormationsCount }}</div>
+            <div class="ps-label">En attente d'approbation</div>
+           </div>
+        </div>
+      </div>
+
+    </section>
+
+    
+  </main>
 </div>

@@ -160,4 +160,52 @@ router.post('/register', async (req, res) => {
 router.post('/logout', (req, res) => {
   res.json({ message: 'Déconnexion réussie' });
 });
+
+/* =========================
+   👤 Mise à jour du profil
+========================= */
+const { verifyToken } = require('../middleware/auth.middleware');
+
+router.put('/profile', verifyToken, (req, res) => {
+  const { nom, email } = req.body;
+  const userId = req.user.id;
+
+  if (!nom || !email) return res.status(400).json({ message: 'Nom et email requis' });
+
+  db.query('SELECT id FROM users WHERE email = ? AND id != ?', [email, userId], (err, existing) => {
+    if (err) return res.status(500).json(err);
+    if (existing.length > 0) return res.status(400).json({ message: 'Email déjà utilisé par un autre compte' });
+
+    db.query('UPDATE users SET nom = ?, email = ? WHERE id = ?', [nom, email, userId], (err2) => {
+      if (err2) return res.status(500).json(err2);
+      res.json({ message: 'Profil mis à jour avec succès', user: { nom, email } });
+    });
+  });
+});
+
+/* =========================
+   🔑 Changement de mot de passe
+========================= */
+router.put('/change-password', verifyToken, async (req, res) => {
+  const { ancien_mdp, nouveau_mdp } = req.body;
+  const userId = req.user.id;
+
+  if (!ancien_mdp || !nouveau_mdp) return res.status(400).json({ message: 'Champs requis' });
+  if (nouveau_mdp.length < 6) return res.status(400).json({ message: 'Nouveau mot de passe trop court (min 6 caractères)' });
+
+  db.query('SELECT mot_de_passe FROM users WHERE id = ?', [userId], async (err, results) => {
+    if (err) return res.status(500).json(err);
+    if (!results.length) return res.status(404).json({ message: 'Utilisateur introuvable' });
+
+    const valid = await bcrypt.compare(ancien_mdp, results[0].mot_de_passe);
+    if (!valid) return res.status(401).json({ message: 'Ancien mot de passe incorrect' });
+
+    const hashed = await bcrypt.hash(nouveau_mdp, 10);
+    db.query('UPDATE users SET mot_de_passe = ? WHERE id = ?', [hashed, userId], (err2) => {
+      if (err2) return res.status(500).json(err2);
+      res.json({ message: 'Mot de passe modifié avec succès' });
+    });
+  });
+});
+
 module.exports = router;

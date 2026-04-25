@@ -1,68 +1,81 @@
-<!-- HERO SECTION -->
-<div class="hero-section bg-light py-5">
-  <div class="container text-center">
-    <h1 class="display-5 fw-bold mb-3 text-primary">
-      Plateforme de Gestion des Formations
-    </h1>
 
-    <p class="lead text-muted mb-4">
-      Une solution simple et efficace pour gérer, suivre et organiser les formations en ligne.
-    </p>
-
-    <div class="d-flex justify-content-center gap-3">
-      <a routerLink="/login" class="btn btn-primary btn-lg shadow-sm">
-        Connexion
-      </a>
-      <a routerLink="/inscription" class="btn btn-outline-primary btn-lg shadow-sm">
-        Inscription
-      </a>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Plateforme de formation en ligne</div>
+    <h1 class="hero-title">Gérez vos formations<br><span class="hero-accent">simplement & efficacement</span></h1>
+    <p class="hero-subtitle">Une solution complète pour les formateurs, les étudiants et les administrateurs. Créez, publiez et suivez vos formations en quelques clics.</p>
+    <div class="hero-actions">
+      <a routerLink="/inscription" class="btn-hero-primary">Commencer gratuitement →</a>
+      <a routerLink="/login" class="btn-hero-secondary">Se connecter</a>
     </div>
   </div>
-</div>
-
-<!-- FEATURES SECTION -->
-<div class="container my-5">
-  <div class="row text-center g-4">
-
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm hover-shadow">
-        <div class="card-body">
-          <h5 class="card-title fw-bold text-primary">Gestion des formations</h5>
-          <p class="card-text text-muted">
-            Créez, modifiez et organisez les formations facilement.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm hover-shadow">
-        <div class="card-body">
-          <h5 class="card-title fw-bold text-success">Suivi des apprenants</h5>
-          <p class="card-text text-muted">
-            Suivez la progression et les inscriptions des participants.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm hover-shadow">
-        <div class="card-body">
-          <h5 class="card-title fw-bold text-warning">Interface sécurisée</h5>
-          <p class="card-text text-muted">
-            Accès sécurisé pour les administrateurs et les apprenants.
-          </p>
-        </div>
-      </div>
-    </div>
-
+  <div class="hero-visual">
+    <div class="hero-card"><div class="hc-icon">📚</div><div class="hc-text"><div class="hc-title">Formations disponibles</div><div class="hc-value">+120</div></div></div>
+    <div class="hero-card"><div class="hc-icon">👥</div><div class="hc-text"><div class="hc-title">Étudiants inscrits</div><div class="hc-value">+850</div></div></div>
+    <div class="hero-card"><div class="hc-icon">🏆</div><div class="hc-text"><div class="hc-title">Formations terminées</div><div class="hc-value">+340</div></div></div>
   </div>
-</div>
+</section>
 
-<!-- CTA SECTION -->
-<div class="container text-center my-5">
-  <h3 class="fw-bold mb-3">Commencez dès maintenant !</h3>
-  <p class="text-muted mb-4">Inscrivez-vous et explorez toutes les fonctionnalités de la plateforme.</p>
-  
-</div>
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-header">
+    <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+    <p class="section-sub">Une plateforme pensée pour chaque acteur de la formation</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon blue">🎓</div>
+      <h3 class="feature-title">Pour les étudiants</h3>
+      <p class="feature-desc">Découvrez les formations, inscrivez-vous en un clic, accédez aux supports et suivez votre progression.</p>
+      <ul class="feature-list"><li>✓ Catalogue de formations</li><li>✓ Inscription instantanée</li><li>✓ Supports pédagogiques</li><li>✓ Suivi de progression</li></ul>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon green">👨‍🏫</div>
+      <h3 class="feature-title">Pour les formateurs</h3>
+      <p class="feature-desc">Créez et gérez vos formations, ajoutez des supports et suivez les inscriptions de vos apprenants.</p>
+      <ul class="feature-list"><li>✓ Création de formations</li><li>✓ Gestion des supports</li><li>✓ Liste des inscrits</li><li>✓ Marquage des présences</li></ul>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon purple">🔧</div>
+      <h3 class="feature-title">Pour les administrateurs</h3>
+      <p class="feature-desc">Supervisez la plateforme, approuvez les formations, gérez les utilisateurs et analysez les statistiques.</p>
+      <ul class="feature-list"><li>✓ Tableau de bord global</li><li>✓ Approbation des formations</li><li>✓ Gestion des utilisateurs</li><li>✓ Statistiques détaillées</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-it-works">
+  <div class="section-header">
+    <h2 class="section-title">Comment ça marche ?</h2>
+    <p class="section-sub">En 3 étapes simples</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step"><div class="step-num">1</div><h4 class="step-title">Créez un compte</h4><p class="step-desc">Inscrivez-vous en tant qu'étudiant ou formateur en moins d'une minute.</p></div>
+    <div class="step-arrow">→</div>
+    <div class="step"><div class="step-num">2</div><h4 class="step-title">Explorez les formations</h4><p class="step-desc">Parcourez le catalogue et inscrivez-vous aux formations qui vous intéressent.</p></div>
+    <div class="step-arrow">→</div>
+    <div class="step"><div class="step-num">3</div><h4 class="step-title">Progressez & réussissez</h4><p class="step-desc">Accédez aux ressources, participez et suivez votre progression.</p></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner">
+    <h2 class="cta-title">Prêt à commencer ?</h2>
+    <p class="cta-sub">Rejoignez des centaines d'apprenants sur FormaPro dès aujourd'hui.</p>
+    <div class="cta-actions">
+      <a routerLink="/inscription" class="btn-hero-primary">Créer un compte</a>
+      <a routerLink="/login" class="btn-cta-secondary">Se connecter</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="footer-brand">🎓 FormaPro</span>
+    <span class="footer-copy">© {{ currentYear }} — Plateforme de gestion des formations</span>
+  </div>
+</footer>

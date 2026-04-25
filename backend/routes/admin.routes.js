@@ -472,7 +472,26 @@ router.put('/formations/:id/approve-and-publish', (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Formation non trouvée ou déjà approuvée' });
     }
-    res.json({ message: 'Formation approuvée et publiée 🚀' });
+   res.json({ message: 'Formation approuvée et publiée 🚀' });
+
+    // Notifier le formateur
+    db.query(
+      `SELECT f.titre, u.id AS formateur_user_id
+       FROM formations f
+       JOIN formateurs fo ON f.formateur_id = fo.id
+       JOIN users u ON fo.user_id = u.id
+       WHERE f.id = ?`,
+      [formationId],
+      (ne, nr) => {
+        if (!ne && nr.length > 0) {
+          db.query(
+            'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+            [nr[0].formateur_user_id, `✅ Votre formation « ${nr[0].titre} » a été approuvée et publiée !`, 'approbation'],
+            () => {}
+          );
+        }
+      }
+    );
   });
 });
 
@@ -501,7 +520,26 @@ router.put('/formations/:id/reject', (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Formation non trouvée ou déjà approuvée' });
     }
-    res.json({ message: `Formation rejetée et remise en draft 🔙 Raison: ${reason || 'Non spécifiée'}` });
+   res.json({ message: `Formation rejetée et remise en draft 🔙 Raison: ${reason || 'Non spécifiée'}` });
+
+    // Notifier le formateur
+    db.query(
+      `SELECT f.titre, u.id AS formateur_user_id
+       FROM formations f
+       JOIN formateurs fo ON f.formateur_id = fo.id
+       JOIN users u ON fo.user_id = u.id
+       WHERE f.id = ?`,
+      [formationId],
+      (ne, nr) => {
+        if (!ne && nr.length > 0) {
+          db.query(
+            'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+            [nr[0].formateur_user_id, `❌ Votre formation « ${nr[0].titre} » a été rejetée. Raison : ${reason || 'Non spécifiée'}`, 'rejet'],
+            () => {}
+          );
+        }
+      }
+    );
   });
 });
 

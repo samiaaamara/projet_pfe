@@ -1,61 +1,31 @@
-<nav class="navbar navbar-expand-lg custom-navbar shadow-sm">
-  <div class="container">
-
-    <a class="navbar-brand fw-bold" routerLink="/home">
-      🎓 Gestion Formations
+<nav class="navbar">
+  <div class="navbar-inner">
+ 
+    <!-- LOGO ISET -->
+    <a class="navbar-brand" routerLink="/home">
+      <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png" alt="ISET" class="iset-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <span class="brand-fallback">
+        <span class="brand-icon">🎓</span>
+        <span class="brand-text">ISET</span>
+      </span>
+      <span class="brand-separator"></span>
+      <span class="brand-subtitle">Plateforme de Formation</span>
     </a>
-
-    <div class="collapse navbar-collapse">
-
-      <ul class="navbar-nav ms-auto align-items-center">
-
-        <!-- ❌ NON CONNECTÉ -->
-        <ng-container *ngIf="!user">
-
-          <li class="nav-item">
-            <a class="btn btn-outline-light ms-2" routerLink="/home">Accueil</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="btn btn-outline-light ms-2" routerLink="/login">Connexion</a>
-          </li>
-
-          <li class="nav-item">
-            <a class="btn btn-outline-light ms-2" routerLink="/inscription">
-              Inscription
-            </a>
-          </li>
-
-        </ng-container>
-
-        <!-- 👤 CONNECTÉ (Étudiant / Formateur / Admin) -->
-        <ng-container *ngIf="user">
-
-          <!-- NOM -->
-          <li class="nav-item">
-            <span class="text-white ms-3 me-3 fw-bold">
-              👋 {{ user.nom }}
-            </span>
-          </li>
-
-          <!-- ROLE BADGE (optionnel) -->
-          <li class="nav-item">
-            <span class="badge bg-success me-3">
-              {{ user.role }}
-            </span>
-          </li>
-
-          <!-- LOGOUT -->
-          <li class="nav-item">
-            <button class="btn btn-danger ms-2" (click)="logout()">
-              Logout
-            </button>
-          </li>
-
-        </ng-container>
-
-      </ul>
+    <!-- LINKS: non connecté -->
+    <div class="navbar-links" *ngIf="!user">
+      <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Accueil</a>
+      <a class="nav-link" routerLink="/login" routerLinkActive="active">Connexion</a>
+      <a class="nav-link btn-register" routerLink="/inscription">S'inscrire</a>
     </div>
-
+     <!-- LINKS: connecté -->
+    <div class="navbar-links" *ngIf="user">
+      <span class="user-greeting">
+        <span class="user-avatar">{{ user.nom?.charAt(0)?.toUpperCase() }}</span>
+        <span class="user-name">{{ user.nom }}</span>
+        <span class="role-chip" [ngClass]="'role-' + user.role">{{ user.role }}</span>
+      </span>
+      <button class="btn-logout" (click)="logout()">🚪 Déconnexion</button>
+    </div>
+ 
   </div>
 </nav>

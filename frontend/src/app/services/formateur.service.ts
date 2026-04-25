@@ -77,13 +77,24 @@ export class FormateurService {
   }
 
   // 🔹 Ajouter un support à une formation
-  ajouterSupport(formationId: number, type: string, fichier: string): Observable<any> {
+
+
+    ajouterSupport(formationId: number, type: string, fichier: string): Observable<any> {
     return this.http.post(`${this.api}/supports`, {
       formation_id: formationId,
       type,
       fichier
     });
   }
+  // 🔹 Ajouter un support avec upload de fichier
+uploadSupport(formationId: number, type: string, file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('formation_id', formationId.toString());
+  formData.append('type', type);
+  formData.append('fichier', file);
+  return this.http.post(`${this.api}/supports`, formData);
+}
+
 
   // 🔹 Supprimer un support
   supprimerSupport(supportId: number): Observable<any> {

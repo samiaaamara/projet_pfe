@@ -28,10 +28,9 @@ export class LoginComponent {
   }).subscribe({
     next: (res: any) => {
 
-      // 🔥 IMPORTANT: user est dans res.user
       const user = res.user;
 
-      // (optionnel mais recommandé)
+     
       localStorage.setItem('token', res.token);
       localStorage.setItem('user', JSON.stringify(user));
 

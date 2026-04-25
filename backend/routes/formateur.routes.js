@@ -1,6 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const multer = require('multer');
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '../uploads')),
+  filename: (req, file, cb) => {
+    const unique = Date.now() + '-' + Math.round(Math.random() * 1e6);
+    cb(null, unique + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = /pdf|doc|docx|ppt|pptx|png|jpg|jpeg|mp4|zip/;
+    const ext = path.extname(file.originalname).toLowerCase().replace('.', '');
+    allowed.test(ext) ? cb(null, true) : cb(new Error('Type de fichier non autorisé'));
+  }
+});
 
 // 🔹 Formations du formateur
 router.get('/mes-formations/:formateurId', (req, res) => {
@@ -153,45 +173,24 @@ router.post('/creer-formation', (req, res) => {
 });
 
 // 🔹 Ajouter un support à une formation
-router.post('/supports', (req, res) => {
-  const { formation_id, type, fichier } = req.body;
-  if (!formation_id || !type || !fichier) {
-    return res.status(400).json({ error: 'Tous les champs sont obligatoires pour le support' });
-  }
+router.post('/supports', upload.single('fichier'), (req, res) => {
+  const { formation_id, type } = req.body;
 
-  const sql = `
-    INSERT INTO supports (formation_id, type, fichier)
-    VALUES (?, ?, ?)
-  `;
+  if (!formation_id || !type)
+    return res.status(400).json({ error: 'formation_id et type sont obligatoires' });
 
-  db.query(sql, [formation_id, type, fichier], (err, results) => {
-    if (err) {
-      console.error('Erreur SQL /supports:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    res.json({ message: "Support ajouté ✅", id: results.insertId });
-  });
+  const fichier = req.file ? `/uploads/${req.file.filename}` : req.body.fichier;
+
+  if (!fichier)
+    return res.status(400).json({ error: 'Un fichier ou une URL est obligatoire' });
+
+  db.query('INSERT INTO supports (formation_id, type, fichier) VALUES (?, ?, ?)',
+    [formation_id, type, fichier], (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ message: 'Support ajouté ✅', id: results.insertId, fichier });
+    });
 });
 
-// 🔹 Supprimer un support
-router.delete('/supports/:supportId', (req, res) => {
-  const supportId = parseInt(req.params.supportId);
-  if (isNaN(supportId)) {
-    return res.status(400).json({ error: 'ID support invalide' });
-  }
-
-  const sql = 'DELETE FROM supports WHERE id = ?';
-  db.query(sql, [supportId], (err, result) => {
-    if (err) {
-      console.error('Erreur SQL DELETE support:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Support non trouvé' });
-    }
-    res.json({ message: 'Support supprimé ❌' });
-  });
-});
 
 // 🔹 Modifier une formation du formateur
 router.put('/formations/:id', (req, res) => {
@@ -238,7 +237,7 @@ router.put('/formations/:id/submit-for-approval', (req, res) => {
   }
 
   // Vérifier d'abord le statut actuel de la formation
-  const checkSql = 'SELECT id, status, formateur_id FROM formations WHERE id = ?';
+  const checkSql = 'SELECT id, status, formateur_id, titre FROM formations WHERE id = ?';
   db.query(checkSql, [formationId], (checkErr, checkResult) => {
     if (checkErr) {
       console.error('Erreur vérification formation:', checkErr);
@@ -274,6 +273,19 @@ router.put('/formations/:id/submit-for-approval', (req, res) => {
         return res.status(404).json({ error: 'Formation non trouvée ou déjà soumise' });
       }
       res.json({ message: 'Formation soumise à l\'admin pour approbation ✉️' });
+
+      // Notifier tous les admins
+      db.query('SELECT id FROM users WHERE role = "admin"', (ae, admins) => {
+        if (!ae) {
+          admins.forEach(admin => {
+            db.query(
+              'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+              [admin.id, `🔔 Nouvelle formation en attente d'approbation : « ${formation.titre} »`, 'approbation'],
+              () => {}
+            );
+          });
+        }
+      });
     });
   });
 });
@@ -326,7 +338,31 @@ router.put('/inscriptions/:inscriptionId/status', (req, res) => {
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Inscription non trouvée' });
     }
-    res.json({ message: 'Statut mis à jour ✅' });
+   res.json({ message: 'Statut mis à jour ✅' });
+
+    // Notifier l'étudiant
+    if (statut === 'présent' || statut === 'absent') {
+      db.query(
+        `SELECT f.titre, e.user_id AS etudiant_user_id
+         FROM inscriptions i
+         JOIN formations f ON i.formation_id = f.id
+         JOIN etudiants e ON i.etudiant_id = e.id
+         WHERE i.id = ?`,
+        [inscriptionId],
+        (ne, nr) => {
+          if (!ne && nr.length > 0) {
+            const msg = statut === 'présent'
+              ? `🏆 Votre présence à la formation « ${nr[0].titre} » a été validée !`
+              : `📋 Votre absence à la formation « ${nr[0].titre} » a été enregistrée.`;
+            db.query(
+              'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+              [nr[0].etudiant_user_id, msg, 'presence'],
+              () => {}
+            );
+          }
+        }
+      );
+    }
   });
 });
 

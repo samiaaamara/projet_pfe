@@ -1,36 +1,157 @@
 /* ===== NAVBAR PRO ===== */
-.custom-navbar {
-  background-color: #0d6efd;
-  padding: 12px 0;
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: linear-gradient(90deg, #0d1b2a 0%, #1a2744 100%);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  height: 60px;
+  display: flex;
+  align-items: center;
 }
-
-.custom-navbar .navbar-brand {
-  color: #ffffff;
-  font-size: 1.25rem;
+.navbar-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
-
-.custom-navbar .navbar-brand:hover {
-  color: #e9f0ff;
+/* BRAND */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-
-.custom-navbar .nav-link {
-  color: #ffffff;
+.iset-logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+ 
+.brand-fallback {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+ 
+.brand-icon { font-size: 22px; }
+ 
+.brand-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.5px;
+}
+ 
+.brand-separator {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.25);
+  margin: 0 4px;
+}
+ 
+.brand-subtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
   font-weight: 500;
-  margin-left: 10px;
-  transition: color 0.2s, background-color 0.2s;
+    white-space: nowrap;
 }
-
-.custom-navbar .nav-link:hover {
-  color: #e9f0ff;
+/* LINKS */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
-.custom-navbar .btn-outline-light {
+.nav-link {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+ 
+.nav-link:hover, .nav-link.active {
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
+ 
+.btn-register {
+  background: white;
+  color: #1a2744;
+  font-weight: 700;
+  padding: 7px 18px;
+  border-radius: 8px;
+}
+ 
+.btn-register:hover {
+  background: #e8eaf6;
+  color: #0d1b2a;
+}
+ 
+/* USER */
+.user-greeting {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+ 
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #3d6aff;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+ 
+.user-name {
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+ 
+.role-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 9px;
   border-radius: 20px;
-  padding: 6px 16px;
-  font-weight: 500;
 }
-
-.custom-navbar .btn-outline-light:hover {
-  background-color: #ffffff;
-  color: #0d6efd;
+ 
+.role-admin     { background: #fce4ec; color: #c2185b; }
+.role-formateur { background: #e8f5e9; color: #2e7d32; }
+.role-etudiant  { background: #e3f2fd; color: #1565c0; }
+ 
+.btn-logout {
+  background: rgba(255,80,80,0.18);
+  color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(255,80,80,0.35);
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+ 
+.btn-logout:hover {
+  background: rgba(255,60,60,0.4);
+  color: white;
+}
+@media (max-width: 600px) {
+  .user-name { display: none; }
+  .nav-link { padding: 7px 10px; }
+  .brand-text { font-size: 15px; }
 }

@@ -1,59 +1,47 @@
-
-<div class="row justify-content-center my-5">
-  <div class="col-md-5">
-
-    <div class="card shadow-lg rounded-3">
-
-      <div class="card-body p-4">
-
-        <h3 class="text-center mb-4 text-primary fw-bold">
-          👑 Connexion Admin
-        </h3>
-
-        <form (ngSubmit)="login()">
-
-          <!-- EMAIL -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Email</label>
-            <input
-              type="email"
-              class="form-control shadow-sm"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="admin@email.com"
-              required
-            />
-          </div>
-
-          <!-- PASSWORD -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Mot de passe</label>
-            <input
-              type="password"
-              class="form-control shadow-sm"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="********"
-              required
-            />
-          </div>
-
-          <!-- BUTTON -->
-          <div class="d-grid mt-3">
-            <button class="btn btn-primary btn-lg shadow-sm">
-              🚀 Se connecter
-            </button>
-          </div>
-
-        </form>
-
-        <!-- ERROR -->
-        <p *ngIf="error" class="text-danger text-center mt-3">
-          {{ error }}
-        </p>
-
+<div class="auth-wrapper">
+  <div class="auth-left">
+    <div class="auth-left-inner">
+      <div class="auth-brand"><span>🎓</span> FormaPro</div>
+      <div class="admin-badge">👑 Espace Administrateur</div>
+      <h2 class="auth-left-title">Accès réservé aux administrateurs</h2>
+      <p class="auth-left-sub">Gérez les formations, validez les inscriptions et supervisez l'ensemble de la plateforme.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="af-icon">📊</span><span>Tableau de bord centralisé</span></div>
+        <div class="auth-feature"><span class="af-icon">✅</span><span>Validation des formations</span></div>
+        <div class="auth-feature"><span class="af-icon">👥</span><span>Gestion des utilisateurs</span></div>
       </div>
     </div>
-
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <div class="auth-avatar-icon">👑</div>
+        <h3 class="auth-title">Connexion Admin</h3>
+        <p class="auth-subtitle">Réservé aux administrateurs de la plateforme</p>
+      </div>
+      <form (ngSubmit)="login()" class="auth-form">
+        <div class="form-group">
+          <label>Email administrateur</label>
+          <div class="input-wrapper">
+            <span class="input-icon">✉️</span>
+            <input type="email" [(ngModel)]="email" name="email" placeholder="admin@email.com" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔑</span>
+            <input type="password" [(ngModel)]="password" name="password" placeholder="Mot de passe admin" required>
+          </div>
+        </div>
+        <div *ngIf="error" class="auth-error">⚠️ {{ error }}</div>
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          <span *ngIf="loading" class="spinner"></span>
+          <span *ngIf="!loading">🚀 Accéder au panneau admin →</span>
+          <span *ngIf="loading">Connexion en cours...</span>
+        </button>
+      </form>
+      <div class="auth-footer"><a routerLink="/login">← Retour à la connexion standard</a></div>
+    </div>
   </div>
 </div>

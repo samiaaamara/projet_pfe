@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormateurService } from '../../services/formateur.service';
+import { Auth } from '../../services/auth';
+import { NotificationsService } from '../../services/notifications.service';
 
 @Component({
   selector: 'app-formateur',
@@ -11,7 +13,7 @@ import { FormateurService } from '../../services/formateur.service';
   templateUrl: './formateur.component.html',
   styleUrls: ['./formateur.component.css'],
 })
-export class FormateurComponent implements OnInit {
+export class FormateurComponent implements OnInit, OnDestroy {
 
   formateurId: number | null = null;
   user: any = null;
@@ -39,12 +41,14 @@ export class FormateurComponent implements OnInit {
   // Support pédagogique
   supportType = '';
   supportFichier = '';
-
+  supportFile: File | null = null;
+  supportMode: 'url' | 'file' = 'file';
   // Formation sélectionnée pour voir les inscriptions ou ajouter un support
   formationSelectionnee: any;
 
   // Statistiques du formateur
   stats = { formations: 0, etudiants: 0 };
+  notifService: any;
 
   // Computed properties pour les compteurs
   get publishedFormationsCount(): number {
@@ -57,12 +61,25 @@ export class FormateurComponent implements OnInit {
 
   // Message général
   message = '';
+ // Profil
+  profileNom = '';
+  profileEmail = '';
+  ancienMdp = '';
+  nouveauMdp = '';
+  confirmMdp = '';
+  messageType: 'success' | 'danger' = 'success';
+  
+  // Notifications
+  notifications: any[] = [];
+  unreadCount = 0;
+  private pollingInterval: any;
 
   // Section active (menu sidebar)
-  activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' = 'accueil';
-
+     activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' = 'accueil';
+     
   constructor(
     private formateurService: FormateurService,
+     private authService: Auth,
     private router: Router
   ) {}
 
@@ -94,8 +111,12 @@ export class FormateurComponent implements OnInit {
         }
 
         this.formateurId = profile.id;
+         this.profileNom = this.user.nom;
+        this.profileEmail = this.user.email;
         console.log('✅ Profil formateur chargé:', profile);
         this.loadFormations();
+         this.loadUnreadCount();
+        this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
       },
       error: (err) => {
         console.error('Erreur chargement profil formateur:', err);
@@ -361,40 +382,58 @@ export class FormateurComponent implements OnInit {
       });
   }
 
+   onSupportFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    this.supportFile = input.files?.[0] || null;
+  }
+
   /** =================== Ajouter support =================== */
   ajouterSupport() {
     if (!this.formationSelectionnee) {
       this.message = 'Veuillez sélectionner une formation';
       return;
     }
-
-    if (!this.supportType || !this.supportFichier) {
-      this.message = 'Veuillez remplir tous les champs du support';
-      return;
+if (!this.supportType) {
+      this.message = 'Veuillez choisir un type de support';
+    return;
     }
-
-    this.formateurService.ajouterSupport(
-      this.formationSelectionnee.id,
-      this.supportType,
-      this.supportFichier
-    ).subscribe({
-      next: () => {
-        this.message = 'Support ajouté ✅';
-        this.supportType = '';
-        this.supportFichier = '';
-        // Recharger les supports pour mise à jour visuelle
-        this.formateurService.getSupports(this.formationSelectionnee.id)
-          .subscribe({
-            next: (data) => this.supports = data,
-            error: (err) => console.error('Erreur rechargement supports:', err)
-          });
-      },
-      error: (err) => {
-        console.error('Erreur ajout support:', err);
-        this.message = 'Erreur lors de l’ajout du support';
-      }
-    });
+    const recharger = () => {
+      this.formateurService.getSupports(this.formationSelectionnee.id)
+        .subscribe({ next: (data) => this.supports = data });
+    };
+ 
+    const onSuccess = () => {
+      this.message = 'Support ajouté ✅';
+      this.supportType = '';
+      this.supportFichier =  '';
+      this.supportFile = null;
+      recharger();
+    };
+ 
+    const onError = (err: any) => {
+      console.error('Erreur ajout support:', err);
+      this.message = err?.error?.error || 'Erreur lors de l\'ajout du support';
+    };
+ 
+    if (this.supportMode === 'file' && this.supportFile) {
+      this.formateurService.uploadSupport(
+        this.formationSelectionnee.id,
+        this.supportType,
+        this.supportFile
+      ).subscribe({ next: onSuccess, error: onError });
+    } else if (this.supportMode === 'url' && this.supportFichier) {
+      this.formateurService.ajouterSupport(
+        this.formationSelectionnee.id,
+        this.supportType,
+        this.supportFichier
+      ).subscribe({ next: onSuccess, error: onError });
+    } else {
+      this.message = this.supportMode === 'file'
+        ? 'Veuillez choisir un fichier'
+        : 'Veuillez entrer une URL';
+    }
   }
+
 
   /** =================== Supprimer support =================== */
   supprimerSupport(supportId: number | undefined) {
@@ -430,7 +469,7 @@ export class FormateurComponent implements OnInit {
   }
 
   /** =================== Changer de section (sidebar) =================== */
-  setSection(section: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports') {
+   setSection(section: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil') {
     this.activeSection = section;
 
     // Reset inscriptions si on quitte mesFormations
@@ -439,5 +478,122 @@ export class FormateurComponent implements OnInit {
       this.formationSelectionnee = null;
     }
   }
+   showMessage(msg: string, type: 'success' | 'danger' = 'success') {
+    this.message = msg;
+    this.messageType = type;
+    setTimeout(() => this.message = '', 4000);
+  }
 
+  /** =================== Profil =================== */
+  sauvegarderProfil() {
+    if (!this.profileNom || !this.profileEmail) {
+      this.showMessage('Nom et email sont requis', 'danger'); return;
+    }
+    this.authService.updateProfile({ nom: this.profileNom, email: this.profileEmail }).subscribe({
+      next: () => {
+        this.user.nom = this.profileNom;
+        this.user.email = this.profileEmail;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.showMessage('Profil mis à jour avec succès ✅');
+      },
+      error: (err: any) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
+    });
+  }
+
+  changerMotDePasse() {
+    if (!this.ancienMdp || !this.nouveauMdp) {
+      this.showMessage('Remplissez tous les champs', 'danger'); return;
+    }
+    if (this.nouveauMdp !== this.confirmMdp) {
+      this.showMessage('Les mots de passe ne correspondent pas', 'danger'); return;
+    }
+    if (this.nouveauMdp.length < 6) {
+      this.showMessage('Mot de passe trop court (min 6 caractères)', 'danger'); return;
+    }
+    this.authService.changePassword({ ancien_mdp: this.ancienMdp, nouveau_mdp: this.nouveauMdp }).subscribe({
+      next: () => {
+        this.showMessage('Mot de passe modifié avec succès ✅');
+        this.ancienMdp = ''; this.nouveauMdp = ''; this.confirmMdp = '';
+      },
+      error: (err: any) => this.showMessage(err?.error?.message || 'Erreur changement de mot de passe', 'danger')
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+  }
+
+  /** =================== Notifications =================== */
+  loadUnreadCount() {
+    if (!this.user?.id) return;
+    this.notifService.getUnreadCount(this.user.id).subscribe({
+      next: (data: { count: number; }) => this.unreadCount = data?.count || 0,
+      error: () => {}
+    });
+  }
+
+ loadNotifications() {
+    if (!this.user?.id) return;
+    this.notifService.getNotifications(this.user.id).subscribe({
+      next: (data: any[]) => {
+        this.notifications = data;
+        this.unreadCount = data.filter((n: any) => !n.lu).length;
+      },
+      error: () => {}
+    });
+  }
+
+  marquerLu(notif: any) {
+    if (notif.lu) return;
+    this.notifService.marquerLu(notif.id).subscribe({
+      next: () => {
+        notif.lu = 1;
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      },
+      error: () => {}
+    });
+  }
+
+  marquerToutLu() {
+    if (!this.user?.id) return;
+    this.notifService.marquerToutLu(this.user.id).subscribe({
+      next: () => {
+        this.notifications.forEach((n: any) => n.lu = 1);
+        this.unreadCount = 0;
+      },
+      error: () => {}
+    });
+  }
+
+  supprimerNotif(id: number, event: Event) {
+    event.stopPropagation();
+    this.notifService.supprimer(id).subscribe({
+      next: () => {
+        const notif = this.notifications.find((n: any) => n.id === id);
+        if (notif && !notif.lu) this.unreadCount = Math.max(0, this.unreadCount - 1);
+        this.notifications = this.notifications.filter((n: any) => n.id !== id);
+      },
+      error: () => {}
+    });
+  }
+
+  getNotifIcon(type: string): string {
+    const icons: any = {
+      'inscription': '📚',
+      'approbation': '✅',
+      'rejet': '❌',
+      'presence': '🏆',
+      'info': 'ℹ️'
+    };
+    return icons[type] || '🔔';
+  }
+
+  openNotifications() {
+    this.activeSection = 'notifications';
+    this.loadNotifications();
+  }
+logout() {
+  localStorage.clear();
+  this.router.navigate(['/login']);
+}
 }

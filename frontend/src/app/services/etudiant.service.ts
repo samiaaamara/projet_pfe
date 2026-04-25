@@ -11,11 +11,12 @@ export class EtudiantService {
   constructor(private http: HttpClient) {}
 
   // 📚 Toutes les formations
-  getFormations(etudiantId: number) {
-  return this.http.get<any[]>(
-    `http://localhost:3000/api/etudiant/formations/${etudiantId}`
+  getFormations(etudiantId: number, page = 1, limit = 10) {
+  return this.http.get<any>(
+    `${this.apiUrl}/formations/${etudiantId}?page=${page}&limit=${limit}`
   );
 }
+
 
   // ✅ Mes formations
   getMesFormations(etudiantId: number) {
@@ -44,5 +45,22 @@ export class EtudiantService {
     return this.http.get<any[]>(
       `${this.apiUrl}/supports/${formationId}`
     );
+  }
+
+  noter(etudiantId: number, formationId: number, note: number, commentaire?: string) {
+    return this.http.post<any>(`${this.apiUrl}/notation`, {
+      etudiant_id: etudiantId,
+      formation_id: formationId,
+      note,
+      commentaire
+    });
+  }
+
+  getMaNote(etudiantId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/notation/${etudiantId}/${formationId}`);
+  }
+
+  getNotationsAvg(formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/notations-avg/${formationId}`);
   }
 }

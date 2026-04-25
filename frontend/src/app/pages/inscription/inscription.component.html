@@ -1,161 +1,158 @@
-<div class="row justify-content-center my-5">
-  <div class="col-md-6">
-    <div class="card shadow-lg rounded-3">
-      <div class="card-body p-4">
-        <h3 class="text-center mb-4 text-success fw-bold">Créer un compte</h3>
+<div class="auth-wrapper">
 
-        <form (ngSubmit)="register()">
-
-          <!-- Nom -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Nom complet</label>
-            <input
-              type="text"
-              class="form-control shadow-sm"
-              [(ngModel)]="nom"
-              name="nom"
-              placeholder="Votre nom complet"
-              required
-            />
-          </div>
-
-          <!-- Email -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Email</label>
-            <input
-              type="email"
-              class="form-control shadow-sm"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="ex: exemple@email.com"
-              required
-            />
-          </div>
-
-          <!-- Password -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Mot de passe</label>
-            <input
-              type="password"
-              class="form-control shadow-sm"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="********"
-              required
-            />
-          </div>
-
-          <!-- Role -->
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Rôle</label>
-            <select
-              class="form-select shadow-sm"
-              [(ngModel)]="role"
-              name="role"
-            >
-              <option value="etudiant">Étudiant</option>
-              <option value="formateur">Formateur</option>
-            </select>
-          </div>
-
-          <!-- 🔥 CHAMPS ETUDIANT -->
-          <div *ngIf="role === 'etudiant'">
-
-            <!-- CIN -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">CIN</label>
-              <input
-                type="text"
-                class="form-control shadow-sm"
-                [(ngModel)]="cin"
-                name="cin"
-                placeholder="Numéro CIN"
-                required
-              />
-            </div>
-<div class="mb-3">
-  <label class="form-label fw-semibold">Département</label>
-  <select
-    [(ngModel)]="departement"
-    name="departement"
-    class="form-select shadow-sm"
-    required
-  >
-    <option value="">-- Département --</option>
-    <option value="Informatique">Informatique</option>
-    <option value="Génie Civil">Génie Civil</option>
-    <option value="Génie Mécanique">Génie Mécanique</option>
-    <option value="Génie Électrique">Génie Électrique</option>
-  </select>
-</div>
-
-            <!-- Niveau -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Niveau</label>
-              <select
-                class="form-select shadow-sm"
-                [(ngModel)]="niveau"
-                name="niveau"
-                required
-              >
-                <option value="">-- Choisir niveau --</option>
-                <option value="L1">L1</option>
-                <option value="L2">L2</option>
-                <option value="L3">L3</option>
-              </select>
-            </div>
-
-            <!-- Spécialité -->
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Spécialité</label>
-              <input
-                type="text"
-                class="form-control shadow-sm"
-                [(ngModel)]="specialite"
-                name="specialite"
-                placeholder="Ex: Développement Web"
-                required
-              />
-            </div>
-
-          </div>
-
-          <!-- 🔥 CHAMP FORMATEUR -->
-          <div *ngIf="role === 'formateur'">
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Spécialité</label>
-              <input
-                type="text"
-                class="form-control shadow-sm"
-                [(ngModel)]="specialite"
-                name="specialite_formateur"
-                placeholder="Ex: Angular, Node.js..."
-              />
-            </div>
-          </div>
-
-          <!-- Submit -->
-          <div class="d-grid mt-3">
-            <button class="btn btn-success btn-lg shadow-sm">
-              S’inscrire
-            </button>
-          </div>
-
-        </form>
-
-        <!-- Message -->
-        <p *ngIf="message" class="text-success text-center mt-3">
-          {{ message }}
-        </p>
-
-        <!-- Login link -->
-        <div class="text-center mt-3">
-          <a routerLink="/login" class="text-decoration-none">
-            Déjà un compte ? Se connecter
-          </a>
-        </div>
-
+  <!-- GAUCHE -->
+  <div class="auth-left">
+    <div class="auth-left-inner">
+      <a class="auth-brand" routerLink="/home">
+        <span>🎓</span> FormaPro
+      </a>
+      <h2 class="auth-left-title">Rejoignez notre communauté de formation</h2>
+      <p class="auth-left-sub">Créez votre compte en quelques instants et accédez à toutes les ressources pédagogiques de la plateforme.</p>
+      <div class="auth-left-features">
+        <div class="auth-feature"><span class="af-icon">✅</span><span>Inscription instantanée et gratuite</span></div>
+        <div class="auth-feature"><span class="af-icon">📂</span><span>Accès aux supports pédagogiques</span></div>
+        <div class="auth-feature"><span class="af-icon">🏆</span><span>Suivez et validez vos formations</span></div>
       </div>
     </div>
   </div>
+
+  <!-- DROITE -->
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <div class="auth-card-header">
+        <div class="auth-avatar-icon green">✏️</div>
+        <h3 class="auth-title">Créer un compte</h3>
+        <p class="auth-subtitle">Remplissez le formulaire pour vous inscrire</p>
+      </div>
+
+      <form (ngSubmit)="register()" class="auth-form">
+
+        <!-- NOM + EMAIL -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom complet *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">👤</span>
+              <input type="text" [(ngModel)]="nom" name="nom" placeholder="Votre nom" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">✉️</span>
+              <input type="email" [(ngModel)]="email" name="email" placeholder="exemple@email.com" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSWORD + ROLE -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mot de passe *</label>
+            <div class="input-wrapper">
+              <span class="input-icon">🔑</span>
+              <input type="password" [(ngModel)]="password" name="password" placeholder="Mot de passe" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Rôle *</label>
+            <div class="input-wrapper select-wrapper">
+              <span class="input-icon">🎭</span>
+              <select [(ngModel)]="role" name="role">
+                <option value="etudiant">Étudiant</option>
+                <option value="formateur">Formateur</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAMPS ÉTUDIANT -->
+        <div *ngIf="role === 'etudiant'" class="role-fields">
+          <div class="role-fields-title">
+            <span class="role-chip blue">Étudiant</span>
+            <span>Informations supplémentaires</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>CIN</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🪪</span>
+                <input type="text" [(ngModel)]="cin" name="cin" placeholder="Numéro CIN">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Département</label>
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon">🏢</span>
+                <select [(ngModel)]="departement" name="departement">
+                  <option value="">-- Département --</option>
+                  <option value="Informatique">Informatique</option>
+                  <option value="Génie Civil">Génie Civil</option>
+                  <option value="Génie Mécanique">Génie Mécanique</option>
+                  <option value="Génie Électrique">Génie Électrique</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Niveau</label>
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon">🎓</span>
+                <select [(ngModel)]="niveau" name="niveau">
+                  <option value="">-- Niveau --</option>
+                  <option value="L1">L1</option>
+                  <option value="L2">L2</option>
+                  <option value="L3">L3</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Spécialité</label>
+              <div class="input-wrapper">
+                <span class="input-icon">💡</span>
+                <input type="text" [(ngModel)]="specialite" name="specialite" placeholder="Ex: Développement Web">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAMPS FORMATEUR -->
+        <div *ngIf="role === 'formateur'" class="role-fields">
+          <div class="role-fields-title">
+            <span class="role-chip green">Formateur</span>
+            <span>Informations supplémentaires</span>
+          </div>
+          <div class="form-group">
+            <label>Spécialité</label>
+            <div class="input-wrapper">
+              <span class="input-icon">💡</span>
+              <input type="text" [(ngModel)]="specialite" name="specialite_formateur" placeholder="Ex: Angular, Node.js...">
+            </div>
+          </div>
+        </div>
+
+        <!-- MESSAGE -->
+        <div *ngIf="message" class="auth-message"
+             [class.auth-success]="message.includes('succès')"
+             [class.auth-error]="message.includes('Erreur')">
+          {{ message }}
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Créer mon compte →
+        </button>
+
+      </form>
+
+      <div class="auth-footer">
+        Déjà un compte ? <a routerLink="/login">Se connecter</a>
+      </div>
+
+    </div>
+  </div>
+
 </div>
