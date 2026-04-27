@@ -1,10 +1,13 @@
-import { Component, OnInit , OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EtudiantService } from '../../services/etudiant.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
+import { MessagesService } from '../../services/messages.service';
+import { QuestionsService } from '../../services/questions.service';
+
 @Component({
   selector: 'app-etudiant',
   standalone: true,
@@ -32,7 +35,6 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   progression = 0;
 
-  
   // Notation
   mesNotes: { [formationId: number]: number } = {};
   noteHover: { [formationId: number]: number } = {};
@@ -47,44 +49,58 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   // Attestation
   formationAttestation: any = null;
-// Notifications
-notifications: any[] = [];
-unreadCount = 0;
-private pollingInterval: any;
+
+  // Notifications
+  notifications: any[] = [];
+  unreadCount = 0;
+  private pollingInterval: any;
+
+  // Messagerie
+  contacts: any[] = [];
+  messagesConversation: any[] = [];
+  contactSelectionne: any = null;
+  nouveauMessage = '';
+  unreadMessages = 0;
+
+  // Questions
+  mesQuestions: any[] = [];
+  questionFormationId: number | null = null;
+  questionTexte = '';
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
-  activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' = 'accueil';
-  notifService: any;
-
- 
+ activeSection: string = 'accueil';
   constructor(
     private etudiantService: EtudiantService,
     private authService: Auth,
-    private notificationsService: NotificationsService,
+    private notifService: NotificationsService,
+    private msgService: MessagesService,
+    private questService: QuestionsService,
     private router: Router
   ) {}
 
   ngOnInit() {
     const stored = localStorage.getItem('user');
     if (!stored) { this.router.navigate(['/login']); return; }
-
     this.user = JSON.parse(stored);
     if (this.user.role !== 'etudiant' || !this.user.etudiantId) {
       this.router.navigate(['/login']); return;
     }
     this.etudiantId = this.user.etudiantId;
+    this.profileNom = this.user.nom;
+    this.profileEmail = this.user.email;
     this.loadFormations();
     this.loadMesFormations();
     this.chargerProgression();
     this.loadUnreadCount();
-this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
+    this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
   }
 
-  setSection(section: any) {
-    this.activeSection = section;
-    this.message = '';
+  ngOnDestroy() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   }
+
+  setSection(section: any) { this.activeSection = section; this.message = ''; }
 
   showMessage(msg: string, type: 'success' | 'danger' = 'success') {
     this.message = msg;
@@ -92,22 +108,20 @@ this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
     setTimeout(() => this.message = '', 4000);
   }
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
+  logout() { localStorage.clear(); this.router.navigate(['/login']); }
 
+  // ===== Formations =====
   loadFormations() {
     if (!this.etudiantId) return;
-    this.etudiantService.getFormations(this.etudiantId, this.page)
-      .subscribe({
-        next: (res: any) => {
-          this.formations = res.data;
-          this.totalPages = res.pagination.pages;
-          this.totalFormations = res.pagination.total;
-        },
-        error: () => this.showMessage('Erreur chargement des formations', 'danger')
-      });
+    this.etudiantService.getFormations(this.etudiantId, this.page).subscribe({
+      next: (res: any) => {
+        this.formations = res.data;
+        this.totalPages = res.pagination.pages;
+        this.totalFormations = res.pagination.total;
+        this.formations.forEach(f => this.chargerMaNote(f.id));
+      },
+      error: () => this.showMessage('Erreur chargement des formations', 'danger')
+    });
   }
 
   get formationsFiltrees() {
@@ -137,57 +151,49 @@ this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
 
   inscrire(formationId: number) {
     if (!this.etudiantId) return;
-    this.etudiantService.inscrire(this.etudiantId, formationId)
-      .subscribe({
-        next: () => {
-          this.showMessage('Inscription réussie ! La formation a été ajoutée à votre espace.');
-          this.loadMesFormations();
-          this.loadFormations();
-        },
-        error: (err) => {
-          this.showMessage(err?.error?.message || "Erreur lors de l'inscription", 'danger');
-        }
-      });
+    this.etudiantService.inscrire(this.etudiantId, formationId).subscribe({
+      next: () => {
+        this.showMessage('Inscription réussie !');
+        this.loadMesFormations();
+        this.loadFormations();
+      },
+      error: (err) => this.showMessage(err?.error?.message || "Erreur lors de l'inscription", 'danger')
+    });
   }
 
   estDejaInscrit(formationId: number): boolean {
     return this.mesFormations.some(f => f.formation_id === formationId);
   }
 
+  // ===== Mes formations =====
   loadMesFormations() {
     if (!this.etudiantId) return;
-    this.etudiantService.getMesFormations(this.etudiantId)
-      .subscribe({
-        next: data => this.mesFormations = data,
-        error: () => this.showMessage('Erreur chargement de vos formations', 'danger')
-      });
+    this.etudiantService.getMesFormations(this.etudiantId).subscribe({
+      next: data => this.mesFormations = data,
+      error: () => this.showMessage('Erreur chargement de vos formations', 'danger')
+    });
   }
 
   getStatutBadge(statut: string): string {
-    const map: any = {
-      'Inscrit': 'bg-primary',
-      'Présent': 'bg-success',
-      'Absent': 'bg-danger',
-      'Terminé': 'bg-secondary'
-    };
+    const map: any = { 'Inscrit': 'bg-primary', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
     return map[statut] || 'bg-secondary';
   }
 
+  // ===== Supports =====
   voirSupports(formation: any) {
     this.formationSelectionnee = formation;
     this.activeSection = 'supports';
     const id = formation.formation_id || formation.id;
-    this.etudiantService.getSupports(id)
-      .subscribe({
-        next: data => this.supports = data,
-        error: () => this.showMessage('Erreur chargement des supports', 'danger')
-      });
+    this.etudiantService.getSupports(id).subscribe({
+      next: data => this.supports = data,
+      error: () => this.showMessage('Erreur chargement des supports', 'danger')
+    });
   }
 
   getIconSupport(type: string): string {
     const t = (type || '').toLowerCase();
     if (t.includes('pdf')) return '📄';
-    if (t.includes('vidéo') || t.includes('video') || t.includes('mp4')) return '🎬';
+    if (t.includes('vidéo') || t.includes('video')) return '🎬';
     if (t.includes('image') || t.includes('img')) return '🖼️';
     if (t.includes('zip') || t.includes('archive')) return '📦';
     if (t.includes('doc') || t.includes('word')) return '📝';
@@ -201,17 +207,17 @@ this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
     return fichier;
   }
 
+  // ===== Progression =====
   chargerProgression() {
     if (!this.etudiantId) return;
-    this.etudiantService.getProgression(this.etudiantId)
-      .subscribe({
-        next: data => this.progression = data?.progression || 0,
-        error: () => {}
-      });
+    this.etudiantService.getProgression(this.etudiantId).subscribe({
+      next: data => this.progression = data?.progression || 0,
+      error: () => {}
+    });
   }
 
   get formationsTerminees(): number {
-    return this.mesFormations.filter(f => f.statut === 'Présent' || f.statut === 'Terminé').length;
+    return this.mesFormations.filter(f => f.statut === 'présent' || f.statut === 'Terminé').length;
   }
 
   get formationsEnCours(): number {
@@ -227,7 +233,7 @@ this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
   pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
-  
+
   // ===== Notation =====
   chargerMaNote(formationId: number) {
     if (!this.etudiantId) return;
@@ -301,64 +307,153 @@ this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
       error: (err) => this.showMessage(err?.error?.message || 'Erreur changement de mot de passe', 'danger')
     });
   }
-  ngOnDestroy() {
-  if (this.pollingInterval) clearInterval(this.pollingInterval);
-}
 
-loadUnreadCount() {
-  if (!this.user?.id) return;
-  this.notifService.getUnreadCount(this.user.id).subscribe({
-    next: (data: { count: number; }) => this.unreadCount = data?.count || 0,
-    error: () => {}
-  });
-}
+  // ===== Notifications =====
+  loadUnreadCount() {
+    if (!this.user?.id) return;
+    this.notifService.getUnreadCount(this.user.id).subscribe({
+      next: data => this.unreadCount = data?.count || 0,
+      error: () => {}
+    });
+  }
 
-loadNotifications() {
-  if (!this.user?.id) return;
-  this.notifService.getNotifications(this.user.id).subscribe({
-    next: (data: any[]) => {
-      this.notifications = data;
-      this.unreadCount = data.filter((n: any) => !n.lu).length;
-    },
-    error: () => {}
-  });
-}
+  loadNotifications() {
+    if (!this.user?.id) return;
+    this.notifService.getNotifications(this.user.id).subscribe({
+      next: data => {
+        this.notifications = data;
+        this.unreadCount = data.filter((n: any) => !n.lu).length;
+      },
+      error: () => {}
+    });
+  }
 
-marquerLu(notif: any) {
-  if (notif.lu) return;
-  this.notifService.marquerLu(notif.id).subscribe({
-    next: () => { notif.lu = 1; this.unreadCount = Math.max(0, this.unreadCount - 1); },
-    error: () => {}
-  });
-}
+  marquerLu(notif: any) {
+    if (notif.lu) return;
+    this.notifService.marquerLu(notif.id).subscribe({
+      next: () => {
+        notif.lu = 1;
+        this.unreadCount = Math.max(0, this.unreadCount - 1);
+      },
+      error: () => {}
+    });
+  }
 
-marquerToutLu() {
-  if (!this.user?.id) return;
-  this.notifService.marquerToutLu(this.user.id).subscribe({
-    next: () => { this.notifications.forEach(n => n.lu = 1); this.unreadCount = 0; },
-    error: () => {}
-  });
-}
+  marquerToutLu() {
+    if (!this.user?.id) return;
+    this.notifService.marquerToutLu(this.user.id).subscribe({
+      next: () => {
+        this.notifications.forEach(n => n.lu = 1);
+        this.unreadCount = 0;
+      },
+      error: () => {}
+    });
+  }
 
-supprimerNotif(id: number, event: Event) {
-  event.stopPropagation();
-  this.notifService.supprimer(id).subscribe({
-    next: () => {
-      const notif = this.notifications.find(n => n.id === id);
-      if (notif && !notif.lu) this.unreadCount = Math.max(0, this.unreadCount - 1);
-      this.notifications = this.notifications.filter(n => n.id !== id);
-    },
-    error: () => {}
-  });
-}
+  supprimerNotif(id: number, event: Event) {
+    event.stopPropagation();
+    this.notifService.supprimer(id).subscribe({
+      next: () => {
+        const notif = this.notifications.find(n => n.id === id);
+        if (notif && !notif.lu) this.unreadCount = Math.max(0, this.unreadCount - 1);
+        this.notifications = this.notifications.filter(n => n.id !== id);
+      },
+      error: () => {}
+    });
+  }
 
-getNotifIcon(type: string): string {
-  const icons: any = { inscription:'📚', approbation:'✅', rejet:'❌', presence:'🏆', info:'ℹ️' };
-  return icons[type] || '🔔';
-}
+  getNotifIcon(type: string): string {
+    const icons: any = {
+      'inscription': '📚',
+      'approbation': '✅',
+      'rejet': '❌',
+      'presence': '🏆',
+      'info': 'ℹ️'
+    };
+    return icons[type] || '🔔';
+  }
 
-openNotifications() {
-  this.activeSection = 'notifications';
-  this.loadNotifications();
-}
+  openNotifications() {
+    this.activeSection = 'notifications';
+    this.loadNotifications();
+  }
+
+  // ===== Messagerie =====
+  openMessages() {
+    this.activeSection = 'messages';
+    this.message = '';
+    this.loadContacts();
+  }
+
+  loadContacts() {
+    if (!this.user?.id) return;
+    this.msgService.getContacts(this.user.id).subscribe({
+      next: data => this.contacts = data,
+      error: () => {}
+    });
+  }
+
+  ouvrirConversation(contact: any) {
+    this.contactSelectionne = contact;
+    contact.non_lus = 0;
+    if (!this.user?.id) return;
+    this.msgService.getConversation(this.user.id, contact.id).subscribe({
+      next: data => this.messagesConversation = data,
+      error: () => {}
+    });
+  }
+
+  envoyerMessage(event?: Event) {
+    if (event) event.preventDefault();
+    if (!this.nouveauMessage.trim() || !this.contactSelectionne || !this.user?.id) return;
+    const texte = this.nouveauMessage.trim();
+    this.nouveauMessage = '';
+    this.msgService.envoyerMessage(this.user.id, this.contactSelectionne.id, texte).subscribe({
+      next: (res: any) => {
+        this.messagesConversation.push({
+          id: res.id,
+          expediteur_id: this.user.id,
+          contenu: texte,
+          date_envoi: new Date().toISOString()
+        });
+        const c = this.contacts.find(c => c.id === this.contactSelectionne.id);
+        if (c) c.dernier_message = texte;
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi du message', 'danger')
+    });
+  }
+
+  // ===== Questions =====
+  openQuestions() {
+    this.activeSection = 'questions';
+    this.message = '';
+    this.loadMesQuestions();
+  }
+
+  loadMesQuestions() {
+    if (!this.user?.id) return;
+    this.questService.getMesQuestions(this.user.id).subscribe({
+      next: data => this.mesQuestions = data,
+      error: () => {}
+    });
+  }
+
+  poserQuestion() {
+    if (!this.questionFormationId || !this.questionTexte.trim() || !this.user?.id) return;
+    this.questService.poserQuestion(this.questionFormationId, this.user.id, this.questionTexte).subscribe({
+      next: () => {
+        this.showMessage('Question envoyée !');
+        this.questionTexte = '';
+        this.loadMesQuestions();
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi de la question', 'danger')
+    });
+  }
+
+  supprimerQuestion(id: number) {
+    this.questService.supprimer(id).subscribe({
+      next: () => this.mesQuestions = this.mesQuestions.filter(q => q.id !== id),
+      error: () => {}
+    });
+  }
 }

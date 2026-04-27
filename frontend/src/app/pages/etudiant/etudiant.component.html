@@ -30,8 +30,14 @@
         <span class="nav-icon">🔔</span> Notifications
         <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </a>
+     <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
+        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'questions'" (click)="openQuestions()">
+        <span class="nav-icon">❓</span> Mes Questions
+      </a>
     </nav>
-
     <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
   </aside>
 
@@ -224,7 +230,7 @@
         <h2>📈 Ma progression</h2>
         <p>Suivi de votre parcours de formation</p>
       </div>
-
+ <!-- Barre de progression -->
       <div class="card-section">
         <h5 class="section-title">Progression globale</h5>
         <div class="progress-container">
@@ -240,7 +246,7 @@
           </div>
         </div>
       </div>
-
+  <!-- Stats formations -->
       <div class="stats-grid">
         <div class="stat-card green">
           <div class="stat-icon">🏆</div>
@@ -328,7 +334,7 @@
         </div>
       </div>
     </section>
- <!-- ===== NOTIFICATIONS ===== -->
+    <!-- ===== NOTIFICATIONS ===== -->
 <section *ngIf="activeSection === 'notifications'">
   <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
     <div>
@@ -339,9 +345,12 @@
       ✅ Tout marquer comme lu
     </button>
   </div>
+
   <div *ngIf="notifications.length === 0" class="empty-state">
-    <span>🔔</span><p>Aucune notification pour le moment.</p>
+    <span>🔔</span>
+    <p>Aucune notification pour le moment.</p>
   </div>
+
   <div class="notifications-list" *ngIf="notifications.length > 0">
     <div class="notif-item" *ngFor="let n of notifications"
          [class.unread]="!n.lu" (click)="marquerLu(n)">
@@ -355,75 +364,94 @@
     </div>
   </div>
 </section>
-    <!-- ===== ATTESTATION ===== -->
-    <section *ngIf="activeSection === 'attestation'">
-      <div class="page-title no-print">
-        <button class="btn-back" (click)="setSection('mesFormations')">← Retour</button>
-        <h2>🏆 Attestation de présence</h2>
-        <button class="btn-primary" (click)="imprimerAttestation()" style="margin-left:auto">🖨️ Imprimer</button>
+
+<!-- ===== ATTESTATION ===== -->
+<section *ngIf="activeSection === 'attestation'">
+  <div class="page-title no-print">
+    <button class="btn-back" (click)="setSection('mesFormations')">← Retour</button>
+    <h2>🏆 Attestation de présence</h2>
+    <button class="btn-primary" (click)="imprimerAttestation()" style="margin-left:auto">🖨️ Imprimer</button>
+  </div>
+
+  <div class="attestation-doc">
+    <div class="attest-header">
+      <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png"
+           class="attest-logo" onerror="this.style.display='none'">
+      <div class="attest-header-text">
+        <div class="attest-institute">Institut Supérieur des Études Technologiques</div>
+        <div class="attest-title-doc">ATTESTATION DE PRÉSENCE</div>
       </div>
-  <!-- Document imprimable -->
-      <div class="attestation-doc">
-        <div class="attest-header">
-          <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png"
-               alt="ISET" class="attest-logo" onerror="this.style.display='none'">
-          <div class="attest-header-text">
-            <div class="attest-institute">Institut Supérieur des Études Technologiques</div>
-            <div class="attest-title-doc">ATTESTATION DE PRÉSENCE</div>
-          </div>
-        </div>
-           <div class="attest-body">
-            <p class="attest-intro">L'Institut Supérieur des Études Technologiques atteste que :</p>
-    <div class="attest-info-block">
-            <div class="attest-info-row">
-              <span class="attest-label">Nom et prénom :</span>
-              <span class="attest-value">{{ user?.nom }}</span>
-            </div>
-            <div class="attest-info-row">
-              <span class="attest-label">Email :</span>
-              <span class="attest-value">{{ user?.email }}</span>
-            </div>
-          </div>
- 
-          <p class="attest-text">
-            A suivi et participé à la formation intitulée :
-          </p>
- 
-          <div class="attest-formation-name">« {{ formationAttestation?.titre }} »</div>
- 
-          <div class="attest-info-block">
-            <div class="attest-info-row" *ngIf="formationAttestation?.date_debut">
-              <span class="attest-label">Date de début :</span>
-              <span class="attest-value">{{ formationAttestation.date_debut | date:'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="attest-info-row" *ngIf="formationAttestation?.date_fin">
-              <span class="attest-label">Date de fin :</span>
-              <span class="attest-value">{{ formationAttestation.date_fin | date:'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="attest-info-row" *ngIf="formationAttestation?.duree">
-              <span class="attest-label">Durée :</span>
-              <span class="attest-value">{{ formationAttestation.duree }} heures</span>
-            </div>
-            <div class="attest-info-row" *ngIf="formationAttestation?.niveau">
-              <span class="attest-label">Niveau :</span>
-              <span class="attest-value">{{ formationAttestation.niveau }}</span>
-            </div>
-          </div>
- 
-          <p class="attest-text">
-            avec la mention <strong>PRÉSENT(E)</strong>.
-          </p>
-        </div>
- 
-        <div class="attest-footer">
-          <div class="attest-date">Délivré le {{ getTodayStr() }}</div>
-          <div class="attest-signature">
-            <div class="sig-line"></div>
-            <div class="sig-label">Cachet et signature</div>
-          </div>
-        </div>
-    
+    </div>
+
+    <div class="attest-body">
+      <p>L'institut atteste que :</p>
+
+      <p><strong>{{ user?.nom }}</strong></p>
+      <p>{{ user?.email }}</p>
+
+      <p>a suivi la formation :</p>
+
+      <h3>{{ formationAttestation?.titre }}</h3>
+
+      <p *ngIf="formationAttestation?.date_debut">
+        Début : {{ formationAttestation.date_debut | date:'dd/MM/yyyy' }}
+      </p>
+
+      <p *ngIf="formationAttestation?.date_fin">
+        Fin : {{ formationAttestation.date_fin | date:'dd/MM/yyyy' }}
+      </p>
+
+      <p><strong>PRÉSENT(E)</strong></p>
+    </div>
+
+    <div class="attest-footer">
+      <div>Délivré le {{ getTodayStr() }}</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MESSAGERIE ===== -->
+<section *ngIf="activeSection === 'messages'">
+  <div class="page-title">
+    <h2>💬 Messagerie</h2>
+  </div>
+
+  <div class="chat-container">
+
+    <!-- CONTACTS -->
+    <div class="contacts-panel">
+      <div *ngFor="let c of contacts"
+           class="contact-item"
+           (click)="ouvrirConversation(c)">
+        {{ c.nom }}
       </div>
-    </section>
+    </div>
+
+    <!-- CONVERSATION -->
+    <div *ngIf="contactSelectionne">
+      <div *ngFor="let m of messagesConversation">
+        {{ m.contenu }}
+      </div>
+
+      <textarea [(ngModel)]="nouveauMessage"
+                (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)">
+      </textarea>
+
+      <button (click)="envoyerMessage()">Envoyer</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== QUESTIONS ===== -->
+<section *ngIf="activeSection === 'questions'">
+  <div class="page-title">
+    <h2>❓ Mes Questions</h2>
+  </div>
+
+  <div *ngFor="let q of mesQuestions">
+    {{ q.question }}
+  </div>
+</section>
   </main>
 </div>

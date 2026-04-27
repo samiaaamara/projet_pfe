@@ -29,6 +29,13 @@
         <span class="nav-icon">🔔</span> Notifications
         <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </a>
+            <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
+        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'questions'" (click)="openQuestions()">
+        <span class="nav-icon">❓</span> Questions
+      </a>
     </nav>
 
     <button class="logout-btn" (click)="logout()">
@@ -430,6 +437,132 @@
 
     </section>
 
-    
+     <!-- ===== MESSAGERIE ===== -->
+    <section *ngIf="activeSection === 'messages'">
+      <div class="page-title">
+        <h2>💬 Messagerie</h2>
+        <p>Échangez des messages avec vos étudiants</p>
+      </div>
+      <div class="chat-container">
+        <!-- Contacts -->
+        <div class="contacts-panel">
+          <div class="contacts-header">Mes étudiants</div>
+          <div class="contacts-list">
+            <div *ngFor="let c of contacts"
+                 class="contact-item"
+                 [class.active]="contactSelectionne?.id === c.id"
+                 (click)="ouvrirConversation(c)">
+              <div class="contact-avatar">{{ c.nom?.charAt(0)?.toUpperCase() }}</div>
+              <div class="contact-info">
+                <div class="contact-name">{{ c.nom }}</div>
+                <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
+              </div>
+              <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
+            </div>
+            <div *ngIf="contacts.length === 0" class="no-contacts">
+              Aucun étudiant inscrit à vos formations
+            </div>
+          </div>
+        </div>
+         <!-- Conversation -->
+        <div class="conversation-panel" *ngIf="contactSelectionne; else noConvFmt">
+          <div class="conv-header">
+            <div class="contact-avatar conv-avatar">{{ contactSelectionne.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div class="conv-info">
+              <div class="conv-name">{{ contactSelectionne.nom }}</div>
+              <div class="conv-role-label">Étudiant</div>
+            </div>
+          </div>
+          <div class="messages-list">
+            <div *ngFor="let m of messagesConversation"
+                 class="msg-item"
+                 [class.msg-sent]="m.expediteur_id === user?.id"
+                 [class.msg-received]="m.expediteur_id !== user?.id">
+              <div class="msg-bubble">{{ m.contenu }}</div>
+              <div class="msg-time">{{ m.date_envoi | date:'dd/MM HH:mm' }}</div>
+            </div>
+            <div *ngIf="messagesConversation.length === 0" class="no-msgs">
+              Aucun message. Commencez la conversation !
+            </div>
+          </div>
+          <div class="msg-input-area">
+            <textarea [(ngModel)]="nouveauMessage"
+                      placeholder="Votre message..."
+                      rows="2"
+                      (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
+            <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
+              Envoyer ✉️
+            </button>
+          </div>
+        </div>
+        <ng-template #noConvFmt>
+          <div class="no-conv-placeholder">
+            <div class="no-conv-icon">💬</div>
+            <p>Sélectionnez un étudiant pour démarrer une conversation</p>
+          </div>
+        </ng-template>
+      </div>
+    </section>
+
+    <!-- ===== QUESTIONS ===== -->
+    <section *ngIf="activeSection === 'questions'">
+      <div class="page-title">
+        <h2>❓ Questions des Étudiants</h2>
+        <p>Répondez aux questions posées sur vos formations</p>
+      </div>
+       <div class="card-form mb-4">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Sélectionner une formation</label>
+          <select [(ngModel)]="formationQuestionsId" class="form-control"
+                  (ngModelChange)="loadQuestionsFormation($event)">
+            <option [ngValue]="null">Choisir une formation...</option>
+            <option *ngFor="let f of formations" [ngValue]="f.id">{{ f.titre }}</option>
+          </select>
+        </div>
+      </div>
+      <div *ngIf="formationQuestionsId">
+        <div class="questions-list">
+          <div class="question-card" *ngFor="let q of questionsFormation">
+            <div class="q-header">
+              <span class="q-student-name">👤 {{ q.etudiant_nom }}</span>
+              <span class="q-date">{{ q.date_question | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="q-content">❓ {{ q.question }}</div>
+<div *ngIf="q.reponse && !q.isEditing" class="q-answer-given">
+              <span class="answer-icon">💡</span>
+              <div class="answer-content">
+                <span class="answer-label">Votre réponse :</span>
+                {{ q.reponse }}
+              </div>
+              <button class="btn-edit-ans" (click)="modifierReponse(q)">✏️ Modifier</button>
+            </div>
+
+            <div *ngIf="!q.reponse || q.isEditing" class="q-reply-form">
+              <textarea [(ngModel)]="q.reponseTemp" rows="2" class="form-control"
+                        placeholder="Entrez votre réponse..."></textarea>
+              <div class="q-reply-actions">
+                <button class="btn-primary btn-sm" (click)="repondreQuestion(q)"
+                        [disabled]="!q.reponseTemp?.trim()">
+                  Répondre ✅
+                </button>
+                <button *ngIf="q.isEditing" class="btn-secondary btn-sm"
+                        (click)="q.isEditing = false">Annuler</button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="questionsFormation.length === 0" class="empty-state">
+            <div>❓</div>
+            <p>Aucune question pour cette formation.</p>
+          </div>
+        </div>
+
+</div>
+
+      <div *ngIf="!formationQuestionsId" class="empty-state">
+        <div>📚</div>
+        <p>Sélectionnez une formation pour voir les questions des étudiants.</p>
+      </div>
+    </section>
+
   </main>
 </div>

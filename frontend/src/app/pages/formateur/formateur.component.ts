@@ -6,6 +6,8 @@ import { FormateurService } from '../../services/formateur.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
 
+import { MessagesService } from '../../services/messages.service';
+import { QuestionsService } from '../../services/questions.service';
 @Component({
   selector: 'app-formateur',
   standalone: true,
@@ -74,12 +76,26 @@ export class FormateurComponent implements OnInit, OnDestroy {
   unreadCount = 0;
   private pollingInterval: any;
 
+  // Messagerie
+  contacts: any[] = [];
+  messagesConversation: any[] = [];
+  contactSelectionne: any = null;
+  nouveauMessage = '';
+  unreadMessages = 0;
+
+  // Questions
+  questionsFormation: any[] = [];
+  formationQuestionsId: number | null = null;
   // Section active (menu sidebar)
-     activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' = 'accueil';
-     
+    
+  activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' | 'messages' | 'questions' = 'accueil';
+
   constructor(
     private formateurService: FormateurService,
      private authService: Auth,
+     private msgService: MessagesService,
+    private questService: QuestionsService,
+      private notificationsService: NotificationsService,
     private router: Router
   ) {}
 
@@ -592,6 +608,85 @@ if (!this.supportType) {
     this.activeSection = 'notifications';
     this.loadNotifications();
   }
+  
+  // ===== Messagerie =====
+  openMessages() {
+    this.activeSection = 'messages';
+    this.message = '';
+    this.loadContacts();
+  }
+
+  loadContacts() {
+    if (!this.user?.id) return;
+    this.msgService.getContacts(this.user.id).subscribe({
+      next: data => this.contacts = data,
+      error: () => {}
+    });
+  }
+
+  ouvrirConversation(contact: any) {
+    this.contactSelectionne = contact;
+    contact.non_lus = 0;
+    if (!this.user?.id) return;
+    this.msgService.getConversation(this.user.id, contact.id).subscribe({
+      next: data => this.messagesConversation = data,
+      error: () => {}
+    });
+  }
+
+  envoyerMessage(event?: Event) {
+    if (event) event.preventDefault();
+    if (!this.nouveauMessage.trim() || !this.contactSelectionne || !this.user?.id) return;
+    const texte = this.nouveauMessage.trim();
+    this.nouveauMessage = '';
+    this.msgService.envoyerMessage(this.user.id, this.contactSelectionne.id, texte).subscribe({
+      next: (res: any) => {
+        this.messagesConversation.push({
+          id: res.id,
+          expediteur_id: this.user.id,
+          contenu: texte,
+          date_envoi: new Date().toISOString()
+        });
+        const c = this.contacts.find(c => c.id === this.contactSelectionne.id);
+        if (c) c.dernier_message = texte;
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi du message', 'danger')
+    });
+  }
+
+  // ===== Questions =====
+  openQuestions() {
+    this.activeSection = 'questions';
+    this.message = '';
+  }
+
+  loadQuestionsFormation(formationId: number) {
+    if (!formationId) { this.questionsFormation = []; return; }
+    this.questService.getQuestionsFormation(formationId).subscribe({
+      next: data => this.questionsFormation = data.map((q: any) => ({ ...q, reponseTemp: '', isEditing: false })),
+      error: () => {}
+    });
+  }
+
+  repondreQuestion(q: any) {
+    if (!q.reponseTemp?.trim()) return;
+    this.questService.repondre(q.id, q.reponseTemp).subscribe({
+      next: () => {
+        q.reponse = q.reponseTemp;
+        q.reponseTemp = '';
+        q.isEditing = false;
+        this.showMessage('Réponse envoyée ✅');
+      },
+      error: () => this.showMessage('Erreur lors de la réponse', 'danger')
+    });
+  }
+
+  modifierReponse(q: any) {
+    q.reponseTemp = q.reponse;
+    q.isEditing = true;
+  }
+
+
 logout() {
   localStorage.clear();
   this.router.navigate(['/login']);
