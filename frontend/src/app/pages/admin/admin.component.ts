@@ -18,6 +18,7 @@ export class AdminComponent implements OnInit {
   formations: any[] = [];
   formateurs: any[] = [];
   formationsPending: any[] = [];
+  formationsAccepted: any[] = [];
   stats: any = {};
 
   userSearch: string = '';
@@ -58,6 +59,7 @@ export class AdminComponent implements OnInit {
     this.loadFormations();
     this.loadFormateurs();
     this.loadFormationsPending();
+    this.loadFormationsAccepted();
     this.loadStats();
   }
 
@@ -65,7 +67,9 @@ export class AdminComponent implements OnInit {
     this.activeSection = section;
     if (section === 'approvals') {
       this.loadFormationsPending();
+      this.loadFormationsAccepted();
     }
+    
   }
 
   getEmptyForm() {
@@ -388,18 +392,42 @@ get filteredUsers() {
     });
   }
 
-  approveAndPublishFormation(formationId: number) {
-    if (!confirm('Approuver et publier cette formation ?')) return;
-    this.adminService.approveAndPublishFormation(formationId).subscribe({
-      next: () => {
-        this.showMessage('Formation approuvée et publiée 🚀', 'success');
-        this.loadFormationsPending();
-        this.loadFormations();
-      },
-      error: err => this.showMessage(err?.error?.error || '❌ Erreur lors de l\'approbation', 'danger')
-    });
-  }
+ loadFormationsAccepted() {
+  this.adminService.getFormationsAccepted().subscribe({
+    next: res => this.formationsAccepted = res,
+    error: err => console.error(err)
+  });
+}
 
+acceptFormation(formationId: number) {
+  if (!confirm('Accepter cette formation ? Une notification sera envoyée au formateur.')) return;
+
+  this.adminService.acceptFormation(formationId).subscribe({
+    next: () => {
+      this.showMessage('Formation acceptée ✅ — Le formateur a été notifié.', 'success');
+      this.loadFormationsPending();
+      this.loadFormationsAccepted();
+    },
+    error: (err) => {
+      this.showMessage(err?.error?.error || '❌ Erreur lors de l\'acceptation', 'danger');
+    }
+  });
+}
+
+publishAcceptedFormation(formationId: number) {
+  if (!confirm('Publier cette formation dans le catalogue ?')) return;
+
+  this.adminService.publishAcceptedFormation(formationId).subscribe({
+    next: () => {
+      this.showMessage('Formation publiée dans le catalogue 🚀 — Le formateur a été notifié.', 'success');
+      this.loadFormationsAccepted();
+      this.loadFormations();
+    },
+    error: (err) => {
+      this.showMessage(err?.error?.error || '❌ Erreur lors de la publication', 'danger');
+    }
+  });
+}
   rejectFormation(formationId: number) {
     const reason = prompt('Raison du rejet:');
     if (reason === null) return;

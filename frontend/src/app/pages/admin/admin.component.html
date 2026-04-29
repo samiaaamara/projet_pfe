@@ -22,8 +22,10 @@
       </a>
       <a class="nav-item" [class.active]="activeSection==='approvals'" (click)="setSection('approvals')">
         <span class="nav-icon">🔔</span> Approbations
-        <span class="nav-badge alert-badge" *ngIf="formationsPending.length">{{ formationsPending.length }}</span>
-      </a>
+       <span class="nav-badge alert-badge" *ngIf="formationsPending.length + formationsAccepted.length > 0">
+  {{ formationsPending.length + formationsAccepted.length }}
+</span>
+     </a>
       <a class="nav-item" [class.active]="activeSection==='formateurs'" (click)="setSection('formateurs')">
         <span class="nav-icon">👨‍🏫</span> Formateurs
         <span class="nav-badge" *ngIf="formateurs.length">{{ formateurs.length }}</span>
@@ -366,38 +368,72 @@
       </div>
     </section>
  
-    <!-- ===== APPROBATIONS ===== -->
-    <section *ngIf="activeSection==='approvals'">
-      <div class="page-title">
-        <h2>🔔 Approbations</h2>
-        <p>{{ formationsPending.length }} formation(s) en attente</p>
+   <!-- ===== APPROBATIONS ===== -->
+<section *ngIf="activeSection==='approvals'">
+  <div class="page-title">
+    <h2>🔔 Approbations</h2>
+    <p>{{ formationsPending.length }} en attente · {{ formationsAccepted.length }} acceptée(s)</p>
+  </div>
+
+  <!-- EN ATTENTE D'ACCEPTATION -->
+  <div class="approvals-sub-title">
+    <h4>📥 En attente d'acceptation</h4>
+  </div>
+
+  <div *ngIf="formationsPending.length === 0" class="empty-state" style="margin-bottom:24px">
+    <span>✅</span>
+    <p>Aucune formation en attente d'acceptation.</p>
+  </div>
+
+  <div class="approvals-grid" *ngIf="formationsPending.length > 0">
+    <div class="approval-card" *ngFor="let f of formationsPending">
+      <div class="approval-header">
+        <span class="status-badge status-pending">En attente</span>
+        <span class="approval-date" *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
       </div>
- 
-      <div *ngIf="formationsPending.length === 0" class="empty-state">
-        <span>✅</span>
-        <p>Aucune formation en attente d'approbation.</p>
+      <h5 class="approval-title">{{ f.titre }}</h5>
+      <p class="approval-desc">{{ f.description }}</p>
+      <div class="approval-meta">
+        <span>👨‍🏫 {{ f.formateur }}</span>
+        <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
+        <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
       </div>
- 
-      <div class="approvals-grid" *ngIf="formationsPending.length > 0">
-        <div class="approval-card" *ngFor="let f of formationsPending">
-          <div class="approval-header">
-            <span class="status-badge status-pending">En attente</span>
-            <span class="approval-date" *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <h5 class="approval-title">{{ f.titre }}</h5>
-          <p class="approval-desc">{{ f.description }}</p>
-          <div class="approval-meta">
-            <span>👨‍🏫 {{ f.formateur }}</span>
-            <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
-           <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
-          </div>
-          <div class="approval-actions">
-            <button class="btn-approve" (click)="approveAndPublishFormation(f.id)">✅ Approuver & Publier</button>
-            <button class="btn-reject" (click)="rejectFormation(f.id)">❌ Rejeter</button>
-          </div>
-        </div>
+      <div class="approval-actions">
+        <button class="btn-approve" (click)="acceptFormation(f.id)">✅ Accepter</button>
+        <button class="btn-reject" (click)="rejectFormation(f.id)">❌ Rejeter</button>
       </div>
-    </section>
+    </div>
+  </div>
+
+  <!-- ACCEPTÉES — EN ATTENTE DE PUBLICATION -->
+  <div class="approvals-sub-title" style="margin-top:32px">
+    <h4>📋 Acceptées — en attente de publication</h4>
+  </div>
+
+  <div *ngIf="formationsAccepted.length === 0" class="empty-state">
+    <span>📭</span>
+    <p>Aucune formation acceptée en attente de publication.</p>
+  </div>
+
+  <div class="approvals-grid" *ngIf="formationsAccepted.length > 0">
+    <div class="approval-card approval-card-accepted" *ngFor="let f of formationsAccepted">
+      <div class="approval-header">
+        <span class="status-badge status-accepted">Acceptée</span>
+        <span class="approval-date" *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <h5 class="approval-title">{{ f.titre }}</h5>
+      <p class="approval-desc">{{ f.description }}</p>
+      <div class="approval-meta">
+        <span>👨‍🏫 {{ f.formateur }}</span>
+        <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
+        <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
+      </div>
+      <div class="approval-actions">
+        <button class="btn-publish" (click)="publishAcceptedFormation(f.id)">🚀 Publier dans le catalogue</button>
+      </div>
+    </div>
+  </div>
+</section>
  
   </main>
 </div>

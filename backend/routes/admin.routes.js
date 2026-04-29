@@ -3,10 +3,7 @@ const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcrypt');
 const { verifyAdmin } = require('../middleware/auth.middleware');
-
-const allowedNiveaux = ['Débutant', 'Intermédiaire', 'Avancé'];
-const allowedStatuses = ['draft', 'published'];
-
+const allowedStatuses = ['draft', 'published', 'accepted'];
 const isValidDate = (value) => {
   return typeof value === 'string' && !Number.isNaN(Date.parse(value));
 };
@@ -445,32 +442,95 @@ router.get('/formations-pending', (req, res) => {
   });
 });
 
-/* =========================
-   ✅ APPROUVER & PUBLIER UNE FORMATION
-========================= */
-router.put('/formations/:id/approve-and-publish', (req, res) => {
+/* ✅ ACCEPTER (pending_approval → accepted) */
+router.put('/formations/:id/accept', (req, res) => {
   const formationId = parseInt(req.params.id);
+  if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
 
-  if (isNaN(formationId)) {
-    return res.status(400).json({ error: 'Formation ID invalide' });
-  }
+  db.query(
+    "UPDATE formations SET status = 'accepted' WHERE id = ? AND status = 'pending_approval'",
+    [formationId],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation introuvable ou déjà traitée' });
 
+      res.json({ message: 'Formation acceptée ✅' });
+
+      db.query(
+        `SELECT f.titre, u.id AS formateur_user_id
+         FROM formations f
+         JOIN formateurs fo ON f.formateur_id = fo.id
+         JOIN users u ON fo.user_id = u.id
+         WHERE f.id = ?`,
+        [formationId],
+        (ne, nr) => {
+          if (!ne && nr.length > 0) {
+            db.query(
+              'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+              [nr[0].formateur_user_id, `✅ Votre formation « ${nr[0].titre} » a été acceptée par l'administrateur. Elle sera publiée prochainement.`, 'approbation'],
+              () => {}
+            );
+          }
+        }
+      );
+    }
+  );
+});
+
+/* 🚀 PUBLIER (accepted → published) */
+router.put('/formations/:id/publish-accepted', (req, res) => {
+  const formationId = parseInt(req.params.id);
+  if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
+
+  db.query(
+    "UPDATE formations SET status = 'published' WHERE id = ? AND status = 'accepted'",
+    [formationId],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation introuvable ou non encore acceptée' });
+
+      res.json({ message: 'Formation publiée dans le catalogue 🚀' });
+
+      db.query(
+        `SELECT f.titre, u.id AS formateur_user_id
+         FROM formations f
+         JOIN formateurs fo ON f.formateur_id = fo.id
+         JOIN users u ON fo.user_id = u.id
+         WHERE f.id = ?`,
+        [formationId],
+        (ne, nr) => {
+          if (!ne && nr.length > 0) {
+            db.query(
+              'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+              [nr[0].formateur_user_id, `🚀 Votre formation « ${nr[0].titre} » est maintenant publiée dans le catalogue !`, 'publication'],
+              () => {}
+            );
+          }
+        }
+      );
+    }
+  );
+});
+
+/* 📋 FORMATIONS ACCEPTÉES */
+router.get('/formations-accepted', (req, res) => {
   const sql = `
-    UPDATE formations
-    SET status = 'published'
-    WHERE id = ? AND status = 'pending_approval'
+    SELECT
+      f.id, f.titre, f.description, f.date_debut, f.date_fin,
+      f.duree, f.specialite, f.nb_places, f.status, f.formateur_id,
+      u.nom AS formateur, u.email AS formateur_email
+    FROM formations f
+    LEFT JOIN formateurs fo ON f.formateur_id = fo.id
+    LEFT JOIN users u ON fo.user_id = u.id
+    WHERE f.status = 'accepted'
+    ORDER BY f.id DESC
   `;
-
-  db.query(sql, [formationId], (err, result) => {
-    if (err) {
-      console.error('Erreur SQL /formations/:id/approve-and-publish:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Formation non trouvée ou déjà approuvée' });
-    }
-   res.json({ message: 'Formation approuvée et publiée 🚀' });
-
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
+});
+   
     // Notifier le formateur
     db.query(
       `SELECT f.titre, u.id AS formateur_user_id
@@ -483,14 +543,12 @@ router.put('/formations/:id/approve-and-publish', (req, res) => {
         if (!ne && nr.length > 0) {
           db.query(
             'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-            [nr[0].formateur_user_id, `✅ Votre formation « ${nr[0].titre} » a été approuvée et publiée !`, 'approbation'],
+            [nr[0].formateur_user_id, `❌ Votre formation « ${nr[0].titre} » a été rejetée. Raison : ${reason || 'Non spécifiée'}`, 'rejet'],
             () => {}
           );
         }
       }
     );
-  });
-});
 
 /* =========================
    ❌ REJETER UNE FORMATION

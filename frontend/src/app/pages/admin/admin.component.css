@@ -150,7 +150,12 @@
 .btn-approve:hover { background: #2e7d32; color: white; }
 .btn-reject  { background: #ffebee; color: #c62828; border: none; padding: 9px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; }
 .btn-reject:hover  { background: #c62828; color: white; }
-
+.btn-publish { background: #e3f2fd; color: #1565c0; border: none; padding: 9px 18px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; transition: all 0.2s; width: 100%; }
+.btn-publish:hover { background: #1565c0; color: white; }
+.status-accepted { background: #e8f5e9; color: #2e7d32; }
+.approval-card-accepted { border-top-color: #43a047; border-color: #e8f5e9; }
+.approvals-sub-title { margin-bottom: 16px; }
+.approvals-sub-title h4 { font-size: 15px; font-weight: 700; color: #1a2744; }
 /* EMPTY STATE */
 .empty-state { text-align: center; padding: 50px 20px; color: #888; }
 .empty-state span { font-size: 48px; display: block; margin-bottom: 12px; }

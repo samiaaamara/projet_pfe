@@ -6,6 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AdminService {
+  approveAndPublishFormation(formationId: number) {
+    throw new Error('Method not implemented.');
+  }
 
   private apiUrl = 'http://localhost:3000/api/admin';
 
@@ -56,10 +59,16 @@ export class AdminService {
   getFormationsPending(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/formations-pending`, this.getAuthHeaders());
   }
+  getFormationsAccepted(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/formations-accepted`, this.getAuthHeaders());
+  }
 
-  // ✅ Approuver et publier une formation
-  approveAndPublishFormation(formationId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/formations/${formationId}/approve-and-publish`, {}, this.getAuthHeaders());
+  acceptFormation(formationId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/accept`, {}, this.getAuthHeaders());
+  }
+
+  publishAcceptedFormation(formationId: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/publish-accepted`, {}, this.getAuthHeaders());
   }
 
   // ❌ Rejeter une formation
