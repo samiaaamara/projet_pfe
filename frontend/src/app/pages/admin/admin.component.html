@@ -101,34 +101,61 @@
     <section *ngIf="activeSection==='utilisateurs'">
       <div class="page-title">
         <h2>👥 Utilisateurs</h2>
-        <p>{{ users.length }} compte(s) enregistré(s)</p>
+        <p>{{ filteredUsers.length }} / {{ users.length }} compte(s)</p>
       </div>
- 
-      <div class="card-section">
+  <div class="filters-bar">
+        <input class="search-input" type="text" [(ngModel)]="userSearch"
+               placeholder="🔍 Rechercher par nom ou email...">
+        <select class="filter-select" [(ngModel)]="userRoleFilter">
+          <option value="">Tous les rôles</option>
+          <option value="etudiant">Étudiant</option>
+          <option value="formateur">Formateur</option>
+          <option value="externe">Externe</option>
+          <option value="admin">Admin</option>
+        </select>
+        <input class="search-input" type="text" [(ngModel)]="userSpecialiteFilter"
+               placeholder="💡 Filtrer par spécialité...">
+        <button class="btn-reset" *ngIf="userSearch || userRoleFilter || userSpecialiteFilter"
+                (click)="userSearch=''; userRoleFilter=''; userSpecialiteFilter=''">✕ Réinitialiser</button>
+      </div>
+ <div class="card-section">
         <div class="data-table-wrapper">
-          <table class="data-table" *ngIf="users.length > 0">
-            <thead>
-              <tr><th>#</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let u of users; let i = index">
-                <td class="text-muted">{{ i + 1 }}</td>
-                <td><strong>{{ u.nom }}</strong></td>
-                <td>{{ u.email }}</td>
-                <td>
-                  <span class="role-badge" [ngClass]="'role-' + u.role">{{ u.role }}</span>
-                </td>
-                <td>
-                  <button class="btn-action red" (click)="deleteUser(u.id)">🗑️ Supprimer</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div *ngIf="users.length === 0" class="empty-state"><span>👥</span><p>Aucun utilisateur.</p></div>
+          <table class="data-table" *ngIf="filteredUsers.length > 0">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nom</th>
+      <th>Email</th>
+      <th>Rôle</th>
+      <th>Spécialité</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let u of filteredUsers; let i = index">
+      <td class="text-muted">{{ i + 1 }}</td>
+      <td><strong>{{ u.nom }}</strong></td>
+      <td>{{ u.email }}</td>
+      <td>
+        <span class="role-badge" [ngClass]="'role-' + u.role">
+          {{ u.role }}
+        </span>
+      </td>
+      <td class="text-muted">{{ u.specialite || '—' }}</td>
+      <td>
+        <button class="btn-action red" (click)="deleteUser(u.id)">
+          🗑️ Supprimer
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+          <div *ngIf="filteredUsers.length === 0" class="empty-state"><span>👥</span><p>Aucun utilisateur trouvé.</p></div>
         </div>
-      </div>
+        </div>
     </section>
- 
+
     <!-- ===== FORMATIONS ===== -->
     <section *ngIf="activeSection==='formations'">
       <div class="page-title-row">
@@ -138,34 +165,34 @@
         </div>
         <button class="btn-primary" (click)="openAddForm()">➕ Ajouter</button>
       </div>
- 
-      <!-- Filtres -->
-      <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="🔍 Rechercher un titre...">
-        <select class="filter-select" [(ngModel)]="statusFilter">
-          <option value="">Tous les statuts</option>
-          <option value="draft">Brouillon</option>
-          <option value="published">Publié</option>
-        </select>
-        <select class="filter-select" [(ngModel)]="departmentFilter">
-          <option value="">Tous les départements</option>
-          <option>Informatique</option><option>Génie électrique</option>
-          <option>Mécanique</option><option>Génie civil</option>
-        </select>
-      </div>
- 
+ <!-- Filtres -->
+<div class="filters-bar">
+  <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="🔍 Rechercher un titre...">
+  <select class="filter-select" [(ngModel)]="statusFilter">
+    <option value="">Tous les statuts</option>
+    <option value="draft">Brouillon</option>
+    <option value="published">Publié</option>
+  </select>
+  <select class="filter-select" [(ngModel)]="specialiteFilter">
+    <option value="">Toutes les spécialités</option>
+    <option>Informatique</option><option>Réseaux</option><option>Génie logiciel</option>
+    <option>Intelligence artificielle</option><option>Cybersécurité</option>
+    <option>Marketing</option><option>Finance</option>
+    <option>Mécanique</option><option>Génie civil</option><option>Génie électrique</option>
+  </select>
+</div>
       <!-- Tableau -->
       <div class="card-section">
         <div class="data-table-wrapper">
           <table class="data-table" *ngIf="filteredFormations.length > 0">
             <thead>
-              <tr><th>Titre</th><th>Formateur</th><th>Département</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
+             <tr><th>Titre</th><th>Formateur</th><th>Spécialité</th><th>Date</th><th>Statut</th><th>Actions</th></tr>
             </thead>
             <tbody>
               <tr *ngFor="let f of paginatedFormations">
                 <td><strong>{{ f.titre }}</strong></td>
                 <td>{{ f.formateur || '-' }}</td>
-                <td>{{ f.departement || '-' }}</td>
+                <td>{{ f.specialite || '-' }}</td>
                 <td>{{ f.date_debut | date:'dd/MM/yyyy' }}</td>
                 <td>
                   <span class="status-badge status-draft" *ngIf="f.status==='draft'">Brouillon</span>
@@ -225,19 +252,16 @@
             <small class="error-msg" *ngIf="formDataErrors.nb_places">{{ formDataErrors.nb_places }}</small>
           </div>
           <div class="form-group">
-            <label>Niveau *</label>
-            <select class="form-input" [(ngModel)]="formData.niveau">
-              <option value="">--</option><option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
-            </select>
-            <small class="error-msg" *ngIf="formDataErrors.niveau">{{ formDataErrors.niveau }}</small>
-          </div>
-          <div class="form-group">
-            <label>Département *</label>
-            <select class="form-input" [(ngModel)]="formData.departement">
-              <option value="">--</option><option>Informatique</option><option>Génie électrique</option><option>Mécanique</option><option>Génie civil</option>
-            </select>
-            <small class="error-msg" *ngIf="formDataErrors.departement">{{ formDataErrors.departement }}</small>
-          </div>
+  <label>Spécialité *</label>
+  <select class="form-input" [(ngModel)]="formData.specialite">
+    <option value="">--</option>
+    <option>Informatique</option><option>Réseaux</option><option>Génie logiciel</option>
+    <option>Intelligence artificielle</option><option>Cybersécurité</option>
+    <option>Marketing</option><option>Finance</option>
+    <option>Mécanique</option><option>Génie civil</option><option>Génie électrique</option>
+  </select>
+  <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
+</div>
           <div class="form-group full">
             <label>Formateur *</label>
             <select class="form-input" [(ngModel)]="formData.formateur_id">
@@ -364,9 +388,8 @@
           <p class="approval-desc">{{ f.description }}</p>
           <div class="approval-meta">
             <span>👨‍🏫 {{ f.formateur }}</span>
-            <span *ngIf="f.niveau">🎓 {{ f.niveau }}</span>
-            <span *ngIf="f.departement">🏢 {{ f.departement }}</span>
-            <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
+            <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
+           <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
           </div>
           <div class="approval-actions">
             <button class="btn-approve" (click)="approveAndPublishFormation(f.id)">✅ Approuver & Publier</button>

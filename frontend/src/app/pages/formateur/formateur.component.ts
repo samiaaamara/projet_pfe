@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
 import { FormateurService } from '../../services/formateur.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
-
 import { MessagesService } from '../../services/messages.service';
 import { QuestionsService } from '../../services/questions.service';
 @Component({
@@ -29,16 +28,14 @@ export class FormateurComponent implements OnInit, OnDestroy {
   date_debut = '';
   date_fin = '';
   duree: number | null = null;
-  niveau = '';
-  departement = '';
+  specialite = '';
   nb_places: number | null = null;
   editMode = false;
   editedFormationId: number | null = null;
 
   searchTerm = '';
   statusFilter: '' | 'draft' | 'published' = '';
-  niveaux = ['Débutant', 'Intermédiaire', 'Avancé'];
-  departements = ['Informatique', 'Génie électrique', 'Mécanique', 'Génie civil'];
+  specialites = ['Informatique', 'Réseaux', 'Génie logiciel', 'Intelligence artificielle', 'Cybersécurité', 'Marketing', 'Finance', 'Mécanique', 'Génie civil', 'Génie électrique'];
 
   // Support pédagogique
   supportType = '';
@@ -63,14 +60,17 @@ export class FormateurComponent implements OnInit, OnDestroy {
 
   // Message général
   message = '';
- // Profil
-  profileNom = '';
+
+ profileNom = '';
   profileEmail = '';
+  profileSpecialite = '';
+  profileTelephone = '';
+  profileDateNaissance = '';
   ancienMdp = '';
   nouveauMdp = '';
   confirmMdp = '';
   messageType: 'success' | 'danger' = 'success';
-  
+
   // Notifications
   notifications: any[] = [];
   unreadCount = 0;
@@ -126,12 +126,15 @@ export class FormateurComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.formateurId = profile.id;
-         this.profileNom = this.user.nom;
+       this.formateurId = profile.id;
+        this.profileNom = this.user.nom;
         this.profileEmail = this.user.email;
+        this.profileSpecialite = profile.specialite || '';
+        this.profileTelephone = profile.telephone || '';
+        this.profileDateNaissance = profile.date_naissance ? profile.date_naissance.substring(0, 10) : '';
         console.log('✅ Profil formateur chargé:', profile);
         this.loadFormations();
-         this.loadUnreadCount();
+        this.loadUnreadCount();
         this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
       },
       error: (err) => {
@@ -172,8 +175,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
     this.date_debut = '';
     this.date_fin = '';
     this.duree = null;
-    this.niveau = '';
-    this.departement = '';
+    this.specialite = '';
     this.nb_places = null;
     this.editMode = false;
     this.editedFormationId = null;
@@ -226,8 +228,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
       date_debut: this.date_debut,
       date_fin: this.date_fin || undefined,
       duree: this.duree || undefined,
-      niveau: this.niveau,
-      departement: this.departement,
+      specialite: this.specialite,
       nb_places: this.nb_places || undefined,
       formateur_id: this.formateurId
     };
@@ -254,8 +255,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
     this.date_debut = formation.date_debut;
     this.date_fin = formation.date_fin || '';
     this.duree = formation.duree || null;
-    this.niveau = formation.niveau || '';
-    this.departement = formation.departement || '';
+    this.specialite = formation.specialite || '';
     this.nb_places = formation.nb_places || null;
     this.activeSection = 'creerFormation';
   }
@@ -281,8 +281,6 @@ export class FormateurComponent implements OnInit, OnDestroy {
       date_debut: this.date_debut,
       date_fin: this.date_fin,
       duree: this.duree || undefined,
-      niveau: this.niveau,
-      departement: this.departement,
       nb_places: this.nb_places || undefined,
       formateur_id: this.formateurId
     }).subscribe({
@@ -500,12 +498,19 @@ if (!this.supportType) {
     setTimeout(() => this.message = '', 4000);
   }
 
+  
   /** =================== Profil =================== */
   sauvegarderProfil() {
     if (!this.profileNom || !this.profileEmail) {
       this.showMessage('Nom et email sont requis', 'danger'); return;
     }
-    this.authService.updateProfile({ nom: this.profileNom, email: this.profileEmail }).subscribe({
+    this.authService.updateProfile({
+      nom: this.profileNom,
+      email: this.profileEmail,
+      specialite: this.profileSpecialite,
+      telephone: this.profileTelephone,
+      date_naissance: this.profileDateNaissance
+    }).subscribe({
       next: () => {
         this.user.nom = this.profileNom;
         this.user.email = this.profileEmail;

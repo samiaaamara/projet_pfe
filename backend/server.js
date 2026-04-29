@@ -30,5 +30,7 @@ app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/messages', require('./routes/messages.routes'));
 app.use('/api/questions', require('./routes/questions.routes'));
+app.use('/api/externe', require('./routes/externe.routes'));
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));

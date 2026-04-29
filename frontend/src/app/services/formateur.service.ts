@@ -9,7 +9,7 @@ export interface Formation {
   date_fin?: string;
   duree?: number;
   niveau?: string;
-  departement?: string;
+  specialite?: string;
   nb_places?: number;
   status?: 'draft' | 'published';
   formateur_id: number;

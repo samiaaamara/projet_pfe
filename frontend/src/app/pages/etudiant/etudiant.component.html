@@ -105,29 +105,30 @@
         <p>{{ totalFormations }} formation(s) publiée(s)</p>
       </div>
 
+        <!-- Filtres -->
       <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="recherche" placeholder="🔍 Rechercher une formation...">
-        <select class="filter-select" [(ngModel)]="filtreNiveau">
-          <option value="">Tous les niveaux</option>
-          <option *ngFor="let n of niveaux" [value]="n">{{ n }}</option>
-        </select>
+        <input class="search-input" type="text" [(ngModel)]="recherche"
+               placeholder="🔍 Rechercher une formation...">
       </div>
-
+ <!-- Grille formations -->
       <div class="formations-grid">
         <div class="formation-card" *ngFor="let f of formationsFiltrees">
           <div class="formation-header">
-            <span class="formation-niveau" *ngIf="f.niveau">{{ f.niveau }}</span>
-            <span class="formation-dept" *ngIf="f.departement">{{ f.departement }}</span>
+            <span class="formation-spec" *ngIf="f.specialite">{{ f.specialite }}</span>
           </div>
           <h5 class="formation-title">{{ f.titre }}</h5>
           <p class="formation-desc">{{ f.description }}</p>
+
           <div class="formation-meta">
             <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
             <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
-            <span *ngIf="f.nb_places !== null" [class.text-danger]="estComplet(f)">
-              👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
+            <span *ngIf="f.nb_places !== null">
+              <span [class.text-danger]="estComplet(f)">
+                👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
+              </span>
             </span>
           </div>
+
           <div class="formation-footer">
             <span *ngIf="estComplet(f)" class="badge-complet">Complet</span>
             <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
@@ -172,10 +173,10 @@
                 <span *ngIf="f.date_debut">📅 Début : {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
                 <span *ngIf="f.date_fin"> — Fin : {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
                 <span *ngIf="f.duree"> · ⏱ {{ f.duree }}h</span>
-                <span *ngIf="f.niveau"> · 🎓 {{ f.niveau }}</span>
               </div>
               <div class="inscription-date">Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</div>
-             <!-- Notation par étoiles -->
+             
+              <!-- Notation par étoiles -->
               <div class="stars-row" (mouseleave)="clearNoteHover(f.formation_id)">
                 <span class="stars-label">Note :</span>
                 <span *ngFor="let s of [1,2,3,4,5]"
@@ -276,64 +277,75 @@
       </div>
     </section>
 
-    <!-- ===== PROFIL ===== -->
-    <section *ngIf="activeSection === 'profil'">
-      <div class="page-title">
-        <h2>👤 Mon profil</h2>
-        <p>Gérez vos informations personnelles</p>
+ <!-- ===== PROFIL ===== -->
+<section *ngIf="activeSection === 'profil'">
+  <div class="page-title">
+    <h2>👤 Mon profil</h2>
+    <p>Gérez vos informations personnelles</p>
+  </div>
+  <div class="profile-grid">
+    <div class="form-card">
+      <h5 class="section-title">Informations personnelles</h5>
+      <div class="profile-avatar-row">
+        <div class="profile-avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+        <div><div class="profile-name">{{ user?.nom }}</div><div class="profile-role-chip">Étudiant</div></div>
       </div>
- 
-      <div class="profile-grid">
-        <!-- Infos générales -->
-        <div class="form-card">
-          <h5 class="section-title">Informations personnelles</h5>
-          <div class="profile-avatar-row">
-            <div class="profile-avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
-            <div>
-              <div class="profile-name">{{ user?.nom }}</div>
-              <div class="profile-role-chip">Étudiant</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Nom complet</label>
-            <div class="input-wrap"><span class="input-prefix">👤</span>
-              <input type="text" [(ngModel)]="profileNom" placeholder="Votre nom">
-            </div>
-          </div>
-          <div class="form-group" style="margin-top:14px">
-            <label>Email</label>
-            <div class="input-wrap"><span class="input-prefix">✉️</span>
-              <input type="email" [(ngModel)]="profileEmail" placeholder="Votre email">
-            </div>
-          </div>
-          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
-        </div>
- 
-        <!-- Changer mot de passe -->
-        <div class="form-card">
-          <h5 class="section-title">🔑 Changer le mot de passe</h5>
-          <div class="form-group">
-            <label>Ancien mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔒</span>
-              <input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel">
-            </div>
-          </div>
-          <div class="form-group" style="margin-top:14px">
-            <label>Nouveau mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔑</span>
-              <input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)">
-            </div>
-          </div>
-          <div class="form-group" style="margin-top:14px">
-            <label>Confirmer le mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">✅</span>
-              <input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le nouveau mot de passe">
-            </div>
-          </div>
-          <button class="btn-save" style="margin-top:20px;background:#1976d2" (click)="changerMotDePasse()">🔄 Modifier le mot de passe</button>
+      <div class="form-group">
+        <label>Nom complet</label>
+        <div class="input-wrap"><span class="input-prefix">👤</span><input type="text" [(ngModel)]="profileNom" placeholder="Votre nom"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Email</label>
+        <div class="input-wrap"><span class="input-prefix">✉️</span><input type="email" [(ngModel)]="profileEmail" placeholder="Votre email"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>CIN</label>
+        <div class="input-wrap"><span class="input-prefix">🪪</span><input type="text" [(ngModel)]="profileCin" placeholder="Numéro CIN"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Téléphone</label>
+        <div class="input-wrap"><span class="input-prefix">📞</span><input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Date de naissance</label>
+        <div class="input-wrap"><span class="input-prefix">📅</span><input type="date" [(ngModel)]="profileDateNaissance"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Niveau</label>
+        <div class="input-wrap"><span class="input-prefix">🎓</span>
+          <select [(ngModel)]="profileNiveau" style="border:none;background:transparent;flex:1;padding:10px 10px 10px 0;font-size:13px;outline:none">
+            <option value="">-- Niveau --</option>
+                <option value="L1">L1</option>
+                <option value="L2">L2</option>
+                <option value="L3">L3</option>
+                <option value="M1">Master 1</option>
+                <option value="M2">Master 2</option></select>
         </div>
       </div>
-    </section>
+      <div class="form-group" style="margin-top:14px">
+        <label>Spécialité</label>
+        <div class="input-wrap"><span class="input-prefix">💡</span><input type="text" [(ngModel)]="profileSpecialite" placeholder="Ex: Développement Web"></div>
+      </div>
+      <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
+    </div>
+    <div class="form-card">
+      <h5 class="section-title">🔑 Changer le mot de passe</h5>
+      <div class="form-group">
+        <label>Ancien mot de passe</label>
+        <div class="input-wrap"><span class="input-prefix">🔒</span><input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Nouveau mot de passe</label>
+        <div class="input-wrap"><span class="input-prefix">🔑</span><input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)"></div>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label>Confirmer le mot de passe</label>
+        <div class="input-wrap"><span class="input-prefix">✅</span><input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le nouveau mot de passe"></div>
+      </div>
+      <button class="btn-save" style="margin-top:20px;background:#1976d2" (click)="changerMotDePasse()">🔄 Modifier le mot de passe</button>
+    </div>
+  </div>
+</section>
     <!-- ===== NOTIFICATIONS ===== -->
 <section *ngIf="activeSection === 'notifications'">
   <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">

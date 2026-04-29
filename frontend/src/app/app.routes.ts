@@ -5,10 +5,11 @@ import { FormateurComponent } from './pages/formateur/formateur.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { AdminGuard } from './guards/admin.guard';
 import { FormateurGuard } from './guards/formateur.guard';
+import { ExterneGuard } from './guards/externe.guard';
 import { AdminLoginComponent } from './pages/admin-login/admin-login.component';
 import { HomeComponent } from './pages/home/home.component';
 import { InscriptionComponent } from './pages/inscription/inscription.component';
-
+import { ExterneComponent } from './pages/externe/externe.component';
 export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'formateur', component: FormateurComponent, canActivate: [FormateurGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
   { path: 'admin-login', component: AdminLoginComponent },
+  { path: 'externe', component: ExterneComponent, canActivate: [ExterneGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
   
 ];

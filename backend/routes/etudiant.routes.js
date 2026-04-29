@@ -101,7 +101,7 @@ router.get('/mes-formations/:etudiantId', (req, res) => {
 
    const sql = `
     SELECT f.id AS formation_id, f.titre, f.description,
-           f.date_debut, f.date_fin, f.duree, f.niveau, f.departement,
+           f.date_debut, f.date_fin, f.duree, f.specialite,
            i.id AS inscription_id, i.statut, i.date_inscription
     FROM inscriptions i
     JOIN formations f ON i.formation_id = f.id

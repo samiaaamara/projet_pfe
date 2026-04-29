@@ -38,6 +38,9 @@ export class LoginComponent {
         this.router.navigate(['/etudiant']);
       } else if (user.role === 'formateur') {
         this.router.navigate(['/formateur']);
+        
+      } else if (user.role === 'externe') {
+        this.router.navigate(['/externe']);
       } else {
         this.router.navigate(['/admin']);
       }

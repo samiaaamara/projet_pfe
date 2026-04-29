@@ -25,9 +25,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   totalPages = 1;
   totalFormations = 0;
   recherche = '';
-  filtreNiveau = '';
-  niveaux = ['Débutant', 'Intermédiaire', 'Avancé'];
-
+  
   mesFormations: any[] = [];
 
   supports: any[] = [];
@@ -40,9 +38,14 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   noteHover: { [formationId: number]: number } = {};
   noteCommentaire = '';
 
-  // Profil
+ // Profil
   profileNom = '';
   profileEmail = '';
+  profileTelephone = '';
+  profileDateNaissance = '';
+  profileSpecialite = '';
+  profileCin = '';
+  profileNiveau = '';
   ancienMdp = '';
   nouveauMdp = '';
   confirmMdp = '';
@@ -69,7 +72,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
- activeSection: string = 'accueil';
+ activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'questions' = 'accueil';
   constructor(
     private etudiantService: EtudiantService,
     private authService: Auth,
@@ -89,6 +92,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     this.etudiantId = this.user.etudiantId;
     this.profileNom = this.user.nom;
     this.profileEmail = this.user.email;
+    this.loadProfilComplet();
     this.loadFormations();
     this.loadMesFormations();
     this.chargerProgression();
@@ -129,8 +133,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
       const matchRecherche = this.recherche
         ? (f.titre + ' ' + f.description).toLowerCase().includes(this.recherche.toLowerCase())
         : true;
-      const matchNiveau = this.filtreNiveau ? f.niveau === this.filtreNiveau : true;
-      return matchRecherche && matchNiveau;
+      return matchRecherche;
     });
   }
 
@@ -274,20 +277,36 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   }
 
   // ===== Profil =====
-  sauvegarderProfil() {
-    if (!this.profileNom || !this.profileEmail) {
-      this.showMessage('Nom et email sont requis', 'danger'); return;
-    }
-    this.authService.updateProfile({ nom: this.profileNom, email: this.profileEmail }).subscribe({
-      next: () => {
-        this.user.nom = this.profileNom;
-        this.user.email = this.profileEmail;
-        localStorage.setItem('user', JSON.stringify(this.user));
-        this.showMessage('Profil mis à jour avec succès');
-      },
-      error: (err) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
-    });
+  loadProfilComplet() {
+  this.authService.getProfile().subscribe({
+    next: (data: any) => {
+      this.profileTelephone = data.telephone || '';
+      this.profileDateNaissance = data.date_naissance ? data.date_naissance.substring(0, 10) : '';
+      this.profileSpecialite = data.specialite || '';
+      this.profileCin = data.cin || '';
+      this.profileNiveau = data.niveau || '';
+    },
+    error: () => {}
+  });
+}
+
+sauvegarderProfil() {
+  if (!this.profileNom || !this.profileEmail) {
+    this.showMessage('Nom et email sont requis', 'danger'); return;
   }
+  this.authService.updateProfile({
+    nom: this.profileNom, email: this.profileEmail,
+    telephone: this.profileTelephone, date_naissance: this.profileDateNaissance,
+    specialite: this.profileSpecialite, cin: this.profileCin, niveau: this.profileNiveau
+  }).subscribe({
+    next: () => {
+      this.user.nom = this.profileNom; this.user.email = this.profileEmail;
+      localStorage.setItem('user', JSON.stringify(this.user));
+      this.showMessage('Profil mis à jour avec succès');
+    },
+    error: (err) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
+  });
+}
 
   changerMotDePasse() {
     if (!this.ancienMdp || !this.nouveauMdp) {
@@ -307,7 +326,6 @@ export class EtudiantComponent implements OnInit, OnDestroy {
       error: (err) => this.showMessage(err?.error?.message || 'Erreur changement de mot de passe', 'danger')
     });
   }
-
   // ===== Notifications =====
   loadUnreadCount() {
     if (!this.user?.id) return;

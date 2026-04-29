@@ -62,6 +62,7 @@
               <select [(ngModel)]="role" name="role">
                 <option value="etudiant">Étudiant</option>
                 <option value="formateur">Formateur</option>
+                 <option value="externe">Utilisateur Externe</option>
               </select>
             </div>
           </div>
@@ -83,16 +84,10 @@
               </div>
             </div>
             <div class="form-group">
-              <label>Département</label>
-              <div class="input-wrapper select-wrapper">
-                <span class="input-icon">🏢</span>
-                <select [(ngModel)]="departement" name="departement">
-                  <option value="">-- Département --</option>
-                  <option value="Informatique">Informatique</option>
-                  <option value="Génie Civil">Génie Civil</option>
-                  <option value="Génie Mécanique">Génie Mécanique</option>
-                  <option value="Génie Électrique">Génie Électrique</option>
-                </select>
+              <label>Téléphone</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📞</span>
+                <input type="text" [(ngModel)]="telephone" name="telephone_etudiant" placeholder="Ex: +216 XX XXX XXX">
               </div>
             </div>
           </div>
@@ -107,6 +102,8 @@
                   <option value="L1">L1</option>
                   <option value="L2">L2</option>
                   <option value="L3">L3</option>
+                   <option value="M1">Master 1</option>
+                  <option value="M2">Master 2</option>
                 </select>
               </div>
             </div>
@@ -118,23 +115,92 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- CHAMPS FORMATEUR -->
-        <div *ngIf="role === 'formateur'" class="role-fields">
-          <div class="role-fields-title">
-            <span class="role-chip green">Formateur</span>
-            <span>Informations supplémentaires</span>
-          </div>
-          <div class="form-group">
-            <label>Spécialité</label>
-            <div class="input-wrapper">
-              <span class="input-icon">💡</span>
-              <input type="text" [(ngModel)]="specialite" name="specialite_formateur" placeholder="Ex: Angular, Node.js...">
+           <div class="form-row">
+            <div class="form-group">
+              <label>Date de naissance</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📅</span>
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_etudiant">
+              </div>
             </div>
           </div>
         </div>
+<!-- CHAMPS FORMATEUR -->
+<div *ngIf="role === 'formateur'" class="role-fields">
+  <div class="role-fields-title">
+    <span class="role-chip green">Formateur</span>
+    <span>Informations supplémentaires</span>
+  </div>
 
+  <div class="form-group">
+    <label>Spécialité</label>
+    <div class="input-wrapper">
+      <span class="input-icon">💡</span>
+      <input type="text" [(ngModel)]="specialite" name="specialite_formateur" placeholder="Ex: Angular, Node.js...">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Téléphone</label>
+    <div class="input-wrapper">
+      <span class="input-icon">📞</span>
+      <input type="text" [(ngModel)]="telephone" name="telephone_formateur" placeholder="Ex: +216 XX XXX XXX">
+    </div>
+  </div>
+
+  <!-- ✅ ICI on garde le form-row DANS le bloc -->
+  <div class="form-row">
+    <div class="form-group">
+      <label>Date de naissance</label>
+      <div class="input-wrapper">
+        <span class="input-icon">📅</span>
+        <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_formateur">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CHAMPS EXTERNE -->
+        <div *ngIf="role === 'externe'" class="role-fields">
+          <div class="role-fields-title">
+            <span class="role-chip teal">Externe</span>
+            <span>Informations supplémentaires (optionnelles)</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Téléphone</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📞</span>
+                <input type="text" [(ngModel)]="telephone" name="telephone" placeholder="Ex: +216 XX XXX XXX">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Entreprise / Organisation</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🏢</span>
+                <input type="text" [(ngModel)]="entreprise" name="entreprise" placeholder="Nom de votre entreprise">
+              </div>
+            </div>
+          </div>
+         <div class="form-row">
+            <div class="form-group">
+              <label>Spécialité</label>
+              <div class="input-wrapper">
+                <span class="input-icon">💡</span>
+                <input type="text" [(ngModel)]="specialite" name="specialite_externe" placeholder="Ex: Marketing, Finance...">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Date de naissance</label>
+              <div class="input-wrapper">
+                <span class="input-icon">📅</span>
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_externe">
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <!-- MESSAGE -->
         <div *ngIf="message" class="auth-message"
              [class.auth-success]="message.includes('succès')"

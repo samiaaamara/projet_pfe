@@ -1,0 +1,391 @@
+<div class="dashboard-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-profile">
+      <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+      <div class="sidebar-username">{{ user?.nom }}</div>
+      <div class="sidebar-role">Utilisateur Externe</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-item" [class.active]="activeSection === 'accueil'" (click)="setSection('accueil')">
+        <span class="nav-icon">🏠</span> Accueil
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'formations'" (click)="setSection('formations')">
+        <span class="nav-icon">📚</span> Catalogue
+        <span class="nav-badge" *ngIf="totalFormations > 0">{{ totalFormations }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'mesInscriptions'" (click)="setSection('mesInscriptions')">
+        <span class="nav-icon">🎓</span> Mes formations
+        <span class="nav-badge" *ngIf="mesInscriptions.length > 0">{{ mesInscriptions.length }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
+        <span class="nav-icon">👤</span> Mon profil
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'notifications'" (click)="openNotifications()">
+        <span class="nav-icon">🔔</span> Notifications
+        <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main class="main-content">
+
+    <div *ngIf="message" class="alert-banner"
+         [class.alert-success]="messageType === 'success'"
+         [class.alert-danger]="messageType === 'danger'">
+      {{ message }}
+    </div>
+
+    <!-- ===== ACCUEIL ===== -->
+    <section *ngIf="activeSection === 'accueil'">
+      <div class="page-title">
+        <h2>Bonjour, {{ user?.nom }} 👋</h2>
+        <p>Bienvenue dans votre espace de formation externe</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card teal" (click)="setSection('formations')">
+          <div class="stat-icon">📚</div>
+          <div class="stat-value">{{ totalFormations }}</div>
+          <div class="stat-label">Formations disponibles</div>
+        </div>
+        <div class="stat-card blue" (click)="setSection('mesInscriptions')">
+          <div class="stat-icon">🎓</div>
+          <div class="stat-value">{{ inscriptionsPayees }}</div>
+          <div class="stat-label">Formations achetées</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">{{ totalDepense | number:'1.0-2' }} TND</div>
+          <div class="stat-label">Total dépensé</div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <h5 class="section-title">Démarrez votre apprentissage</h5>
+        <div class="quick-actions">
+          <div class="quick-card" (click)="setSection('formations')">
+            <div class="qc-icon">🔍</div>
+            <div class="qc-title">Explorer le catalogue</div>
+            <div class="qc-desc">Découvrez toutes nos formations disponibles</div>
+          </div>
+          <div class="quick-card" (click)="setSection('mesInscriptions')">
+            <div class="qc-icon">📖</div>
+            <div class="qc-title">Mes formations</div>
+            <div class="qc-desc">Accédez aux supports de vos formations achetées</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section" *ngIf="mesInscriptions.length > 0">
+        <h5 class="section-title">Dernières acquisitions</h5>
+        <div class="recent-list">
+          <div class="recent-item" *ngFor="let i of mesInscriptions.slice(0,3)">
+            <div class="recent-icon">📘</div>
+            <div class="recent-info">
+              <div class="recent-title">{{ i.titre }}</div>
+              <div class="recent-date">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
+            </div>
+            <div class="price-tag">{{ i.montant > 0 ? (i.montant + ' TND') : 'Gratuit' }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CATALOGUE FORMATIONS ===== -->
+    <section *ngIf="activeSection === 'formations'">
+      <div class="page-title">
+        <h2>📚 Catalogue des formations</h2>
+        <p>{{ totalFormations }} formation(s) disponible(s)</p>
+      </div>
+
+      <div class="filters-bar">
+        <input class="search-input" type="text" [(ngModel)]="recherche"
+               placeholder="🔍 Rechercher une formation...">
+      </div>
+
+      <div class="formations-grid">
+        <div class="formation-card" *ngFor="let f of formationsFiltrees">
+          <div class="formation-header">
+            <span class="formation-niveau" *ngIf="f.niveau">{{ f.niveau }}</span>
+            <span class="formation-dept" *ngIf="f.departement">{{ f.departement }}</span>
+          </div>
+          <h5 class="formation-title">{{ f.titre }}</h5>
+          <p class="formation-desc">{{ f.description }}</p>
+
+          <div class="formation-meta">
+            <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
+            <span *ngIf="f.formateur_nom">👨‍🏫 {{ f.formateur_nom }}</span>
+          </div>
+
+          <div class="price-section">
+            <div class="price-display" [class.free]="!f.prix || f.prix == 0">
+              {{ (!f.prix || f.prix == 0) ? '🆓 Gratuit' : (f.prix + ' TND') }}
+            </div>
+            <div class="places-info" *ngIf="f.nb_places !== null">
+              👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
+            </div>
+          </div>
+
+          <div class="formation-footer">
+            <span *ngIf="estComplet(f)" class="badge-complet">Complet</span>
+            <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Acheté</span>
+            <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)"
+                    class="btn-payer"
+                    [class.btn-gratuit]="!f.prix || f.prix == 0"
+                    (click)="ouvrirPaiement(f)">
+              {{ (!f.prix || f.prix == 0) ? 'S\'inscrire' : '💳 Acheter — ' + f.prix + ' TND' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p *ngIf="formationsFiltrees.length === 0" class="empty-state">
+        <span>🔎</span><br>Aucune formation ne correspond à votre recherche.
+      </p>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button class="page-btn" (click)="changerPage(page - 1)" [disabled]="page === 1">‹</button>
+        <button class="page-btn" *ngFor="let p of pages()"
+                [class.active]="p === page" (click)="changerPage(p)">{{ p }}</button>
+        <button class="page-btn" (click)="changerPage(page + 1)" [disabled]="page === totalPages">›</button>
+      </div>
+    </section>
+
+    <!-- ===== MES INSCRIPTIONS ===== -->
+    <section *ngIf="activeSection === 'mesInscriptions'">
+      <div class="page-title">
+        <h2>🎓 Mes formations</h2>
+        <p>{{ mesInscriptions.length }} formation(s) achetée(s)</p>
+      </div>
+
+      <div *ngIf="mesInscriptions.length === 0" class="empty-state">
+        <span>📭</span>
+        <p>Vous n'avez encore acheté aucune formation.</p>
+        <button class="btn-primary" (click)="setSection('formations')">Explorer le catalogue</button>
+      </div>
+
+      <div class="inscriptions-list" *ngIf="mesInscriptions.length > 0">
+        <div class="inscription-card" *ngFor="let i of mesInscriptions">
+          <div class="inscription-left">
+            <div class="inscription-icon">📘</div>
+            <div>
+              <div class="inscription-title">{{ i.titre }}</div>
+              <div class="inscription-meta">
+                <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="i.duree"> · ⏱ {{ i.duree }}h</span>
+                <span *ngIf="i.formateur_nom"> · 👨‍🏫 {{ i.formateur_nom }}</span>
+              </div>
+              <div class="inscription-date">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
+            </div>
+          </div>
+          <div class="inscription-right">
+            <div class="price-paid">
+              {{ i.montant > 0 ? (i.montant + ' TND') : 'Gratuit' }}
+            </div>
+            <span class="badge-paiement" [ngClass]="getStatutBadgeClass(i.statut_paiement)">
+              {{ i.statut_paiement === 'payé' ? '✅ Payé' : i.statut_paiement === 'en_attente' ? '⏳ En attente' : '↩️ Remboursé' }}
+            </span>
+            <button class="btn-supports" (click)="voirSupports(i)"
+                    *ngIf="i.statut_paiement === 'payé'">
+              📂 Supports
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SUPPORTS ===== -->
+    <section *ngIf="activeSection === 'supports'">
+      <div class="page-title">
+        <button class="btn-back" (click)="setSection('mesInscriptions')">← Retour</button>
+        <h2>📂 Supports — {{ formationSelectionnee?.titre }}</h2>
+        <p>Ressources pédagogiques de votre formation</p>
+      </div>
+
+      <div *ngIf="supports.length === 0" class="empty-state">
+        <span>📭</span>
+        <p>Aucun support disponible pour cette formation.</p>
+      </div>
+
+      <div class="supports-grid" *ngIf="supports.length > 0">
+        <a class="support-card" *ngFor="let s of supports"
+           [href]="getLienSupport(s.fichier)" target="_blank" rel="noopener">
+          <div class="support-icon">{{ getIconSupport(s.type) }}</div>
+          <div class="support-info">
+            <div class="support-type">{{ s.type }}</div>
+            <div class="support-name">{{ s.fichier?.split('/').pop() }}</div>
+          </div>
+          <div class="support-action">Télécharger ↓</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ===== PROFIL ===== -->
+    <section *ngIf="activeSection === 'profil'">
+      <div class="page-title">
+        <h2>👤 Mon profil</h2>
+        <p>Gérez vos informations personnelles</p>
+      </div>
+
+      <div class="profile-grid">
+        <div class="form-card">
+          <h5 class="section-title">Informations personnelles</h5>
+          <div class="profile-avatar-row">
+            <div class="profile-avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div>
+              <div class="profile-name">{{ user?.nom }}</div>
+              <div class="profile-role-chip">Utilisateur Externe</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Nom complet</label>
+            <div class="input-wrap"><span class="input-prefix">👤</span>
+              <input type="text" [(ngModel)]="profileNom" placeholder="Votre nom">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Email</label>
+            <div class="input-wrap"><span class="input-prefix">✉️</span>
+              <input type="email" [(ngModel)]="profileEmail" placeholder="Votre email">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Téléphone</label>
+            <div class="input-wrap"><span class="input-prefix">📞</span>
+              <input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Entreprise / Organisation</label>
+            <div class="input-wrap"><span class="input-prefix">🏢</span>
+              <input type="text" [(ngModel)]="profileEntreprise" placeholder="Nom de votre entreprise">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Spécialité</label>
+            <div class="input-wrap"><span class="input-prefix">💡</span>
+              <input type="text" [(ngModel)]="profileSpecialite" placeholder="Ex: Marketing, Finance...">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Date de naissance</label>
+            <div class="input-wrap"><span class="input-prefix">📅</span>
+              <input type="date" [(ngModel)]="profileDateNaissance">
+            </div>
+          </div>
+          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
+        </div>
+
+        <div class="form-card">
+          <h5 class="section-title">🔑 Changer le mot de passe</h5>
+          <div class="form-group">
+            <label>Ancien mot de passe</label>
+            <div class="input-wrap"><span class="input-prefix">🔒</span>
+              <input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Nouveau mot de passe</label>
+            <div class="input-wrap"><span class="input-prefix">🔑</span>
+              <input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:14px">
+            <label>Confirmer</label>
+            <div class="input-wrap"><span class="input-prefix">✅</span>
+              <input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le mot de passe">
+            </div>
+          </div>
+          <button class="btn-save" style="margin-top:20px;background:#0077b6" (click)="changerMotDePasse()">🔄 Modifier</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== NOTIFICATIONS ===== -->
+    <section *ngIf="activeSection === 'notifications'">
+      <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2>🔔 Notifications</h2>
+          <p>{{ unreadCount }} non lue(s) · {{ notifications.length }} au total</p>
+        </div>
+        <button class="btn-mark-all" *ngIf="notifications.length > 0" (click)="marquerToutLu()">
+          ✅ Tout marquer comme lu
+        </button>
+      </div>
+
+      <div *ngIf="notifications.length === 0" class="empty-state">
+        <span>🔔</span>
+        <p>Aucune notification pour le moment.</p>
+      </div>
+
+      <div class="notifications-list" *ngIf="notifications.length > 0">
+        <div class="notif-item" *ngFor="let n of notifications"
+             [class.unread]="!n.lu" (click)="marquerLu(n)">
+          <div class="notif-dot" *ngIf="!n.lu"></div>
+          <div class="notif-icon-wrap">{{ getNotifIcon(n.type) }}</div>
+          <div class="notif-body">
+            <div class="notif-message">{{ n.message }}</div>
+            <div class="notif-time">{{ n.date_creation | date:'dd/MM/yyyy à HH:mm' }}</div>
+          </div>
+          <button class="notif-close" (click)="supprimerNotif(n.id, $event)">×</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===== MODAL PAIEMENT ===== -->
+<div class="modal-backdrop" *ngIf="showPaiementModal" (click)="fermerModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>💳 Confirmation {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'd\'inscription' : 'de paiement' }}</h3>
+      <button class="modal-close" (click)="fermerModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-formation-name">{{ formationPaiement?.titre }}</div>
+
+      <div class="modal-details">
+        <div class="modal-row" *ngIf="formationPaiement?.date_debut">
+          <span>📅 Date de début</span>
+          <span>{{ formationPaiement?.date_debut | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="modal-row" *ngIf="formationPaiement?.duree">
+          <span>⏱ Durée</span>
+          <span>{{ formationPaiement?.duree }}h</span>
+        </div>
+        <div class="modal-row" *ngIf="formationPaiement?.formateur_nom">
+          <span>👨‍🏫 Formateur</span>
+          <span>{{ formationPaiement?.formateur_nom }}</span>
+        </div>
+      </div>
+
+      <div class="modal-price-block" [class.free-block]="!formationPaiement?.prix || formationPaiement?.prix == 0">
+        <div class="modal-price-label">
+          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Formation gratuite' : 'Montant à payer' }}
+        </div>
+        <div class="modal-price-value">
+          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'GRATUIT' : (formationPaiement?.prix + ' TND') }}
+        </div>
+      </div>
+
+      <p class="modal-note" *ngIf="formationPaiement?.prix > 0">
+        🔒 Paiement sécurisé simulé — Vous aurez accès aux supports immédiatement après confirmation.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel-modal" (click)="fermerModal()">Annuler</button>
+      <button class="btn-confirm-pay" (click)="confirmerPaiement()">
+        {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Confirmer l\'inscription ✅' : '💳 Payer ' + formationPaiement?.prix + ' TND' }}
+      </button>
+    </div>
+  </div>
+</div>

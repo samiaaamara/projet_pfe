@@ -152,17 +152,10 @@
             <input type="number" [(ngModel)]="nb_places" placeholder="Ex: 30">
           </div>
           <div class="form-group">
-            <label>Niveau</label>
-            <select [(ngModel)]="niveau">
-              <option value="">-- Niveau --</option>
-              <option *ngFor="let n of niveaux" [value]="n">{{ n }}</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Département</label>
-            <select [(ngModel)]="departement">
-              <option value="">-- Département --</option>
-              <option *ngFor="let d of departements" [value]="d">{{ d }}</option>
+            <label>Spécialité</label>
+            <select [(ngModel)]="specialite">
+              <option value="">-- Spécialité --</option>
+              <option *ngFor="let s of specialites" [value]="s">{{ s }}</option>
             </select>
           </div>
         </div>
@@ -365,13 +358,15 @@
         </div>
       </div>
     </section>
+
   <!-- ===== PROFIL ===== -->
     <section *ngIf="activeSection === 'profil'">
       <div class="page-title">
         <h2>👤 Mon profil</h2>
         <p>Gérez vos informations personnelles</p>
       </div>
-     <div class="profile-grid">
+
+      <div class="profile-grid">
         <!-- Informations personnelles -->
         <div class="form-card">
           <div class="profile-avatar-row">
@@ -386,13 +381,26 @@
             <label>Nom complet</label>
             <input type="text" [(ngModel)]="profileNom" placeholder="Votre nom">
           </div>
-          <div class="form-group" style="margin-bottom:20px">
+          <div class="form-group" style="margin-bottom:14px">
             <label>Adresse email</label>
             <input type="email" [(ngModel)]="profileEmail" placeholder="Votre email">
           </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Téléphone</label>
+            <input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label>Date de naissance</label>
+            <input type="date" [(ngModel)]="profileDateNaissance">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label>Spécialité</label>
+            <input type="text" [(ngModel)]="profileSpecialite" placeholder="Ex: Angular, Node.js...">
+          </div>
           <button class="btn-save" (click)="sauvegarderProfil()">💾 Sauvegarder</button>
-        </div>   
-         <!-- Changer mot de passe -->
+        </div>
+
+        <!-- Changer mot de passe -->
         <div class="form-card">
           <h5 class="section-title">🔒 Changer le mot de passe</h5>
           <div class="form-group" style="margin-bottom:14px">
@@ -410,8 +418,7 @@
           <button class="btn-save" (click)="changerMotDePasse()">🔒 Changer le mot de passe</button>
         </div>
       </div>
- 
-      <!-- Stats profil -->
+           <!-- Stats profil -->
       <div class="card-section">
         <h5 class="section-title">📊 Résumé d'activité</h5>
         <div class="profile-stats-row">

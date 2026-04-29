@@ -36,12 +36,8 @@ const validateFormationPayload = ({ titre, date_debut, date_fin, duree, niveau, 
     return 'Le nombre de places doit être un nombre positif.';
   }
 
-  if (!niveau || !allowedNiveaux.includes(niveau)) {
-    return 'Le niveau est invalide.';
-  }
-
-  if (!departement || typeof departement !== 'string' || departement.trim().length === 0) {
-    return 'Le département est obligatoire.';
+ if (!specialite || typeof specialite !== 'string' || specialite.trim().length === 0) {
+    return 'Le spécialité est obligatoire.';
   }
 
   if (!formateur_id || Number(formateur_id) <= 0) {
@@ -61,13 +57,20 @@ router.use(verifyAdmin);
    👥 USERS
 ========================= */
 router.get('/users', (req, res) => {
-  db.query(
-    'SELECT id, nom, email, role FROM users',
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err });
-      res.json(results);
-    }
-  );
+  const sql = `
+    SELECT
+      u.id, u.nom, u.email, u.role,
+      COALESCE(e.specialite, f.specialite, ex.specialite) AS specialite
+    FROM users u
+    LEFT JOIN etudiants e  ON u.role = 'etudiant'  AND e.user_id = u.id
+    LEFT JOIN formateurs f ON u.role = 'formateur' AND f.user_id = u.id
+    LEFT JOIN externes ex  ON u.role = 'externe'   AND ex.user_id = u.id
+    ORDER BY u.id DESC
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({ error: err });
+    res.json(results);
+  });
 });
 
 /* =========================
@@ -83,8 +86,7 @@ router.get('/formations', (req, res) => {
       f.date_debut,
       f.date_fin,
       f.duree,
-      f.niveau,
-      f.departement,
+      f.specialite,
       f.nb_places,
       f.status,
       f.formateur_id,
@@ -117,8 +119,7 @@ router.post('/formations', (req, res) => {
     date_debut,
     date_fin,
     duree,
-    niveau,
-    departement,
+    specialite,
     nb_places,
     formateur_id
   } = payload;
@@ -131,12 +132,12 @@ router.post('/formations', (req, res) => {
 
     const sql = `
       INSERT INTO formations 
-      (titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id, status)
+      (titre, description, date_debut, date_fin, duree,.specialite, nb_places, formateur_id, status)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')
     `;
 
     db.query(sql,
-      [titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id],
+      [titre, description, date_debut, date_fin, duree, specialite, nb_places, formateur_id],
       (insertErr, result) => {
         if (insertErr) return res.status(500).json({ error: insertErr });
         res.json({
@@ -165,8 +166,7 @@ router.put('/formations/:id', (req, res) => {
     date_debut,
     date_fin,
     duree,
-    niveau,
-    departement,
+   specialite,
     nb_places,
     formateur_id,
     status
@@ -186,8 +186,7 @@ router.put('/formations/:id', (req, res) => {
         date_debut=?,
         date_fin=?,
         duree=?,
-        niveau=?,
-        departement=?,
+        specialite=?,
         nb_places=?,
         formateur_id=?,
         status=?
@@ -201,8 +200,7 @@ router.put('/formations/:id', (req, res) => {
         date_debut,
         date_fin,
         duree,
-        niveau,
-        departement,
+        specialite,
         nb_places,
         formateur_id,
         status,
@@ -428,8 +426,7 @@ router.get('/formations-pending', (req, res) => {
       f.date_debut,
       f.date_fin,
       f.duree,
-      f.niveau,
-      f.departement,
+      f.specialite,
       f.nb_places,
       f.status,
       f.formateur_id,

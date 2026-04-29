@@ -152,23 +152,44 @@ router.get('/stats/:formateurId', (req, res) => {
 
 // 🔹 Créer une formation
 router.post('/creer-formation', (req, res) => {
-  const { titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id } = req.body;
+  const { 
+    titre, 
+    description, 
+    date_debut, 
+    date_fin, 
+    duree, 
+    specialite, 
+    nb_places, 
+    formateur_id 
+  } = req.body;
 
   if (!titre || !description || !date_debut || !formateur_id) {
     return res.status(400).json({ error: 'Tous les champs obligatoires sont requis' });
   }
 
   const sql = `
-    INSERT INTO formations (titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id, status)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft')
+    INSERT INTO formations 
+    (titre, description, date_debut, date_fin, duree, specialite, nb_places, formateur_id, status)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [titre, description, date_debut, date_fin || null, duree || null, niveau || null, departement || null, nb_places || null, formateur_id], (err, results) => {
+  db.query(sql, [
+    titre,
+    description,
+    date_debut,
+    date_fin || null,
+    duree || null,
+    specialite || null,
+    nb_places || null,
+    formateur_id,
+    'draft'
+  ], (err, results) => {
     if (err) {
       console.error('Erreur SQL /creer-formation:', err);
       return res.status(500).json({ error: err.message });
     }
-    res.json({ message: 'Formation créée avec succès', id: results.insertId });
+
+    res.json({ message: 'Formation créée avec succès ✅', id: results.insertId });
   });
 });
 
@@ -195,7 +216,7 @@ router.post('/supports', upload.single('fichier'), (req, res) => {
 // 🔹 Modifier une formation du formateur
 router.put('/formations/:id', (req, res) => {
   const formationId = parseInt(req.params.id);
-  const { titre, description, date_debut, date_fin, duree, niveau, departement, nb_places, formateur_id } = req.body;
+  const { titre, description, date_debut, date_fin, duree, specialite, nb_places, formateur_id } = req.body;
 
   if (isNaN(formationId)) {
     return res.status(400).json({ error: 'Formation ID invalide' });
@@ -207,11 +228,11 @@ router.put('/formations/:id', (req, res) => {
 
   const sql = `
     UPDATE formations
-    SET titre = ?, description = ?, date_debut = ?, date_fin = ?, duree = ?, niveau = ?, departement = ?, nb_places = ?
+    SET titre = ?, description = ?, date_debut = ?, date_fin = ?, duree = ?, specialite = ?, nb_places = ?
     WHERE id = ? AND formateur_id = ?
   `;
 
-  db.query(sql, [titre, description, date_debut, date_fin || null, duree || null, niveau || null, departement || null, nb_places || null, formationId, formateur_id], (err, result) => {
+  db.query(sql, [titre, description, date_debut, date_fin || null, duree || null, specialite || null, nb_places || null, formationId, formateur_id], (err, result) => {
     if (err) {
       console.error('Erreur SQL /formations/:id PUT:', err);
       return res.status(500).json({ error: err.message });
