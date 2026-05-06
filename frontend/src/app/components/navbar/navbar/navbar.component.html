@@ -1,31 +1,39 @@
 <nav class="navbar">
   <div class="navbar-inner">
- 
-    <!-- LOGO ISET -->
+
+    <!-- LOGO -->
     <a class="navbar-brand" routerLink="/home">
-      <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png" alt="ISET" class="iset-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+      <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png"
+           alt="ISET"
+           class="iset-logo"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+
       <span class="brand-fallback">
         <span class="brand-icon">🎓</span>
         <span class="brand-text">ISET</span>
       </span>
+
       <span class="brand-separator"></span>
       <span class="brand-subtitle">Plateforme de Formation</span>
     </a>
-    <!-- LINKS: non connecté -->
+
+    <!-- NON CONNECTÉ -->
     <div class="navbar-links" *ngIf="!user">
       <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Accueil</a>
       <a class="nav-link" routerLink="/login" routerLinkActive="active">Connexion</a>
       <a class="nav-link btn-register" routerLink="/inscription">S'inscrire</a>
     </div>
-     <!-- LINKS: connecté -->
+
+    <!-- CONNECTÉ -->
     <div class="navbar-links" *ngIf="user">
       <span class="user-greeting">
         <span class="user-avatar">{{ user.nom?.charAt(0)?.toUpperCase() }}</span>
         <span class="user-name">{{ user.nom }}</span>
         <span class="role-chip" [ngClass]="'role-' + user.role">{{ user.role }}</span>
       </span>
+
       <button class="btn-logout" (click)="logout()">🚪 Déconnexion</button>
     </div>
- 
+
   </div>
 </nav>

@@ -96,4 +96,28 @@ getFormateurs(): Observable<any[]> {
     return this.http.delete(`${this.apiUrl}/formateurs/${formateurId}`, this.getAuthHeaders());
   }
 
+  // ======================
+  // PROGRAMME
+  // ======================
+
+  getProgramme(formationId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/formations/${formationId}/programme`, this.getAuthHeaders());
+  }
+
+  saveProgramme(formationId: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/programme`, data, this.getAuthHeaders());
+  }
+
+  addModule(formationId: number, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/formations/${formationId}/modules`, data, this.getAuthHeaders());
+  }
+
+  updateModule(formationId: number, moduleId: number, data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/modules/${moduleId}`, data, this.getAuthHeaders());
+  }
+
+  deleteModule(formationId: number, moduleId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/formations/${formationId}/modules/${moduleId}`, this.getAuthHeaders());
+  }
+
 }

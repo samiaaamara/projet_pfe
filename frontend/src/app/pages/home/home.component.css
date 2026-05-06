@@ -44,17 +44,8 @@
 .step-desc  { font-size: 13px; color: #777; line-height: 1.6; }
 .step-arrow { font-size: 28px; color: #ccd0e0; padding-bottom: 30px; }
 
-/* CTA */
-.cta { background: linear-gradient(135deg, #0d1b2a 0%, #1a2744 100%); padding: 80px 40px; text-align: center; }
-.cta-inner { max-width: 600px; margin: 0 auto; }
-.cta-title { font-size: 36px; font-weight: 800; color: white; margin-bottom: 14px; }
-.cta-sub   { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 36px; }
-.cta-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.btn-cta-secondary { background: transparent; color: rgba(255,255,255,0.85); text-decoration: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); transition: all 0.2s; }
-.btn-cta-secondary:hover { background: rgba(255,255,255,0.1); }
-
 /* FOOTER */
-.footer { background: #060d17; padding: 20px 40px; }
+.footer { background: #0d1b2a 0%; padding: 20px 40px; }
 .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .footer-brand { color: white; font-size: 16px; font-weight: 700; }
 .footer-copy  { color: rgba(255,255,255,0.45); font-size: 13px; }
@@ -73,4 +64,61 @@
   .hero-title { font-size: 26px; }
   .hero { padding: 40px 20px; }
   .section-title { font-size: 24px; }
+}
+/* ABOUT ISET */
+.about-iset {
+  padding: 80px;
+  background: #ffffff;
+}
+
+.about-container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.about-images img {
+  width: 220px;
+  border-radius: 12px;
+}
+
+.about-content {
+  max-width: 500px;
+}
+
+.about-text {
+  margin-top: 10px;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* DOMAINES */
+.domains {
+  padding: 80px;
+  background: #f8f9fe;
+}
+
+.domains-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.domain-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.domain-card:hover {
+  transform: translateY(-5px);
+}
+
+.domain-icon {
+  font-size: 30px;
+  margin-bottom: 10px;
 }

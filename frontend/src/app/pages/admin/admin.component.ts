@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
+import { MessagesService } from '../../services/messages.service';
+import { Auth } from '../../services/auth';
 
 @Component({
   selector: 'app-admin',
@@ -10,9 +12,19 @@ import { AdminService } from '../../services/admin.service';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css'],
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
 
-  activeSection: 'accueil' | 'utilisateurs' | 'formations' | 'formateurs' | 'approvals' = 'accueil';
+  activeSection: 'accueil' | 'utilisateurs' | 'formations' | 'formateurs' | 'approvals' | 'messages' = 'accueil';
+
+  user: any = null;
+
+  // Messagerie
+  contacts: any[] = [];
+  messagesConversation: any[] = [];
+  contactSelectionne: any = null;
+  nouveauMessage = '';
+  unreadMessages = 0;
+  private msgPollingInterval: any;
 
   users: any[] = [];
   formations: any[] = [];
@@ -32,10 +44,7 @@ export class AdminComponent implements OnInit {
   formateurSearch: string = '';
   formateurSpecialiteFilter: string = '';
   formateurSort: 'nom' | 'email' | 'specialite' = 'nom';
-  formateurSpecialiteOptions = [
-    'Informatique', 'Réseaux', 'Génie logiciel', 'Intelligence artificielle',
-    'Cybersécurité', 'Marketing', 'Finance', 'Mécanique', 'Génie civil', 'Génie électrique'
-  ];
+  formateurSpecialiteOptions: string[] = [];
 
   message: string = '';
   messageType: 'success' | 'warning' | 'danger' | 'info' = 'info';
@@ -52,24 +61,101 @@ export class AdminComponent implements OnInit {
 
   loading = false;
 
-  constructor(private adminService: AdminService) {}
+  // Programme de formation
+  showProgrammeEditor = false;
+  programmeFormation: any = null;
+  programmeData = { description_globale: '', objectifs: '', prerequis: '' };
+  programmeModules: any[] = [];
+  moduleForm = { titre: '', description: '', duree_heures: '' as string | number, ordre: 0 };
+  editModuleMode = false;
+  editModuleId: number | null = null;
+
+  constructor(
+    private adminService: AdminService,
+    private msgService: MessagesService,
+    private authService: Auth
+  ) {}
 
   ngOnInit() {
+    const stored = localStorage.getItem('user');
+    if (stored) this.user = JSON.parse(stored);
+    this.authService.getSpecialites().subscribe({
+      next: data => this.formateurSpecialiteOptions = data.map(s => s.nom),
+      error: () => {}
+    });
     this.loadUsers();
     this.loadFormations();
     this.loadFormateurs();
     this.loadFormationsPending();
     this.loadFormationsAccepted();
     this.loadStats();
+    this.loadUnreadMessages();
+    this.msgPollingInterval = setInterval(() => this.loadUnreadMessages(), 30000);
   }
 
-  setSection(section: 'accueil' | 'utilisateurs' | 'formations' | 'formateurs' | 'approvals') {
+  ngOnDestroy() {
+    if (this.msgPollingInterval) clearInterval(this.msgPollingInterval);
+  }
+
+  setSection(section: 'accueil' | 'utilisateurs' | 'formations' | 'formateurs' | 'approvals' | 'messages') {
     this.activeSection = section;
     if (section === 'approvals') {
       this.loadFormationsPending();
       this.loadFormationsAccepted();
     }
-    
+    if (section === 'messages') this.loadContacts();
+  }
+
+  // ===== Messagerie =====
+  loadUnreadMessages() {
+    if (!this.user?.id) return;
+    this.msgService.getUnreadCount(this.user.id).subscribe({
+      next: data => this.unreadMessages = data?.count || 0,
+      error: () => {}
+    });
+  }
+
+  loadContacts() {
+    if (!this.user?.id) return;
+    this.msgService.getContacts(this.user.id).subscribe({
+      next: data => this.contacts = data,
+      error: () => {}
+    });
+  }
+
+  ouvrirConversation(contact: any) {
+    this.contactSelectionne = contact;
+    contact.non_lus = 0;
+    if (!this.user?.id) return;
+    this.msgService.getConversation(this.user.id, contact.id).subscribe({
+      next: data => this.messagesConversation = data,
+      error: () => {}
+    });
+  }
+
+  envoyerMessage(event?: Event) {
+    if (event) event.preventDefault();
+    if (!this.nouveauMessage.trim() || !this.contactSelectionne || !this.user?.id) return;
+    const texte = this.nouveauMessage.trim();
+    this.nouveauMessage = '';
+    this.msgService.envoyerMessage(this.user.id, this.contactSelectionne.id, texte).subscribe({
+      next: (res: any) => {
+        this.messagesConversation.push({
+          id: res.id,
+          expediteur_id: this.user.id,
+          contenu: texte,
+          date_envoi: new Date().toISOString()
+        });
+        const c = this.contacts.find(c => c.id === this.contactSelectionne.id);
+        if (c) c.dernier_message = texte;
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi du message', 'danger')
+    });
+  }
+
+  getRoleLabel(role: string): string {
+    const labels: any = { formateur: 'Formateur', etudiant: 'Étudiant', externe: 'Externe', admin: 'Admin' };
+    return labels[role] || role;
   }
 
   getEmptyForm() {
@@ -83,6 +169,7 @@ export class AdminComponent implements OnInit {
       formateur_id: null,
       specialite: '',
       nb_places: null,
+      prix: 0,
       status: 'draft'
     };
   }
@@ -280,6 +367,7 @@ get filteredUsers() {
       formateur_id: f.formateur_id || null,
       specialite: f.specialite || '',
       nb_places: f.nb_places || 0,
+      prix: f.prix || 0,
       status: f.status || 'draft'
     };
   }
@@ -437,6 +525,87 @@ publishAcceptedFormation(formationId: number) {
         this.loadFormationsPending();
       },
       error: err => this.showMessage(err?.error?.error || '❌ Erreur lors du rejet', 'danger')
+    });
+  }
+
+  // ===== Programme =====
+  ouvrirProgramme(f: any) {
+    this.programmeFormation = f;
+    this.showProgrammeEditor = true;
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: 0 };
+    this.adminService.getProgramme(f.id).subscribe({
+      next: (res: any) => {
+        const p = res.programme;
+        this.programmeData = p
+          ? { description_globale: p.description_globale || '', objectifs: p.objectifs || '', prerequis: p.prerequis || '' }
+          : { description_globale: '', objectifs: '', prerequis: '' };
+        this.programmeModules = res.modules || [];
+      },
+      error: () => this.showMessage('Erreur chargement du programme', 'danger')
+    });
+  }
+
+  fermerProgrammeEditor() {
+    this.showProgrammeEditor = false;
+    this.programmeFormation = null;
+    this.editModuleMode = false;
+    this.editModuleId = null;
+  }
+
+  sauvegarderProgramme() {
+    if (!this.programmeFormation) return;
+    this.adminService.saveProgramme(this.programmeFormation.id, this.programmeData).subscribe({
+      next: () => this.showMessage('Programme sauvegardé ✅', 'success'),
+      error: () => this.showMessage('Erreur sauvegarde programme', 'danger')
+    });
+  }
+
+  soumettrModule() {
+    if (!this.moduleForm.titre || !(this.moduleForm.titre as string).trim() || !this.programmeFormation) return;
+    if (this.editModuleMode && this.editModuleId !== null) {
+      this.adminService.updateModule(this.programmeFormation.id, this.editModuleId, this.moduleForm).subscribe({
+        next: () => {
+          const idx = this.programmeModules.findIndex(m => m.id === this.editModuleId);
+          if (idx !== -1) this.programmeModules[idx] = { ...this.programmeModules[idx], ...this.moduleForm };
+          this.annulerEditModule();
+          this.showMessage('Module mis à jour ✅', 'success');
+        },
+        error: () => this.showMessage('Erreur mise à jour module', 'danger')
+      });
+    } else {
+      this.adminService.addModule(this.programmeFormation.id, this.moduleForm).subscribe({
+        next: (res: any) => {
+          this.programmeModules.push({ id: res.id, ...this.moduleForm, formation_id: this.programmeFormation.id });
+          this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: this.programmeModules.length };
+          this.showMessage('Module ajouté ✅', 'success');
+        },
+        error: () => this.showMessage('Erreur ajout module', 'danger')
+      });
+    }
+  }
+
+  editerModule(m: any) {
+    this.editModuleMode = true;
+    this.editModuleId = m.id;
+    this.moduleForm = { titre: m.titre, description: m.description || '', duree_heures: m.duree_heures || '', ordre: m.ordre };
+  }
+
+  annulerEditModule() {
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: this.programmeModules.length };
+  }
+
+  supprimerModule(moduleId: number) {
+    if (!confirm('Supprimer ce module ?') || !this.programmeFormation) return;
+    this.adminService.deleteModule(this.programmeFormation.id, moduleId).subscribe({
+      next: () => {
+        this.programmeModules = this.programmeModules.filter(m => m.id !== moduleId);
+        this.showMessage('Module supprimé ✅', 'success');
+      },
+      error: () => this.showMessage('Erreur suppression module', 'danger')
     });
   }
 

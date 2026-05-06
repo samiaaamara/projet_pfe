@@ -1,0 +1,42 @@
+<!-- bouton flottant -->
+<div class="chat-button" (click)="toggleChat()">
+  💬
+</div>
+
+<!-- fenêtre chat -->
+<div class="chat-container" *ngIf="isOpen">
+
+  <!-- header -->
+  <div class="chat-header">
+    Assistant IA 🤖
+    <span class="close-btn" (click)="toggleChat()">✖</span>
+  </div>
+
+  <!-- messages -->
+  <div class="chat-body" #chatBody>
+
+    <div *ngFor="let msg of messages"
+         class="message"
+         [ngClass]="msg.sender">
+
+      {{ msg.text }}
+    </div>
+
+    <!-- typing -->
+    <div class="typing" *ngIf="isTyping">
+      L'IA écrit...
+    </div>
+
+  </div>
+
+  <!-- input -->
+  <div class="chat-footer">
+    <input
+      [(ngModel)]="userMessage"
+      (keydown.enter)="send()"
+      placeholder="Pose ta question..." />
+
+    <button (click)="send()">➤</button>
+  </div>
+
+</div>

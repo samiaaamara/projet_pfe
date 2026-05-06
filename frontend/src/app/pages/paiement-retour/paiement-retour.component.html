@@ -1,0 +1,47 @@
+<div class="retour-page">
+
+  <!-- Chargement -->
+  <div class="retour-card" *ngIf="statut === 'chargement'">
+    <div class="spinner-lg"></div>
+    <h2>Vérification du paiement...</h2>
+    <p>Merci de patienter quelques instants.</p>
+  </div>
+
+  <!-- Succès -->
+  <div class="retour-card succes" *ngIf="statut === 'succes'">
+    <div class="retour-icon">✅</div>
+    <h2>Paiement réussi !</h2>
+    <p>{{ message }}</p>
+    <div class="retour-actions">
+      <button class="btn-retour-primary" (click)="retourDashboard()">
+        Accéder à mes formations →
+      </button>
+    </div>
+  </div>
+
+  <!-- Échec -->
+  <div class="retour-card echec" *ngIf="statut === 'echec'">
+    <div class="retour-icon">❌</div>
+    <h2>Paiement non complété</h2>
+    <p>{{ message }}</p>
+    <div class="retour-actions">
+      <button class="btn-retour-secondary" (click)="retourDashboard()">
+        ← Retour au catalogue
+      </button>
+    </div>
+  </div>
+
+  <!-- Erreur technique -->
+  <div class="retour-card erreur" *ngIf="statut === 'erreur'">
+    <div class="retour-icon">⚠️</div>
+    <h2>Erreur technique</h2>
+    <p>{{ message }}</p>
+    <p class="retour-contact">Si votre paiement a été débité, contactez-nous.</p>
+    <div class="retour-actions">
+      <button class="btn-retour-secondary" (click)="retourDashboard()">
+        ← Retour au tableau de bord
+      </button>
+    </div>
+  </div>
+
+</div>

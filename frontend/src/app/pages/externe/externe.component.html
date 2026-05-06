@@ -27,6 +27,10 @@
         <span class="nav-icon">🔔</span> Notifications
         <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </a>
+      <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
+        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
+      </a>
     </nav>
 
     <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
@@ -61,7 +65,7 @@
         </div>
         <div class="stat-card orange">
           <div class="stat-icon">💰</div>
-          <div class="stat-value">{{ totalDepense | number:'1.0-2' }} TND</div>
+          <div class="stat-value">{{ totalDepense | number:'1.0-2' }} EUR</div>
           <div class="stat-label">Total dépensé</div>
         </div>
       </div>
@@ -91,7 +95,7 @@
               <div class="recent-title">{{ i.titre }}</div>
               <div class="recent-date">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
             </div>
-            <div class="price-tag">{{ i.montant > 0 ? (i.montant + ' TND') : 'Gratuit' }}</div>
+            <div class="price-tag">{{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}</div>
           </div>
         </div>
       </div>
@@ -99,9 +103,10 @@
 
     <!-- ===== CATALOGUE FORMATIONS ===== -->
     <section *ngIf="activeSection === 'formations'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>📚 Catalogue des formations</h2>
-        <p>{{ totalFormations }} formation(s) disponible(s)</p>
+        <p>{{ totalFormations }} formation(s) disponible(s) à venir</p>
       </div>
 
       <div class="filters-bar">
@@ -114,6 +119,11 @@
           <div class="formation-header">
             <span class="formation-niveau" *ngIf="f.niveau">{{ f.niveau }}</span>
             <span class="formation-dept" *ngIf="f.departement">{{ f.departement }}</span>
+            <span *ngIf="f.date_debut" class="badge-date" [ngClass]="badgeDateClass(f.date_debut)">
+              {{ joursRestants(f.date_debut) === 0 ? "Aujourd'hui" :
+                 joursRestants(f.date_debut) === 1 ? 'Demain' :
+                 'Dans ' + joursRestants(f.date_debut) + ' j' }}
+            </span>
           </div>
           <h5 class="formation-title">{{ f.titre }}</h5>
           <p class="formation-desc">{{ f.description }}</p>
@@ -126,7 +136,7 @@
 
           <div class="price-section">
             <div class="price-display" [class.free]="!f.prix || f.prix == 0">
-              {{ (!f.prix || f.prix == 0) ? '🆓 Gratuit' : (f.prix + ' TND') }}
+              {{ (!f.prix || f.prix == 0) ? '🆓 Gratuit' : (f.prix + ' EUR') }}
             </div>
             <div class="places-info" *ngIf="f.nb_places !== null">
               👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
@@ -134,13 +144,14 @@
           </div>
 
           <div class="formation-footer">
+            <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
             <span *ngIf="estComplet(f)" class="badge-complet">Complet</span>
             <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Acheté</span>
             <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)"
                     class="btn-payer"
                     [class.btn-gratuit]="!f.prix || f.prix == 0"
                     (click)="ouvrirPaiement(f)">
-              {{ (!f.prix || f.prix == 0) ? 'S\'inscrire' : '💳 Acheter — ' + f.prix + ' TND' }}
+              {{ (!f.prix || f.prix == 0) ? 'S\'inscrire' : '💳 Acheter — ' + f.prix + ' EUR' }}
             </button>
           </div>
         </div>
@@ -160,6 +171,7 @@
 
     <!-- ===== MES INSCRIPTIONS ===== -->
     <section *ngIf="activeSection === 'mesInscriptions'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>🎓 Mes formations</h2>
         <p>{{ mesInscriptions.length }} formation(s) achetée(s)</p>
@@ -187,7 +199,7 @@
           </div>
           <div class="inscription-right">
             <div class="price-paid">
-              {{ i.montant > 0 ? (i.montant + ' TND') : 'Gratuit' }}
+              {{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}
             </div>
             <span class="badge-paiement" [ngClass]="getStatutBadgeClass(i.statut_paiement)">
               {{ i.statut_paiement === 'payé' ? '✅ Payé' : i.statut_paiement === 'en_attente' ? '⏳ En attente' : '↩️ Remboursé' }}
@@ -229,6 +241,7 @@
 
     <!-- ===== PROFIL ===== -->
     <section *ngIf="activeSection === 'profil'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>👤 Mon profil</h2>
         <p>Gérez vos informations personnelles</p>
@@ -311,6 +324,7 @@
 
     <!-- ===== NOTIFICATIONS ===== -->
     <section *ngIf="activeSection === 'notifications'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
           <h2>🔔 Notifications</h2>
@@ -337,6 +351,74 @@
           </div>
           <button class="notif-close" (click)="supprimerNotif(n.id, $event)">×</button>
         </div>
+      </div>
+    </section>
+
+    <!-- ===== MESSAGERIE ===== -->
+    <section *ngIf="activeSection === 'messages'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
+      <div class="page-title">
+        <h2>💬 Messagerie</h2>
+        <p>Échangez des messages avec vos formateurs</p>
+      </div>
+      <div class="chat-container">
+        <!-- Contacts -->
+        <div class="contacts-panel">
+          <div class="contacts-header">Mes formateurs</div>
+          <div class="contacts-list">
+            <div *ngFor="let c of contacts"
+                 class="contact-item"
+                 [class.active]="contactSelectionne?.id === c.id"
+                 (click)="ouvrirConversation(c)">
+              <div class="contact-avatar">{{ c.nom?.charAt(0)?.toUpperCase() }}</div>
+              <div class="contact-info">
+                <div class="contact-name">{{ c.nom }}</div>
+                <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
+              </div>
+              <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
+            </div>
+            <div *ngIf="contacts.length === 0" class="no-contacts">
+              Inscrivez-vous à une formation payante pour contacter un formateur
+            </div>
+          </div>
+        </div>
+        <!-- Conversation -->
+        <div class="conversation-panel" *ngIf="contactSelectionne; else noConvExt">
+          <div class="conv-header">
+            <div class="contact-avatar conv-avatar">{{ contactSelectionne.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div class="conv-info">
+              <div class="conv-name">{{ contactSelectionne.nom }}</div>
+              <div class="conv-role-label">Formateur</div>
+            </div>
+          </div>
+          <div class="messages-list">
+            <div *ngFor="let m of messagesConversation"
+                 class="msg-item"
+                 [class.msg-sent]="m.expediteur_id === user?.id"
+                 [class.msg-received]="m.expediteur_id !== user?.id">
+              <div class="msg-bubble">{{ m.contenu }}</div>
+              <div class="msg-time">{{ m.date_envoi | date:'dd/MM HH:mm' }}</div>
+            </div>
+            <div *ngIf="messagesConversation.length === 0" class="no-msgs">
+              Aucun message. Commencez la conversation !
+            </div>
+          </div>
+          <div class="msg-input-area">
+            <textarea [(ngModel)]="nouveauMessage"
+                      placeholder="Votre message..."
+                      rows="2"
+                      (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
+            <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
+              Envoyer ✉️
+            </button>
+          </div>
+        </div>
+        <ng-template #noConvExt>
+          <div class="no-conv-placeholder">
+            <div class="no-conv-icon">💬</div>
+            <p>Sélectionnez un formateur pour démarrer une conversation</p>
+          </div>
+        </ng-template>
       </div>
     </section>
 
@@ -373,19 +455,82 @@
           {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Formation gratuite' : 'Montant à payer' }}
         </div>
         <div class="modal-price-value">
-          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'GRATUIT' : (formationPaiement?.prix + ' TND') }}
+          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'GRATUIT' : (formationPaiement?.prix + ' EUR') }}
         </div>
       </div>
 
       <p class="modal-note" *ngIf="formationPaiement?.prix > 0">
-        🔒 Paiement sécurisé simulé — Vous aurez accès aux supports immédiatement après confirmation.
+        🔒 Paiement sécurisé via <strong>Stripe</strong> — carte bancaire (Visa, Mastercard, etc.).
+        Vous serez redirigé vers la page de paiement Stripe.
       </p>
     </div>
     <div class="modal-footer">
-      <button class="btn-cancel-modal" (click)="fermerModal()">Annuler</button>
-      <button class="btn-confirm-pay" (click)="confirmerPaiement()">
-        {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Confirmer l\'inscription ✅' : '💳 Payer ' + formationPaiement?.prix + ' TND' }}
+      <button class="btn-cancel-modal" (click)="fermerModal()" [disabled]="paiementEnCours">Annuler</button>
+      <button class="btn-confirm-pay" (click)="confirmerPaiement()" [disabled]="paiementEnCours">
+        <span *ngIf="paiementEnCours" class="spinner-sm"></span>
+        <span *ngIf="!paiementEnCours">
+          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Confirmer l\'inscription ✅' : '💳 Payer ' + formationPaiement?.prix + ' EUR' }}
+        </span>
+        <span *ngIf="paiementEnCours">Redirection en cours...</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL PROGRAMME ===== -->
+<div class="modal-backdrop" *ngIf="programmeFormation" (click)="fermerProgramme()">
+  <div class="modal-programme" (click)="$event.stopPropagation()">
+    <div class="modal-prog-header">
+      <div>
+        <h3>📋 Programme de la formation</h3>
+        <p class="prog-formation-title">{{ programmeFormation?.titre }}</p>
+      </div>
+      <button class="modal-close" (click)="fermerProgramme()">×</button>
+    </div>
+
+    <div class="modal-prog-body">
+      <div *ngIf="programmeLoading" class="prog-loading">Chargement du programme...</div>
+
+      <div *ngIf="!programmeLoading && programmeData">
+        <!-- Description globale -->
+        <div class="prog-block" *ngIf="programmeData.programme?.description_globale">
+          <h5 class="prog-block-title">📖 Description</h5>
+          <p class="prog-block-text">{{ programmeData.programme.description_globale }}</p>
+        </div>
+
+        <!-- Objectifs -->
+        <div class="prog-block" *ngIf="programmeData.programme?.objectifs">
+          <h5 class="prog-block-title">🎯 Objectifs pédagogiques</h5>
+          <p class="prog-block-text">{{ programmeData.programme.objectifs }}</p>
+        </div>
+
+        <!-- Prérequis -->
+        <div class="prog-block" *ngIf="programmeData.programme?.prerequis">
+          <h5 class="prog-block-title">✅ Prérequis</h5>
+          <p class="prog-block-text">{{ programmeData.programme.prerequis }}</p>
+        </div>
+
+        <!-- Modules -->
+        <div class="prog-block" *ngIf="programmeData.modules?.length > 0">
+          <h5 class="prog-block-title">📚 Contenu — {{ programmeData.modules.length }} module(s)</h5>
+          <div class="prog-modules-list">
+            <div class="prog-module-item" *ngFor="let m of programmeData.modules; let i = index">
+              <div class="prog-module-num">{{ i + 1 }}</div>
+              <div class="prog-module-info">
+                <div class="prog-module-titre">{{ m.titre }}
+                  <span class="prog-module-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+                </div>
+                <div class="prog-module-desc" *ngIf="m.description">{{ m.description }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-empty" *ngIf="!programmeData.programme && programmeData.modules?.length === 0">
+          <span>📋</span>
+          <p>Le programme de cette formation n'a pas encore été renseigné.</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

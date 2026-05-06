@@ -28,7 +28,9 @@ router.get('/contacts/:userId', (req, res) => {
         WHERE i.etudiant_id = (SELECT id FROM etudiants WHERE user_id = ?)
       `;
       params = [userId, userId, userId, userId];
+
     } else if (role === 'formateur') {
+      /* Formateur voit : étudiants inscrits + externes payés + admins */
       sql = `
         SELECT DISTINCT u.id, u.nom, u.role,
           (SELECT contenu FROM messages
@@ -37,13 +39,58 @@ router.get('/contacts/:userId', (req, res) => {
            ORDER BY date_envoi DESC LIMIT 1) AS dernier_message,
           (SELECT COUNT(*) FROM messages
            WHERE expediteur_id = u.id AND destinataire_id = ? AND lu = 0) AS non_lus
-        FROM formations f
-        JOIN inscriptions i ON i.formation_id = f.id
-        JOIN etudiants e ON i.etudiant_id = e.id
-        JOIN users u ON e.user_id = u.id
-        WHERE f.formateur_id = (SELECT id FROM formateurs WHERE user_id = ?)
+        FROM users u
+        WHERE u.id IN (
+          SELECT e.user_id FROM inscriptions i
+          JOIN formations f ON i.formation_id = f.id
+          JOIN etudiants e ON i.etudiant_id = e.id
+          WHERE f.formateur_id = (SELECT id FROM formateurs WHERE user_id = ?)
+          UNION
+          SELECT ex.user_id FROM inscriptions_externes ie
+          JOIN formations f ON ie.formation_id = f.id
+          JOIN externes ex ON ie.externe_id = ex.id
+          WHERE f.formateur_id = (SELECT id FROM formateurs WHERE user_id = ?)
+          AND ie.statut_paiement = 'payé'
+          UNION
+          SELECT id FROM users WHERE role = 'admin'
+        )
+      `;
+      params = [userId, userId, userId, userId, userId];
+
+    } else if (role === 'admin') {
+      /* Admin voit tous les formateurs */
+      sql = `
+        SELECT DISTINCT u.id, u.nom, u.role,
+          (SELECT contenu FROM messages
+           WHERE (expediteur_id = u.id AND destinataire_id = ?)
+              OR (expediteur_id = ? AND destinataire_id = u.id)
+           ORDER BY date_envoi DESC LIMIT 1) AS dernier_message,
+          (SELECT COUNT(*) FROM messages
+           WHERE expediteur_id = u.id AND destinataire_id = ? AND lu = 0) AS non_lus
+        FROM formateurs fo
+        JOIN users u ON fo.user_id = u.id
+      `;
+      params = [userId, userId, userId];
+
+    } else if (role === 'externe') {
+      /* Externe voit les formateurs de ses formations payées */
+      sql = `
+        SELECT DISTINCT u.id, u.nom, u.role,
+          (SELECT contenu FROM messages
+           WHERE (expediteur_id = u.id AND destinataire_id = ?)
+              OR (expediteur_id = ? AND destinataire_id = u.id)
+           ORDER BY date_envoi DESC LIMIT 1) AS dernier_message,
+          (SELECT COUNT(*) FROM messages
+           WHERE expediteur_id = u.id AND destinataire_id = ? AND lu = 0) AS non_lus
+        FROM inscriptions_externes ie
+        JOIN formations f ON ie.formation_id = f.id
+        JOIN formateurs fo ON f.formateur_id = fo.id
+        JOIN users u ON fo.user_id = u.id
+        WHERE ie.externe_id = (SELECT id FROM externes WHERE user_id = ?)
+        AND ie.statut_paiement = 'payé'
       `;
       params = [userId, userId, userId, userId];
+
     } else {
       return res.json([]);
     }
@@ -111,4 +158,3 @@ router.get('/unread-count/:userId', (req, res) => {
 });
 
 module.exports = router;
-

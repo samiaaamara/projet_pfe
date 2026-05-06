@@ -63,4 +63,39 @@ export class EtudiantService {
   getNotationsAvg(formationId: number) {
     return this.http.get<any>(`${this.apiUrl}/notations-avg/${formationId}`);
   }
+
+  getProgressionModules(etudiantId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/progression-modules/${etudiantId}/${formationId}`);
+  }
+
+  getMesPresences(etudiantId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/mes-presences/${etudiantId}/${formationId}`);
+  }
+
+  // Liste d'attente
+  rejoindreListeAttente(etudiantId: number, formationId: number) {
+    return this.http.post<any>(`${this.apiUrl}/liste-attente`, { etudiant_id: etudiantId, formation_id: formationId });
+  }
+  quitterListeAttente(etudiantId: number, formationId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/liste-attente/${etudiantId}/${formationId}`);
+  }
+  getEnAttente(etudiantId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/en-attente/${etudiantId}`);
+  }
+  desinscrire(etudiantId: number, formationId: number) {
+    return this.http.delete<any>(`${this.apiUrl}/inscription/${etudiantId}/${formationId}`);
+  }
+
+  // Justificatifs
+  soumettreJustificatif(etudiantId: number, seanceId: number, motif: string) {
+    return this.http.post<any>(`${this.apiUrl}/justificatifs`, { etudiant_id: etudiantId, seance_id: seanceId, motif });
+  }
+  getMesJustificatifs(etudiantId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/mes-justificatifs/${etudiantId}`);
+  }
+
+  // Attestation avec données complètes
+  getAttestationData(etudiantId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/attestation-data/${etudiantId}/${formationId}`);
+  }
 }

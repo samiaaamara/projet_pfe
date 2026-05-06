@@ -4,14 +4,14 @@
   <div class="auth-left">
     <div class="auth-left-inner">
       <a class="auth-brand" routerLink="/home">
-        <span>🎓</span> FormaPro
+        <span>&#127891;</span> FormaPro
       </a>
-      <h2 class="auth-left-title">Rejoignez notre communauté de formation</h2>
-      <p class="auth-left-sub">Créez votre compte en quelques instants et accédez à toutes les ressources pédagogiques de la plateforme.</p>
+      <h2 class="auth-left-title">Rejoignez notre communaute de formation</h2>
+      <p class="auth-left-sub">Creez votre compte en quelques instants et accedit a toutes les ressources pedagogiques de la plateforme.</p>
       <div class="auth-left-features">
-        <div class="auth-feature"><span class="af-icon">✅</span><span>Inscription instantanée et gratuite</span></div>
-        <div class="auth-feature"><span class="af-icon">📂</span><span>Accès aux supports pédagogiques</span></div>
-        <div class="auth-feature"><span class="af-icon">🏆</span><span>Suivez et validez vos formations</span></div>
+        <div class="auth-feature"><span class="af-icon">&#9989;</span><span>Inscription instantanee et gratuite</span></div>
+        <div class="auth-feature"><span class="af-icon">&#128194;</span><span>Acces aux supports pedagogiques</span></div>
+        <div class="auth-feature"><span class="af-icon">&#127942;</span><span>Suivez et validez vos formations</span></div>
       </div>
     </div>
   </div>
@@ -21,27 +21,38 @@
     <div class="auth-card">
 
       <div class="auth-card-header">
-        <div class="auth-avatar-icon green">✏️</div>
-        <h3 class="auth-title">Créer un compte</h3>
+        <div class="auth-avatar-icon green">&#9997;&#65039;</div>
+        <h3 class="auth-title">Creer un compte</h3>
         <p class="auth-subtitle">Remplissez le formulaire pour vous inscrire</p>
       </div>
 
-      <form (ngSubmit)="register()" class="auth-form">
+      <form #inscriptionForm="ngForm" (ngSubmit)="register(inscriptionForm)" class="auth-form" novalidate>
 
         <!-- NOM + EMAIL -->
         <div class="form-row">
           <div class="form-group">
             <label>Nom complet *</label>
-            <div class="input-wrapper">
-              <span class="input-icon">👤</span>
-              <input type="text" [(ngModel)]="nom" name="nom" placeholder="Votre nom" required>
+            <div class="input-wrapper" [class.is-invalid]="nomRef.invalid && (nomRef.dirty || nomRef.touched)">
+              <span class="input-icon">&#128100;</span>
+              <input type="text" [(ngModel)]="nom" name="nom" #nomRef="ngModel"
+                     placeholder="Votre nom complet" required minlength="3" maxlength="100">
+            </div>
+            <div *ngIf="nomRef.invalid && (nomRef.dirty || nomRef.touched)" class="field-error">
+              <span *ngIf="nomRef.errors?.['required']">Le nom complet est obligatoire.</span>
+              <span *ngIf="nomRef.errors?.['minlength']">Le nom doit contenir au moins 3 caracteres.</span>
             </div>
           </div>
+
           <div class="form-group">
             <label>Email *</label>
-            <div class="input-wrapper">
-              <span class="input-icon">✉️</span>
-              <input type="email" [(ngModel)]="email" name="email" placeholder="exemple@email.com" required>
+            <div class="input-wrapper" [class.is-invalid]="emailRef.invalid && (emailRef.dirty || emailRef.touched)">
+              <span class="input-icon">&#9993;&#65039;</span>
+              <input type="email" [(ngModel)]="email" name="email" #emailRef="ngModel"
+                     placeholder="exemple@email.com" required email>
+            </div>
+            <div *ngIf="emailRef.invalid && (emailRef.dirty || emailRef.touched)" class="field-error">
+              <span *ngIf="emailRef.errors?.['required']">L'adresse email est obligatoire.</span>
+              <span *ngIf="emailRef.errors?.['email']">Veuillez entrer une adresse email valide (ex: nom@domaine.com).</span>
             </div>
           </div>
         </div>
@@ -50,44 +61,60 @@
         <div class="form-row">
           <div class="form-group">
             <label>Mot de passe *</label>
-            <div class="input-wrapper">
-              <span class="input-icon">🔑</span>
-              <input type="password" [(ngModel)]="password" name="password" placeholder="Mot de passe" required>
+            <div class="input-wrapper" [class.is-invalid]="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)">
+              <span class="input-icon">&#128273;</span>
+              <input type="password" [(ngModel)]="password" name="password" #passwordRef="ngModel"
+                     placeholder="Au moins 6 caracteres" required minlength="6">
+            </div>
+            <div *ngIf="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)" class="field-error">
+              <span *ngIf="passwordRef.errors?.['required']">Le mot de passe est obligatoire.</span>
+              <span *ngIf="passwordRef.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caracteres.</span>
             </div>
           </div>
+
           <div class="form-group">
-            <label>Rôle *</label>
+            <label>Role *</label>
             <div class="input-wrapper select-wrapper">
-              <span class="input-icon">🎭</span>
-              <select [(ngModel)]="role" name="role">
-                <option value="etudiant">Étudiant</option>
+              <span class="input-icon">&#127917;</span>
+              <select [(ngModel)]="role" name="role" required>
+                <option value="etudiant">Etudiant</option>
                 <option value="formateur">Formateur</option>
-                 <option value="externe">Utilisateur Externe</option>
+                <option value="externe">Utilisateur Externe</option>
               </select>
             </div>
           </div>
         </div>
 
-        <!-- CHAMPS ÉTUDIANT -->
+        <!-- CHAMPS ETUDIANT -->
         <div *ngIf="role === 'etudiant'" class="role-fields">
           <div class="role-fields-title">
-            <span class="role-chip blue">Étudiant</span>
-            <span>Informations supplémentaires</span>
+            <span class="role-chip blue">Etudiant</span>
+            <span>Informations supplementaires</span>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>CIN</label>
-              <div class="input-wrapper">
-                <span class="input-icon">🪪</span>
-                <input type="text" [(ngModel)]="cin" name="cin" placeholder="Numéro CIN">
+              <label>CIN *</label>
+              <div class="input-wrapper" [class.is-invalid]="cinRef.invalid && (cinRef.dirty || cinRef.touched)">
+                <span class="input-icon">&#129370;</span>
+                <input type="text" [(ngModel)]="cin" name="cin" #cinRef="ngModel"
+                       placeholder="8 chiffres" required pattern="[0-9]{8}" maxlength="8">
+              </div>
+              <div *ngIf="cinRef.invalid && (cinRef.dirty || cinRef.touched)" class="field-error">
+                <span *ngIf="cinRef.errors?.['required']">Le CIN est obligatoire.</span>
+                <span *ngIf="cinRef.errors?.['pattern']">Le CIN doit contenir exactement 8 chiffres (ex: 12345678).</span>
               </div>
             </div>
+
             <div class="form-group">
-              <label>Téléphone</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📞</span>
-                <input type="text" [(ngModel)]="telephone" name="telephone_etudiant" placeholder="Ex: +216 XX XXX XXX">
+              <label>Telephone</label>
+              <div class="input-wrapper" [class.is-invalid]="telEtudRef.invalid && (telEtudRef.dirty || telEtudRef.touched)">
+                <span class="input-icon">&#128222;</span>
+                <input type="text" [(ngModel)]="telephone" name="telephone_etudiant" #telEtudRef="ngModel"
+                       placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
+              </div>
+              <div *ngIf="telEtudRef.invalid && (telEtudRef.dirty || telEtudRef.touched)" class="field-error">
+                <span *ngIf="telEtudRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
               </div>
             </div>
           </div>
@@ -96,126 +123,159 @@
             <div class="form-group">
               <label>Niveau</label>
               <div class="input-wrapper select-wrapper">
-                <span class="input-icon">🎓</span>
+                <span class="input-icon">&#127891;</span>
                 <select [(ngModel)]="niveau" name="niveau">
-                  <option value="">-- Niveau --</option>
+                  <option value="">-- Selectionnez un niveau --</option>
                   <option value="L1">L1</option>
                   <option value="L2">L2</option>
                   <option value="L3">L3</option>
-                   <option value="M1">Master 1</option>
+                  <option value="M1">Master 1</option>
                   <option value="M2">Master 2</option>
                 </select>
               </div>
             </div>
+
             <div class="form-group">
               <label>Spécialité</label>
-              <div class="input-wrapper">
-                <span class="input-icon">💡</span>
-                <input type="text" [(ngModel)]="specialite" name="specialite" placeholder="Ex: Développement Web">
+              <div class="input-wrapper select-wrapper">
+                <span class="input-icon">&#128161;</span>
+                <select [(ngModel)]="specialite" name="specialite">
+                  <option value="">-- Sélectionnez une spécialité --</option>
+                  <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
+                </select>
               </div>
             </div>
           </div>
-           <div class="form-row">
+
+          <div class="form-row">
             <div class="form-group">
               <label>Date de naissance</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📅</span>
-                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_etudiant">
+              <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
+                <span class="input-icon">&#128197;</span>
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_etudiant"
+                       [attr.max]="today" (change)="validateDateNaissance()">
+              </div>
+              <div *ngIf="dateNaissanceError" class="field-error">
+                <span>La date de naissance doit etre dans le passe.</span>
               </div>
             </div>
           </div>
         </div>
-<!-- CHAMPS FORMATEUR -->
-<div *ngIf="role === 'formateur'" class="role-fields">
-  <div class="role-fields-title">
-    <span class="role-chip green">Formateur</span>
-    <span>Informations supplémentaires</span>
-  </div>
 
-  <div class="form-group">
-    <label>Spécialité</label>
-    <div class="input-wrapper">
-      <span class="input-icon">💡</span>
-      <input type="text" [(ngModel)]="specialite" name="specialite_formateur" placeholder="Ex: Angular, Node.js...">
-    </div>
-  </div>
+        <!-- CHAMPS FORMATEUR -->
+        <div *ngIf="role === 'formateur'" class="role-fields">
+          <div class="role-fields-title">
+            <span class="role-chip green">Formateur</span>
+            <span>Informations supplementaires</span>
+          </div>
 
-  <div class="form-group">
-    <label>Téléphone</label>
-    <div class="input-wrapper">
-      <span class="input-icon">📞</span>
-      <input type="text" [(ngModel)]="telephone" name="telephone_formateur" placeholder="Ex: +216 XX XXX XXX">
-    </div>
-  </div>
+          <div class="form-group">
+            <label>Spécialité</label>
+            <div class="input-wrapper select-wrapper">
+              <span class="input-icon">&#128161;</span>
+              <select [(ngModel)]="specialite" name="specialite_formateur">
+                <option value="">-- Sélectionnez une spécialité --</option>
+                <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
+              </select>
+            </div>
+          </div>
 
-  <!-- ✅ ICI on garde le form-row DANS le bloc -->
-  <div class="form-row">
-    <div class="form-group">
-      <label>Date de naissance</label>
-      <div class="input-wrapper">
-        <span class="input-icon">📅</span>
-        <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_formateur">
-      </div>
-    </div>
-  </div>
+          <div class="form-group">
+            <label>Telephone</label>
+            <div class="input-wrapper" [class.is-invalid]="telFormRef.invalid && (telFormRef.dirty || telFormRef.touched)">
+              <span class="input-icon">&#128222;</span>
+              <input type="text" [(ngModel)]="telephone" name="telephone_formateur" #telFormRef="ngModel"
+                     placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
+            </div>
+            <div *ngIf="telFormRef.invalid && (telFormRef.dirty || telFormRef.touched)" class="field-error">
+              <span *ngIf="telFormRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
+            </div>
+          </div>
 
-</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Date de naissance</label>
+              <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
+                <span class="input-icon">&#128197;</span>
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_formateur"
+                       [attr.max]="today" (change)="validateDateNaissance()">
+              </div>
+              <div *ngIf="dateNaissanceError" class="field-error">
+                <span>La date de naissance doit etre dans le passe.</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<!-- CHAMPS EXTERNE -->
+        <!-- CHAMPS EXTERNE -->
         <div *ngIf="role === 'externe'" class="role-fields">
           <div class="role-fields-title">
             <span class="role-chip teal">Externe</span>
-            <span>Informations supplémentaires (optionnelles)</span>
+            <span>Informations supplementaires (optionnelles)</span>
           </div>
+
           <div class="form-row">
             <div class="form-group">
-              <label>Téléphone</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📞</span>
-                <input type="text" [(ngModel)]="telephone" name="telephone" placeholder="Ex: +216 XX XXX XXX">
+              <label>Telephone</label>
+              <div class="input-wrapper" [class.is-invalid]="telExtRef.invalid && (telExtRef.dirty || telExtRef.touched)">
+                <span class="input-icon">&#128222;</span>
+                <input type="text" [(ngModel)]="telephone" name="telephone" #telExtRef="ngModel"
+                       placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
+              </div>
+              <div *ngIf="telExtRef.invalid && (telExtRef.dirty || telExtRef.touched)" class="field-error">
+                <span *ngIf="telExtRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
               </div>
             </div>
+
             <div class="form-group">
               <label>Entreprise / Organisation</label>
               <div class="input-wrapper">
-                <span class="input-icon">🏢</span>
-                <input type="text" [(ngModel)]="entreprise" name="entreprise" placeholder="Nom de votre entreprise">
+                <span class="input-icon">&#127970;</span>
+                <input type="text" [(ngModel)]="entreprise" name="entreprise"
+                       placeholder="Nom de votre entreprise" maxlength="150">
               </div>
             </div>
           </div>
-         <div class="form-row">
+
+          <div class="form-row">
             <div class="form-group">
-              <label>Spécialité</label>
+              <label>Specialite</label>
               <div class="input-wrapper">
-                <span class="input-icon">💡</span>
-                <input type="text" [(ngModel)]="specialite" name="specialite_externe" placeholder="Ex: Marketing, Finance...">
+                <span class="input-icon">&#128161;</span>
+                <input type="text" [(ngModel)]="specialite" name="specialite_externe"
+                       placeholder="Ex: Marketing, Finance..." maxlength="100">
               </div>
             </div>
+
             <div class="form-group">
               <label>Date de naissance</label>
-              <div class="input-wrapper">
-                <span class="input-icon">📅</span>
-                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_externe">
+              <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
+                <span class="input-icon">&#128197;</span>
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_externe"
+                       [attr.max]="today" (change)="validateDateNaissance()">
+              </div>
+              <div *ngIf="dateNaissanceError" class="field-error">
+                <span>La date de naissance doit etre dans le passe.</span>
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- MESSAGE -->
+
+        <!-- MESSAGE GLOBAL -->
         <div *ngIf="message" class="auth-message"
-             [class.auth-success]="message.includes('succès')"
-             [class.auth-error]="message.includes('Erreur')">
+             [class.auth-success]="message.includes('succes')"
+             [class.auth-error]="!message.includes('succes')">
           {{ message }}
         </div>
 
         <button type="submit" class="btn-submit">
-          Créer mon compte →
+          Creer mon compte &#8594;
         </button>
 
       </form>
 
       <div class="auth-footer">
-        Déjà un compte ? <a routerLink="/login">Se connecter</a>
+        Deja un compte ? <a routerLink="/login">Se connecter</a>
       </div>
 
     </div>

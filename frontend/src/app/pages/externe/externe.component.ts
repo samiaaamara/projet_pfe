@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
+import { MessagesService } from '../../services/messages.service';
 
 @Component({
   selector: 'app-externe',
@@ -56,12 +57,20 @@ export class ExterneComponent implements OnInit {
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
-  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'profil' | 'notifications' = 'accueil';
+  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'profil' | 'notifications' | 'messages' = 'accueil';
+
+  // Messagerie
+  contacts: any[] = [];
+  messagesConversation: any[] = [];
+  contactSelectionne: any = null;
+  nouveauMessage = '';
+  unreadMessages = 0;
 
   constructor(
     private externeService: ExterneService,
     private authService: Auth,
     private notifService: NotificationsService,
+    private msgService: MessagesService,
     private router: Router
   ) {}
 
@@ -80,6 +89,8 @@ export class ExterneComponent implements OnInit {
     this.loadMesInscriptions();
     this.loadUnreadCount();
     this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
+    this.loadUnreadMessages();
+    setInterval(() => this.loadUnreadMessages(), 30000);
   }
     ngOnDestroy() {
     if (this.pollingInterval) clearInterval(this.pollingInterval);
@@ -136,7 +147,21 @@ export class ExterneComponent implements OnInit {
     return f.nb_places !== null && this.placesRestantes(f) === 0;
   }
 
+  joursRestants(dateDebut: string): number {
+    const diff = new Date(dateDebut).getTime() - new Date().setHours(0, 0, 0, 0);
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  badgeDateClass(dateDebut: string): string {
+    const j = this.joursRestants(dateDebut);
+    if (j <= 7) return 'badge-urgent';
+    if (j <= 30) return 'badge-proche';
+    return 'badge-loin';
+  }
+
   // ===== Paiement =====
+  paiementEnCours = false;
+
   ouvrirPaiement(formation: any) {
     this.formationPaiement = formation;
     this.showPaiementModal = true;
@@ -145,20 +170,29 @@ export class ExterneComponent implements OnInit {
   fermerModal() {
     this.showPaiementModal = false;
     this.formationPaiement = null;
+    this.paiementEnCours = false;
   }
 
   confirmerPaiement() {
-    if (!this.externeId || !this.formationPaiement) return;
-    this.externeService.payer(this.externeId, this.formationPaiement.id).subscribe({
+    if (!this.externeId || !this.formationPaiement || this.paiementEnCours) return;
+    this.paiementEnCours = true;
+
+    this.externeService.initierPaiement(this.externeId, this.formationPaiement.id).subscribe({
       next: (res: any) => {
-        this.fermerModal();
-        const montant = this.formationPaiement?.prix || 0;
-        this.showMessage(montant > 0 ? `Paiement de ${montant} TND confirmé ✅` : 'Inscription confirmée ✅');
-        this.loadMesInscriptions();
-        this.loadFormations();
+        if (res.gratuit) {
+          // Formation gratuite : inscription directe
+          this.fermerModal();
+          this.showMessage('Inscription confirmée ✅');
+          this.loadMesInscriptions();
+          this.loadFormations();
+        } else if (res.payUrl) {
+          // Formation payante : rediriger vers Konnect
+          this.fermerModal();
+          window.location.href = res.payUrl;
+        }
       },
       error: (err) => {
-        this.fermerModal();
+        this.paiementEnCours = false;
         this.showMessage(err?.error?.message || 'Erreur lors du paiement', 'danger');
       }
     });
@@ -322,6 +356,79 @@ export class ExterneComponent implements OnInit {
   getNotifIcon(type: string): string {
     const icons: any = { 'inscription': '📚', 'approbation': '✅', 'rejet': '❌', 'info': 'ℹ️' };
     return icons[type] || '🔔';
+  }
+
+  // ===== Messagerie =====
+  loadUnreadMessages() {
+    if (!this.user?.id) return;
+    this.msgService.getUnreadCount(this.user.id).subscribe({
+      next: data => this.unreadMessages = data?.count || 0,
+      error: () => {}
+    });
+  }
+
+  openMessages() {
+    this.activeSection = 'messages';
+    this.message = '';
+    this.loadContacts();
+  }
+
+  loadContacts() {
+    if (!this.user?.id) return;
+    this.msgService.getContacts(this.user.id).subscribe({
+      next: data => this.contacts = data,
+      error: () => {}
+    });
+  }
+
+  ouvrirConversation(contact: any) {
+    this.contactSelectionne = contact;
+    contact.non_lus = 0;
+    if (!this.user?.id) return;
+    this.msgService.getConversation(this.user.id, contact.id).subscribe({
+      next: data => this.messagesConversation = data,
+      error: () => {}
+    });
+  }
+
+  envoyerMessage(event?: Event) {
+    if (event) event.preventDefault();
+    if (!this.nouveauMessage.trim() || !this.contactSelectionne || !this.user?.id) return;
+    const texte = this.nouveauMessage.trim();
+    this.nouveauMessage = '';
+    this.msgService.envoyerMessage(this.user.id, this.contactSelectionne.id, texte).subscribe({
+      next: (res: any) => {
+        this.messagesConversation.push({
+          id: res.id,
+          expediteur_id: this.user.id,
+          contenu: texte,
+          date_envoi: new Date().toISOString()
+        });
+        const c = this.contacts.find(c => c.id === this.contactSelectionne.id);
+        if (c) c.dernier_message = texte;
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi du message', 'danger')
+    });
+  }
+
+  // ===== Programme =====
+  programmeFormation: any = null;
+  programmeData: any = null;
+  programmeLoading = false;
+
+  voirProgramme(f: any) {
+    this.programmeFormation = f;
+    this.programmeData = null;
+    this.programmeLoading = true;
+    this.externeService.getProgramme(f.id).subscribe({
+      next: (res: any) => { this.programmeData = res; this.programmeLoading = false; },
+      error: () => { this.programmeLoading = false; this.showMessage('Erreur chargement du programme', 'danger'); }
+    });
+  }
+
+  fermerProgramme() {
+    this.programmeFormation = null;
+    this.programmeData = null;
   }
 
   // Calculs dashboard

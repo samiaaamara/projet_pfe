@@ -171,6 +171,37 @@
 .role-chip.green { background: #e8f5e9; color: #2e7d32; }
 .role-chip.teal  { background: #e0f7fa; color: #006064; }
 
+/* VALIDATION ERRORS */
+.input-wrapper.is-invalid {
+  border-color: #e53935;
+  box-shadow: 0 0 0 3px rgba(229,57,53,0.1);
+  background: #fff8f8;
+}
+
+.field-error {
+  font-size: 11.5px;
+  color: #c62828;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-error::before {
+  content: '!';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #e53935;
+  color: white;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
 /* MESSAGES */
 .auth-message { padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 500; }
 .auth-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }

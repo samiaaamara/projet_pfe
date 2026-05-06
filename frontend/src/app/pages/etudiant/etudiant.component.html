@@ -100,9 +100,18 @@
 
     <!-- FORMATIONS DISPONIBLES -->
     <section *ngIf="activeSection === 'formations'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>📚 Formations disponibles</h2>
-        <p>{{ totalFormations }} formation(s) publiée(s)</p>
+        <div class="titre-sub-row">
+          <p>{{ totalFormations }} formation(s) disponible(s) à venir</p>
+          <span *ngIf="filtreSpecialite" class="filtre-spec-badge">
+            🎯 Filtrées par spécialité : <strong>{{ filtreSpecialite }}</strong>
+          </span>
+          <span *ngIf="!filtreSpecialite" class="filtre-spec-badge filtre-all">
+            📋 Toutes spécialités — <a (click)="setSection('profil')" class="lien-profil">définir la vôtre</a>
+          </span>
+        </div>
       </div>
 
         <!-- Filtres -->
@@ -115,6 +124,11 @@
         <div class="formation-card" *ngFor="let f of formationsFiltrees">
           <div class="formation-header">
             <span class="formation-spec" *ngIf="f.specialite">{{ f.specialite }}</span>
+            <span *ngIf="f.date_debut" class="badge-date" [ngClass]="badgeDateClass(f.date_debut)">
+              {{ joursRestants(f.date_debut) === 0 ? "Aujourd'hui" :
+                 joursRestants(f.date_debut) === 1 ? 'Demain' :
+                 'Dans ' + joursRestants(f.date_debut) + ' j' }}
+            </span>
           </div>
           <h5 class="formation-title">{{ f.titre }}</h5>
           <p class="formation-desc">{{ f.description }}</p>
@@ -130,11 +144,23 @@
           </div>
 
           <div class="formation-footer">
-            <span *ngIf="estComplet(f)" class="badge-complet">Complet</span>
+            <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
+            <!-- Déjà inscrit -->
+            <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Inscrit</span>
+            <!-- Place disponible -->
             <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
               S'inscrire
             </button>
-            <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Inscrit</span>
+            <!-- Formation complète : liste d'attente -->
+            <ng-container *ngIf="!estDejaInscrit(f.id) && estComplet(f)">
+              <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
+                ⏳ Liste d'attente
+              </button>
+              <span *ngIf="estEnAttente(f.id)" class="badge-attente">
+                ⏳ En attente #{{ positionAttente(f.id) }}
+                <button class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste">✕</button>
+              </span>
+            </ng-container>
           </div>
         </div>
       </div>
@@ -152,6 +178,7 @@
 
     <!-- MES FORMATIONS -->
     <section *ngIf="activeSection === 'mesFormations'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>✅ Mes inscriptions</h2>
         <p>{{ mesFormations.length }} formation(s) inscrite(s)</p>
@@ -191,9 +218,7 @@
             <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
             <button class="btn-supports" (click)="voirSupports(f)">📂 Supports</button>
           
-            <button class="btn-attestation" *ngIf="f.statut === 'présent' || f.statut === 'Terminé'"
-                    (click)="ouvrirAttestation(f)">🏆 Attestation</button>
-         
+            <button class="btn-attestation" (click)="ouvrirAttestation(f)">🏆 Attestation</button>
           </div>
         </div>
       </div>
@@ -227,6 +252,7 @@
 
     <!-- PROGRESSION -->
     <section *ngIf="activeSection === 'progression'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>📈 Ma progression</h2>
         <p>Suivi de votre parcours de formation</p>
@@ -267,11 +293,98 @@
       </div>
 
       <div class="card-section" *ngIf="mesFormations.length > 0">
-        <h5 class="section-title">Détail par formation</h5>
+        <h5 class="section-title">Progression par formation</h5>
         <div class="progress-list">
           <div class="progress-item" *ngFor="let f of mesFormations">
-            <div class="progress-item-title">{{ f.titre }}</div>
-            <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
+            <div class="prog-item-top">
+              <div class="progress-item-title">{{ f.titre }}</div>
+              <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
+            </div>
+            <div class="mes-formations-btns">
+              <button class="btn-prog-detail"
+                      [class.active]="formationProgressionSelectionnee?.formation_id === f.formation_id"
+                      (click)="formationProgressionSelectionnee?.formation_id === f.formation_id ? fermerProgressionFormation() : voirProgressionFormation(f)">
+                📈 {{ formationProgressionSelectionnee?.formation_id === f.formation_id ? 'Masquer' : 'Progression' }}
+              </button>
+              <button class="btn-prog-detail pres-btn"
+                      [class.active]="presencesFormation?.formation_id === f.formation_id"
+                      (click)="presencesFormation?.formation_id === f.formation_id ? fermerPresences() : voirMesPresences(f)">
+                📋 {{ presencesFormation?.formation_id === f.formation_id ? 'Masquer' : 'Présences' }}
+              </button>
+            </div>
+
+            <!-- Détail progression pour cette formation -->
+            <div class="prog-detail-box" *ngIf="formationProgressionSelectionnee?.formation_id === f.formation_id">
+              <!-- Barre -->
+              <div class="prog-detail-bar-wrap">
+                <div class="prog-detail-track">
+                  <div class="prog-detail-fill"
+                       [style.width.%]="progressionPourcentageFormation"
+                       [style.background]="getProgressBarColor(progressionPourcentageFormation)">
+                    {{ progressionPourcentageFormation }}%
+                  </div>
+                </div>
+                <span class="prog-detail-count">
+                  {{ countTerminesFormation() }} / {{ progressionModulesFormation.length }} modules terminés
+                </span>
+              </div>
+
+              <!-- Modules -->
+              <div class="prog-detail-modules" *ngIf="progressionModulesFormation.length > 0">
+                <div class="prog-detail-mod" *ngFor="let m of progressionModulesFormation; let i = index">
+                  <span class="prog-detail-icon"
+                        [class.icon-nc]="m.statut === 'non_commence'"
+                        [class.icon-ec]="m.statut === 'en_cours'"
+                        [class.icon-t]="m.statut === 'termine'">
+                    {{ m.statut === 'termine' ? '✅' : m.statut === 'en_cours' ? '🔄' : '⬜' }}
+                  </span>
+                  <span class="prog-detail-mod-title">{{ m.titre }}</span>
+                  <span class="prog-detail-mod-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+                </div>
+              </div>
+
+              <p class="prog-detail-empty" *ngIf="progressionModulesFormation.length === 0">
+                Aucun module défini pour cette formation.
+              </p>
+
+              <div class="cert-banner-sm" *ngIf="progressionPourcentageFormation === 100">
+                🎓 Formation complétée à 100% !
+              </div>
+            </div>
+
+            <!-- Taux de présence pour cette formation -->
+            <div class="presence-box" *ngIf="presencesFormation?.formation_id === f.formation_id && presencesData">
+              <div class="presence-box-header">
+                <span>📋 Mes présences — <strong>{{ f.titre }}</strong></span>
+                <span class="taux-badge" [class.taux-good]="presencesData.taux >= 75" [class.taux-mid]="presencesData.taux >= 50 && presencesData.taux < 75" [class.taux-low]="presencesData.taux < 50">
+                  Taux : {{ presencesData.taux !== null ? presencesData.taux + '%' : 'N/A' }}
+                </span>
+              </div>
+              <div class="presence-stats">
+                <span>📅 {{ presencesData.total }} séance(s)</span>
+                <span>✅ {{ presencesData.presents }} présent(s)</span>
+                <span>❌ {{ presencesData.total - presencesData.presents }} absent(s)</span>
+              </div>
+              <div class="presence-seances-list" *ngIf="presencesData.seances?.length > 0">
+                <div class="presence-seance-row" *ngFor="let s of presencesData.seances">
+                  <span class="seance-dt">{{ s.date_seance | date:'dd/MM/yyyy' }} {{ s.heure_debut }}</span>
+                  <span *ngIf="s.salle" class="seance-room">🏫 {{ s.salle }}</span>
+                  <span class="pres-badge" [ngClass]="getPresenceClass(s.statut_presence)">{{ s.statut_presence }}</span>
+                  <button *ngIf="s.statut_presence === 'absent'" class="btn-justifier"
+                          (click)="justifSeanceId === s.seance_id ? fermerJustificatif() : ouvrirJustificatif(s.seance_id)">
+                    📝 {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Justifier' }}
+                  </button>
+                  <!-- Formulaire justificatif inline -->
+                  <div class="justif-form" *ngIf="justifSeanceId === s.seance_id">
+                    <textarea [(ngModel)]="justifMotif" placeholder="Décrivez le motif de votre absence..." rows="3"></textarea>
+                    <button class="btn-justif-submit" (click)="soumettreJustificatif()">Envoyer</button>
+                  </div>
+                </div>
+              </div>
+              <p class="prog-detail-empty" *ngIf="presencesData.seances?.length === 0">
+                Aucune séance enregistrée pour cette formation.
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -279,6 +392,7 @@
 
  <!-- ===== PROFIL ===== -->
 <section *ngIf="activeSection === 'profil'">
+  <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title">
     <h2>👤 Mon profil</h2>
     <p>Gérez vos informations personnelles</p>
@@ -324,7 +438,13 @@
       </div>
       <div class="form-group" style="margin-top:14px">
         <label>Spécialité</label>
-        <div class="input-wrap"><span class="input-prefix">💡</span><input type="text" [(ngModel)]="profileSpecialite" placeholder="Ex: Développement Web"></div>
+        <div class="input-wrap input-wrap-select">
+          <span class="input-prefix">💡</span>
+          <select [(ngModel)]="profileSpecialite" class="input-select">
+            <option value="">-- Sélectionnez --</option>
+            <option *ngFor="let s of specialites" [value]="s">{{ s }}</option>
+          </select>
+        </div>
       </div>
       <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
     </div>
@@ -348,6 +468,7 @@
 </section>
     <!-- ===== NOTIFICATIONS ===== -->
 <section *ngIf="activeSection === 'notifications'">
+  <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
     <div>
       <h2>🔔 Notifications</h2>
@@ -385,45 +506,79 @@
     <button class="btn-primary" (click)="imprimerAttestation()" style="margin-left:auto">🖨️ Imprimer</button>
   </div>
 
-  <div class="attestation-doc">
+  <div *ngIf="attestationLoading" class="attest-loading">Chargement...</div>
+
+  <div class="attestation-doc" *ngIf="!attestationLoading">
     <div class="attest-header">
-      <img src="https://letemps.news/wp-content/uploads/2025/07/iset_logo.png"
-           class="attest-logo" onerror="this.style.display='none'">
       <div class="attest-header-text">
         <div class="attest-institute">Institut Supérieur des Études Technologiques</div>
-        <div class="attest-title-doc">ATTESTATION DE PRÉSENCE</div>
+        <div class="attest-title-doc">ATTESTATION DE FORMATION</div>
       </div>
     </div>
 
     <div class="attest-body">
-      <p>L'institut atteste que :</p>
+      <p class="attest-intro">L'établissement soussigné atteste que :</p>
 
-      <p><strong>{{ user?.nom }}</strong></p>
-      <p>{{ user?.email }}</p>
+      <div class="attest-participant">
+        <div class="attest-name">{{ attestationData?.etudiant_nom || user?.nom }}</div>
+        <div class="attest-email">{{ attestationData?.etudiant_email || user?.email }}</div>
+      </div>
 
-      <p>a suivi la formation :</p>
+      <p class="attest-intro">a participé à la formation :</p>
 
-      <h3>{{ formationAttestation?.titre }}</h3>
+      <div class="attest-formation-title">{{ attestationData?.titre || formationAttestation?.titre }}</div>
 
-      <p *ngIf="formationAttestation?.date_debut">
-        Début : {{ formationAttestation.date_debut | date:'dd/MM/yyyy' }}
-      </p>
-
-      <p *ngIf="formationAttestation?.date_fin">
-        Fin : {{ formationAttestation.date_fin | date:'dd/MM/yyyy' }}
-      </p>
-
-      <p><strong>PRÉSENT(E)</strong></p>
+      <div class="attest-details-grid">
+        <div class="attest-detail" *ngIf="attestationData?.specialite">
+          <span class="attest-detail-label">Spécialité</span>
+          <span class="attest-detail-val">{{ attestationData.specialite }}</span>
+        </div>
+        <div class="attest-detail" *ngIf="attestationData?.date_debut">
+          <span class="attest-detail-label">Période</span>
+          <span class="attest-detail-val">
+            {{ attestationData.date_debut | date:'dd/MM/yyyy' }}
+            <span *ngIf="attestationData?.date_fin"> – {{ attestationData.date_fin | date:'dd/MM/yyyy' }}</span>
+          </span>
+        </div>
+        <div class="attest-detail" *ngIf="attestationData?.duree">
+          <span class="attest-detail-label">Durée</span>
+          <span class="attest-detail-val">{{ attestationData.duree }} heures</span>
+        </div>
+        <div class="attest-detail" *ngIf="attestationData?.formateur_nom">
+          <span class="attest-detail-label">Formateur</span>
+          <span class="attest-detail-val">{{ attestationData.formateur_nom }}</span>
+        </div>
+        <div class="attest-detail" *ngIf="attestationData?.total_seances > 0">
+          <span class="attest-detail-label">Séances</span>
+          <span class="attest-detail-val">{{ attestationData.seances_presentes }} / {{ attestationData.total_seances }}</span>
+        </div>
+        <div class="attest-detail" *ngIf="attestationData?.taux !== null">
+          <span class="attest-detail-label">Taux de présence</span>
+          <span class="attest-detail-val attest-taux"
+                [class.taux-good]="attestationData.taux >= 75"
+                [class.taux-low]="attestationData.taux < 75">
+            {{ attestationData.taux }}%
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="attest-footer">
-      <div>Délivré le {{ getTodayStr() }}</div>
+      <div class="attest-footer-left">
+        <div class="attest-footer-label">Formateur</div>
+        <div class="attest-footer-sig">{{ attestationData?.formateur_nom || '_______________' }}</div>
+      </div>
+      <div class="attest-footer-right">
+        <div class="attest-footer-label">Délivré le</div>
+        <div class="attest-footer-sig">{{ getTodayStr() }}</div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ===== MESSAGERIE ===== -->
 <section *ngIf="activeSection === 'messages'">
+  <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title">
     <h2>💬 Messagerie</h2>
   </div>
@@ -457,6 +612,7 @@
 
 <!-- ===== QUESTIONS ===== -->
 <section *ngIf="activeSection === 'questions'">
+  <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title">
     <h2>❓ Mes Questions</h2>
   </div>
@@ -466,4 +622,54 @@
   </div>
 </section>
   </main>
+</div>
+
+<!-- ===== MODAL PROGRAMME ===== -->
+<div class="modal-backdrop" *ngIf="programmeFormation" (click)="fermerProgramme()">
+  <div class="modal-programme" (click)="$event.stopPropagation()">
+    <div class="modal-prog-header">
+      <div>
+        <h3>📋 Programme de la formation</h3>
+        <p class="prog-formation-title">{{ programmeFormation?.titre }}</p>
+      </div>
+      <button class="modal-close" (click)="fermerProgramme()">×</button>
+    </div>
+
+    <div class="modal-prog-body">
+      <div *ngIf="programmeLoading" class="prog-loading">Chargement du programme...</div>
+
+      <div *ngIf="!programmeLoading && programmeData">
+        <div class="prog-block" *ngIf="programmeData.programme?.description_globale">
+          <h5 class="prog-block-title">📖 Description</h5>
+          <p class="prog-block-text">{{ programmeData.programme.description_globale }}</p>
+        </div>
+        <div class="prog-block" *ngIf="programmeData.programme?.objectifs">
+          <h5 class="prog-block-title">🎯 Objectifs pédagogiques</h5>
+          <p class="prog-block-text">{{ programmeData.programme.objectifs }}</p>
+        </div>
+        <div class="prog-block" *ngIf="programmeData.programme?.prerequis">
+          <h5 class="prog-block-title">✅ Prérequis</h5>
+          <p class="prog-block-text">{{ programmeData.programme.prerequis }}</p>
+        </div>
+        <div class="prog-block" *ngIf="programmeData.modules?.length > 0">
+          <h5 class="prog-block-title">📚 Contenu — {{ programmeData.modules.length }} module(s)</h5>
+          <div class="prog-modules-list">
+            <div class="prog-module-item" *ngFor="let m of programmeData.modules; let i = index">
+              <div class="prog-module-num">{{ i + 1 }}</div>
+              <div class="prog-module-info">
+                <div class="prog-module-titre">{{ m.titre }}
+                  <span class="prog-module-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+                </div>
+                <div class="prog-module-desc" *ngIf="m.description">{{ m.description }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="prog-empty" *ngIf="!programmeData.programme && programmeData.modules?.length === 0">
+          <span>📋</span>
+          <p>Le programme de cette formation n'a pas encore été renseigné.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

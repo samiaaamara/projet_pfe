@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EtudiantService } from '../../services/etudiant.service';
+import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
@@ -24,6 +25,8 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   page = 1;
   totalPages = 1;
   totalFormations = 0;
+  filtreSpecialite: string | null = null;
+  specialites: string[] = [];
   recherche = '';
   
   mesFormations: any[] = [];
@@ -73,8 +76,33 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   message = '';
   messageType: 'success' | 'danger' = 'success';
  activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'questions' = 'accueil';
+
+  // Programme
+  programmeFormation: any = null;
+  programmeData: any = null;
+  programmeLoading = false;
+
+  // Progression par formation
+  formationProgressionSelectionnee: any = null;
+  progressionModulesFormation: any[] = [];
+  progressionPourcentageFormation = 0;
+
+  // Présences
+  presencesFormation: any = null;
+  presencesData: any = null;
+
+  // Liste d'attente
+  enAttente: any[] = [];
+
+  // Justificatifs
+  justifSeanceId: number | null = null;
+  justifMotif = '';
+  attestationData: any = null;
+  attestationLoading = false;
+
   constructor(
     private etudiantService: EtudiantService,
+    private externeService: ExterneService,
     private authService: Auth,
     private notifService: NotificationsService,
     private msgService: MessagesService,
@@ -96,7 +124,12 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     this.loadFormations();
     this.loadMesFormations();
     this.chargerProgression();
+    this.loadEnAttente();
     this.loadUnreadCount();
+    this.authService.getSpecialites().subscribe({
+      next: data => this.specialites = data.map(s => s.nom),
+      error: () => {}
+    });
     this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
   }
 
@@ -122,6 +155,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
         this.formations = res.data;
         this.totalPages = res.pagination.pages;
         this.totalFormations = res.pagination.total;
+        this.filtreSpecialite = res.filtre_specialite || null;
         this.formations.forEach(f => this.chargerMaNote(f.id));
       },
       error: () => this.showMessage('Erreur chargement des formations', 'danger')
@@ -150,6 +184,18 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   estComplet(f: any): boolean {
     return f.nb_places !== null && this.placesRestantes(f) === 0;
+  }
+
+  joursRestants(dateDebut: string): number {
+    const diff = new Date(dateDebut).getTime() - new Date().setHours(0, 0, 0, 0);
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  badgeDateClass(dateDebut: string): string {
+    const j = this.joursRestants(dateDebut);
+    if (j <= 7) return 'badge-urgent';
+    if (j <= 30) return 'badge-proche';
+    return 'badge-loin';
   }
 
   inscrire(formationId: number) {
@@ -264,11 +310,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     return this.noteHover[formationId] ?? this.mesNotes[formationId] ?? 0;
   }
 
-  // ===== Attestation =====
-  ouvrirAttestation(f: any) {
-    this.formationAttestation = f;
-    this.activeSection = 'attestation';
-  }
+
 
   imprimerAttestation() { window.print(); }
 
@@ -472,6 +514,155 @@ sauvegarderProfil() {
     this.questService.supprimer(id).subscribe({
       next: () => this.mesQuestions = this.mesQuestions.filter(q => q.id !== id),
       error: () => {}
+    });
+  }
+
+  // ===== Progression modulaire =====
+  voirProgressionFormation(f: any) {
+    if (!this.etudiantId) return;
+    this.formationProgressionSelectionnee = f;
+    this.etudiantService.getProgressionModules(this.etudiantId, f.formation_id).subscribe({
+      next: (res: any) => {
+        this.progressionModulesFormation = res.modules || [];
+        this.progressionPourcentageFormation = res.pourcentage || 0;
+      },
+      error: () => {}
+    });
+  }
+
+  fermerProgressionFormation() {
+    this.formationProgressionSelectionnee = null;
+    this.progressionModulesFormation = [];
+    this.progressionPourcentageFormation = 0;
+  }
+
+  countTerminesFormation(): number {
+    return this.progressionModulesFormation.filter(m => m.statut === 'termine').length;
+  }
+
+  getProgressBarColor(pct: number): string {
+    if (pct >= 80) return 'linear-gradient(90deg, #2e7d32, #66bb6a)';
+    if (pct >= 40) return 'linear-gradient(90deg, #f57c00, #ffb74d)';
+    return 'linear-gradient(90deg, #e53935, #ef9a9a)';
+  }
+
+  // ===== Programme =====
+  voirProgramme(f: any) {
+    this.programmeFormation = f;
+    this.programmeData = null;
+    this.programmeLoading = true;
+    this.externeService.getProgramme(f.id).subscribe({
+      next: (res: any) => { this.programmeData = res; this.programmeLoading = false; },
+      error: () => { this.programmeLoading = false; this.showMessage('Erreur chargement du programme', 'danger'); }
+    });
+  }
+
+  fermerProgramme() {
+    this.programmeFormation = null;
+    this.programmeData = null;
+  }
+
+  // ===== Présences =====
+  voirMesPresences(f: any) {
+    if (!this.etudiantId) return;
+    this.presencesFormation = f;
+    this.presencesData = null;
+    this.etudiantService.getMesPresences(this.etudiantId, f.formation_id).subscribe({
+      next: (res: any) => this.presencesData = res,
+      error: () => this.showMessage('Erreur chargement des présences', 'danger')
+    });
+  }
+
+  fermerPresences() {
+    this.presencesFormation = null;
+    this.presencesData = null;
+  }
+
+  getPresenceClass(statut: string): string {
+    const map: any = { 'présent': 'pres-present', 'retard': 'pres-retard', 'excusé': 'pres-excuse', 'absent': 'pres-absent' };
+    return map[statut] || 'pres-absent';
+  }
+
+  // ===== Liste d'attente =====
+  loadEnAttente() {
+    if (!this.etudiantId) return;
+    this.etudiantService.getEnAttente(this.etudiantId).subscribe({
+      next: data => this.enAttente = data,
+      error: () => {}
+    });
+  }
+
+  estEnAttente(formationId: number): boolean {
+    return this.enAttente.some(f => f.formation_id === formationId);
+  }
+
+  positionAttente(formationId: number): number {
+    return this.enAttente.find(f => f.formation_id === formationId)?.position ?? 0;
+  }
+
+  rejoindreListeAttente(formationId: number) {
+    if (!this.etudiantId) return;
+    this.etudiantService.rejoindreListeAttente(this.etudiantId, formationId).subscribe({
+      next: () => { this.showMessage('Vous avez rejoint la liste d\'attente ✅'); this.loadEnAttente(); },
+      error: (err) => this.showMessage(err?.error?.error || 'Erreur', 'danger')
+    });
+  }
+
+  quitterListeAttente(formationId: number) {
+    if (!this.etudiantId) return;
+    this.etudiantService.quitterListeAttente(this.etudiantId, formationId).subscribe({
+      next: () => { this.showMessage('Retiré de la liste d\'attente'); this.loadEnAttente(); },
+      error: () => this.showMessage('Erreur', 'danger')
+    });
+  }
+
+  desinscrire(formationId: number) {
+    if (!this.etudiantId || !confirm('Se désinscrire de cette formation ?')) return;
+    this.etudiantService.desinscrire(this.etudiantId, formationId).subscribe({
+      next: () => {
+        this.showMessage('Désinscription effectuée');
+        this.loadMesFormations();
+        this.loadFormations();
+      },
+      error: () => this.showMessage('Erreur lors de la désinscription', 'danger')
+    });
+  }
+
+  // ===== Justificatifs =====
+  ouvrirJustificatif(seanceId: number) {
+    this.justifSeanceId = seanceId;
+    this.justifMotif = '';
+  }
+
+  fermerJustificatif() {
+    this.justifSeanceId = null;
+    this.justifMotif = '';
+  }
+
+  soumettreJustificatif() {
+    if (!this.etudiantId || !this.justifSeanceId || !this.justifMotif.trim()) {
+      this.showMessage('Veuillez rédiger un motif', 'danger'); return;
+    }
+    this.etudiantService.soumettreJustificatif(this.etudiantId, this.justifSeanceId, this.justifMotif).subscribe({
+      next: () => {
+        this.showMessage('Justificatif envoyé ✅');
+        this.fermerJustificatif();
+        // Rafraîchir les présences
+        if (this.presencesFormation) this.voirMesPresences(this.presencesFormation);
+      },
+      error: () => this.showMessage('Erreur lors de l\'envoi', 'danger')
+    });
+  }
+
+  // ===== Attestation enrichie =====
+  ouvrirAttestation(f: any) {
+    this.formationAttestation = f;
+    this.attestationData = null;
+    this.attestationLoading = true;
+    this.activeSection = 'attestation';
+    this.etudiantService.getAttestationData(this.etudiantId!, f.formation_id).subscribe({
+      next: data => { this.attestationData = data; this.attestationLoading = false; },
+      error: () => { this.attestationLoading = false; }
     });
   }
 }

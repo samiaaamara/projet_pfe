@@ -15,8 +15,15 @@ export class ExterneService {
     return this.http.get<any[]>(`${this.apiUrl}/mes-inscriptions/${externeId}`);
   }
 
-  payer(externe_id: number, formation_id: number) {
-    return this.http.post<any>(`${this.apiUrl}/payer`, { externe_id, formation_id });
+  initierPaiement(externeId: number, formationId: number) {
+    return this.http.post<any>(`${this.apiUrl}/initier-paiement`, {
+      externe_id: externeId,
+      formation_id: formationId,
+    });
+  }
+
+  confirmerPaiement(paymentRef: string) {
+    return this.http.get<any>(`${this.apiUrl}/confirmer-paiement?payment_ref=${paymentRef}`);
   }
 
   getSupports(externeId: number, formationId: number) {
@@ -25,5 +32,9 @@ export class ExterneService {
 
   getProfil(userId: number) {
     return this.http.get<any>(`${this.apiUrl}/profil/${userId}`);
+  }
+
+  getProgramme(formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/formations/${formationId}/programme`);
   }
 }

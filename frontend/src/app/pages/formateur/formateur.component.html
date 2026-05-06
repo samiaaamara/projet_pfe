@@ -74,6 +74,11 @@
           <div class="stat-value">{{ stats.etudiants }}</div>
           <div class="stat-label">Étudiants inscrits</div>
         </div>
+        <div class="stat-card teal" (click)="setSection('mesFormations')">
+          <div class="stat-icon">📅</div>
+          <div class="stat-value">{{ stats.seances }}</div>
+          <div class="stat-label">Séances planifiées</div>
+        </div>
         <div class="stat-card purple">
           <div class="stat-icon">✅</div>
           <div class="stat-value">{{ publishedFormationsCount }}</div>
@@ -120,6 +125,7 @@
  
     <!-- ===== CRÉER / MODIFIER FORMATION ===== -->
     <section *ngIf="activeSection === 'creerFormation'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>{{ editMode ? '✏️ Modifier la formation' : '➕ Créer une formation' }}</h2>
         <p>Remplissez les informations de la formation</p>
@@ -129,38 +135,48 @@
         <div class="form-grid">
           <div class="form-group full">
             <label>Titre *</label>
-            <input type="text" [(ngModel)]="titre" placeholder="Titre de la formation">
+            <input class="form-input" type="text" [(ngModel)]="titre" placeholder="Titre de la formation">
+            <small class="error-msg" *ngIf="formErrors.titre">{{ formErrors.titre }}</small>
           </div>
-          <div class="form-group full">
+
+           <div class="form-group full">
             <label>Description *</label>
-            <textarea [(ngModel)]="description" placeholder="Description détaillée" rows="3"></textarea>
+            <textarea class="form-input" [(ngModel)]="description" placeholder="Description détaillée" rows="3"></textarea>
+            <small class="error-msg" *ngIf="formErrors.description">{{ formErrors.description }}</small>
           </div>
+
           <div class="form-group">
             <label>Date de début *</label>
-            <input type="date" [(ngModel)]="date_debut">
+            <input class="form-input" type="date" [(ngModel)]="date_debut" [min]="today">
+            <small class="error-msg" *ngIf="formErrors.date_debut">{{ formErrors.date_debut }}</small>
           </div>
-          <div class="form-group">
+
+           <div class="form-group">
             <label>Date de fin</label>
-            <input type="date" [(ngModel)]="date_fin">
+            <input class="form-input" type="date" [(ngModel)]="date_fin" [min]="date_debut || today">
+            <small class="error-msg" *ngIf="formErrors.date_fin">{{ formErrors.date_fin }}</small>
           </div>
           <div class="form-group">
             <label>Durée (heures)</label>
-            <input type="number" [(ngModel)]="duree" placeholder="Ex: 20">
+            <input class="form-input" type="number" [(ngModel)]="duree" placeholder="Ex: 20" min="1">
+            <small class="error-msg" *ngIf="formErrors.duree">{{ formErrors.duree }}</small>
           </div>
           <div class="form-group">
             <label>Nombre de places</label>
-            <input type="number" [(ngModel)]="nb_places" placeholder="Ex: 30">
+            <input class="form-input" type="number" [(ngModel)]="nb_places" placeholder="Ex: 30" min="1">
+            <small class="error-msg" *ngIf="formErrors.nb_places">{{ formErrors.nb_places }}</small>
           </div>
           <div class="form-group">
-            <label>Spécialité</label>
-            <select [(ngModel)]="specialite">
+            <label>Spécialité *</label>
+            <select class="form-input" [(ngModel)]="specialite">
               <option value="">-- Spécialité --</option>
               <option *ngFor="let s of specialites" [value]="s">{{ s }}</option>
             </select>
+            <small class="error-msg" *ngIf="formErrors.specialite">{{ formErrors.specialite }}</small>
           </div>
         </div>
  
-        <div class="form-actions">
+       <div class="form-actions">
           <button class="btn-save" (click)="editMode ? modifierFormation() : creerFormation()">
             💾 {{ editMode ? 'Enregistrer les modifications' : 'Créer la formation' }}
           </button>
@@ -173,12 +189,12 @@
  
     <!-- ===== MES FORMATIONS ===== -->
     <section *ngIf="activeSection === 'mesFormations'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>📚 Mes formations</h2>
         <p>{{ formations.length }} formation(s) au total</p>
       </div>
- 
-     
+
       <!-- Filtres -->
       <div class="filters-bar">
         <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="🔍 Rechercher...">
@@ -216,6 +232,7 @@
           </div>
           <div class="formation-item-actions">
             <button class="btn-action blue" (click)="voirInscriptions(f.id)">👥 Inscrits</button>
+            <button class="btn-action teal" (click)="ouvrirSeances(f)">📅 Séances</button>
             <button class="btn-action orange" (click)="ouvrirEditionFormation(f)" [disabled]="f.status === 'pending_approval' || f.status === 'accepted'">✏️ Modifier</button>
             <button class="btn-action purple" (click)="ajouterSupportDirect(f.id)">📎 Supports</button>
             <button class="btn-action green" *ngIf="f.status === 'draft'" (click)="soumettreFormationPourApprobation(f.id)">✉️ Soumettre</button>
@@ -241,16 +258,207 @@
                 <td class="action-cell">
                   <button class="btn-action green" *ngIf="e.statut !== 'présent'" (click)="validerPresence(e, 'présent')">Présent</button>
                   <button class="btn-action red" *ngIf="e.statut !== 'absent'" (click)="validerPresence(e, 'absent')">Absent</button>
+                  <button class="btn-action teal" (click)="ouvrirProgression(e)" title="Gérer la progression">📈</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <!-- ===== PANNEAU PROGRESSION ===== -->
+      <div class="progression-panel" *ngIf="progressionEtudiant">
+        <div class="prog-panel-header">
+          <div>
+            <h5>📈 Progression — <strong>{{ progressionEtudiant.nom }}</strong></h5>
+            <span class="prog-formation-sub">{{ formationSelectionnee?.titre }}</span>
+          </div>
+          <button class="btn-close-prog" (click)="fermerProgression()">✕ Fermer</button>
+        </div>
+
+        <!-- Barre de progression -->
+        <div class="prog-bar-wrap">
+          <div class="prog-bar-track">
+            <div class="prog-bar-fill"
+                 [style.width.%]="progressionPourcentage"
+                 [class.fill-low]="progressionPourcentage < 40"
+                 [class.fill-mid]="progressionPourcentage >= 40 && progressionPourcentage < 80"
+                 [class.fill-high]="progressionPourcentage >= 80">
+              {{ progressionPourcentage }}%
+            </div>
+          </div>
+          <span class="prog-bar-label">
+            {{ countTermines() }} / {{ progressionModules.length }} modules terminés
+          </span>
+        </div>
+
+        <!-- Liste des modules -->
+        <div class="prog-modules-table" *ngIf="progressionModules.length > 0">
+          <div class="prog-mod-row" *ngFor="let m of progressionModules; let i = index">
+            <div class="prog-mod-num">{{ i + 1 }}</div>
+            <div class="prog-mod-title">
+              {{ m.titre }}
+              <span class="prog-mod-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+            </div>
+            <div class="prog-mod-actions">
+              <button class="btn-statut"
+                      [class.active]="m.statut === 'non_commence'"
+                      (click)="changerStatutModule(m, 'non_commence')">⬜</button>
+              <button class="btn-statut en-cours"
+                      [class.active]="m.statut === 'en_cours'"
+                      (click)="changerStatutModule(m, 'en_cours')">🔄</button>
+              <button class="btn-statut termine"
+                      [class.active]="m.statut === 'termine'"
+                      (click)="changerStatutModule(m, 'termine')">✅</button>
+              <span class="prog-statut-label"
+                    [class.label-nc]="m.statut === 'non_commence'"
+                    [class.label-ec]="m.statut === 'en_cours'"
+                    [class.label-t]="m.statut === 'termine'">
+                {{ getStatutLabel(m.statut) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="prog-no-modules" *ngIf="progressionModules.length === 0">
+          ⚠️ Aucun module défini pour cette formation. Ajoutez des modules dans le programme.
+        </div>
+
+        <div class="cert-banner" *ngIf="progressionPourcentage === 100">
+          🎓 Formation complétée à 100% ! Une notification a été envoyée à l'étudiant.
+        </div>
+      </div>
+
+      <!-- ===== PANNEAU SÉANCES ===== -->
+      <div class="seances-panel" *ngIf="showSeancesPanel">
+        <div class="seances-panel-header">
+          <div>
+            <h5>📅 Séances — <strong>{{ formationSelectionnee?.titre }}</strong></h5>
+          </div>
+          <button class="btn-close-prog" (click)="fermerSeances()">✕ Fermer</button>
+        </div>
+
+        <!-- Formulaire création / édition -->
+        <div class="seance-form-card">
+          <h6>{{ editSeanceMode ? '✏️ Modifier la séance' : '➕ Nouvelle séance' }}</h6>
+          <div class="seance-form-row">
+            <div class="seance-form-group">
+              <label>Date</label>
+              <input type="date" [(ngModel)]="seanceForm.date_seance" class="form-input" />
+            </div>
+            <div class="seance-form-group">
+              <label>Heure début</label>
+              <input type="time" [(ngModel)]="seanceForm.heure_debut" class="form-input" />
+            </div>
+            <div class="seance-form-group">
+              <label>Heure fin</label>
+              <input type="time" [(ngModel)]="seanceForm.heure_fin" class="form-input" />
+            </div>
+            <div class="seance-form-group">
+              <label>Salle</label>
+              <input type="text" [(ngModel)]="seanceForm.salle" placeholder="ex: A12" class="form-input" />
+            </div>
+            <div class="seance-form-group" *ngIf="editSeanceMode">
+              <label>Statut</label>
+              <select [(ngModel)]="seanceForm.statut" class="form-input">
+                <option value="planifiée">Planifiée</option>
+                <option value="en_cours">En cours</option>
+                <option value="terminée">Terminée</option>
+              </select>
+            </div>
+          </div>
+          <div class="seance-form-btns">
+            <button class="btn-save-seance" (click)="soumettreSeance()">
+              {{ editSeanceMode ? '💾 Enregistrer' : '➕ Ajouter' }}
+            </button>
+            <button class="btn-cancel-seance" *ngIf="editSeanceMode" (click)="annulerEditSeance()">Annuler</button>
+          </div>
+        </div>
+
+        <!-- Liste des séances -->
+        <div class="seances-list" *ngIf="seancesFormation.length > 0">
+          <div class="seance-row" *ngFor="let s of seancesFormation">
+            <div class="seance-info">
+              <span class="seance-date">📆 {{ s.date_seance | date:'dd/MM/yyyy' }}</span>
+              <span class="seance-hours">🕐 {{ s.heure_debut }} – {{ s.heure_fin }}</span>
+              <span class="seance-salle" *ngIf="s.salle">🏫 {{ s.salle }}</span>
+              <span class="seance-statut" [ngClass]="'statut-' + s.statut?.replace('é','e').replace('è','e')">{{ s.statut }}</span>
+            </div>
+            <div class="seance-actions">
+              <button class="btn-action blue" (click)="ouvrirFeuillePresence(s)" title="Feuille de présence">📋 Présences</button>
+              <button class="btn-action orange" (click)="editerSeance(s)" title="Modifier">✏️</button>
+              <button class="btn-action red" (click)="supprimerSeance(s.id)" title="Supprimer">🗑️</button>
+            </div>
+          </div>
+        </div>
+        <div class="seances-empty" *ngIf="seancesFormation.length === 0">
+          Aucune séance planifiée pour cette formation.
+        </div>
+
+        <!-- Justificatifs en attente -->
+        <div class="justifs-section" *ngIf="justificatifs.length > 0">
+          <h6 class="justifs-title">📋 Justificatifs d'absence
+            <span class="justif-count">{{ justificatifs.length }}</span>
+          </h6>
+          <div class="justif-row" *ngFor="let j of justificatifs">
+            <div class="justif-info">
+              <span class="justif-etudiant">{{ j.etudiant_nom }}</span>
+              <span class="justif-date">Séance du {{ j.date_seance | date:'dd/MM/yyyy' }} {{ j.heure_debut }}</span>
+              <span class="justif-motif">{{ j.motif }}</span>
+            </div>
+            <div class="justif-actions">
+              <span class="justif-badge" [ngClass]="getJustifClass(j.statut)">{{ j.statut }}</span>
+              <ng-container *ngIf="j.statut === 'en_attente'">
+                <button class="btn-justif-ok" (click)="traiterJustificatif(j, 'accepté')">✅ Accepter</button>
+                <button class="btn-justif-ko" (click)="traiterJustificatif(j, 'refusé')">❌ Refuser</button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feuille de présence -->
+        <div class="presence-sheet" *ngIf="seanceSelectionnee">
+          <div class="presence-header">
+            <h6>📋 Feuille de présence — {{ seanceSelectionnee.date_seance | date:'dd/MM/yyyy' }}
+              <span *ngIf="seanceSelectionnee.salle"> · {{ seanceSelectionnee.salle }}</span>
+            </h6>
+            <button class="btn-cancel-seance" (click)="fermerFeuillePresence()">✕ Fermer</button>
+          </div>
+          <div class="presence-table-wrap" *ngIf="feuillePresence.length > 0">
+            <table class="presence-table">
+              <thead>
+                <tr>
+                  <th>Étudiant</th>
+                  <th>Email</th>
+                  <th>Présence</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of feuillePresence">
+                  <td>{{ e.nom }}</td>
+                  <td>{{ e.email }}</td>
+                  <td>
+                    <div class="presence-btns">
+                      <button class="btn-presence present" [class.active]="e.statut === 'présent'" (click)="changerPresence(e, 'présent')">✅ Présent</button>
+                      <button class="btn-presence retard" [class.active]="e.statut === 'retard'" (click)="changerPresence(e, 'retard')">⏰ Retard</button>
+                      <button class="btn-presence excuse" [class.active]="e.statut === 'excusé'" (click)="changerPresence(e, 'excusé')">📝 Excusé</button>
+                      <button class="btn-presence absent" [class.active]="e.statut === 'absent'" (click)="changerPresence(e, 'absent')">❌ Absent</button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="seances-empty" *ngIf="feuillePresence.length === 0">
+            Aucun étudiant inscrit à cette formation.
+          </div>
+        </div>
+      </div>
     </section>
  
    <!-- ===== SUPPORTS ===== -->
     <section *ngIf="activeSection === 'supports'">
+      <button class="btn-back-dash" (click)="setSection('mesFormations')">&#8592; Retour a mes formations</button>
       <div class="page-title">
         <h2>📎 Supports pédagogiques</h2>
         <p *ngIf="!formationSelectionnee">Sélectionnez une formation pour gérer ses supports</p>
@@ -332,6 +540,7 @@
     </section>
       <!-- ===== NOTIFICATIONS ===== -->
     <section *ngIf="activeSection === 'notifications'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px">
         <div>
           <h2>🔔 Notifications</h2>
@@ -364,6 +573,7 @@
 
   <!-- ===== PROFIL ===== -->
     <section *ngIf="activeSection === 'profil'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>👤 Mon profil</h2>
         <p>Gérez vos informations personnelles</p>
@@ -449,14 +659,15 @@
 
      <!-- ===== MESSAGERIE ===== -->
     <section *ngIf="activeSection === 'messages'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>💬 Messagerie</h2>
-        <p>Échangez des messages avec vos étudiants</p>
+        <p>Échangez des messages avec vos étudiants, externes et l'administration</p>
       </div>
       <div class="chat-container">
         <!-- Contacts -->
         <div class="contacts-panel">
-          <div class="contacts-header">Mes étudiants</div>
+          <div class="contacts-header">Mes contacts</div>
           <div class="contacts-list">
             <div *ngFor="let c of contacts"
                  class="contact-item"
@@ -466,11 +677,17 @@
               <div class="contact-info">
                 <div class="contact-name">{{ c.nom }}</div>
                 <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
+                <span class="contact-role-tag"
+                  [class.tag-etudiant]="c.role==='etudiant'"
+                  [class.tag-externe]="c.role==='externe'"
+                  [class.tag-admin]="c.role==='admin'">
+                  {{ c.role === 'etudiant' ? 'Étudiant' : c.role === 'externe' ? 'Externe' : 'Admin' }}
+                </span>
               </div>
               <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
             </div>
             <div *ngIf="contacts.length === 0" class="no-contacts">
-              Aucun étudiant inscrit à vos formations
+              Aucun contact disponible
             </div>
           </div>
         </div>
@@ -480,7 +697,9 @@
             <div class="contact-avatar conv-avatar">{{ contactSelectionne.nom?.charAt(0)?.toUpperCase() }}</div>
             <div class="conv-info">
               <div class="conv-name">{{ contactSelectionne.nom }}</div>
-              <div class="conv-role-label">Étudiant</div>
+              <div class="conv-role-label">
+                {{ contactSelectionne.role === 'etudiant' ? 'Étudiant' : contactSelectionne.role === 'externe' ? 'Externe' : 'Administrateur' }}
+              </div>
             </div>
           </div>
           <div class="messages-list">
@@ -508,7 +727,7 @@
         <ng-template #noConvFmt>
           <div class="no-conv-placeholder">
             <div class="no-conv-icon">💬</div>
-            <p>Sélectionnez un étudiant pour démarrer une conversation</p>
+            <p>Sélectionnez un contact pour démarrer une conversation</p>
           </div>
         </ng-template>
       </div>
@@ -516,6 +735,7 @@
 
     <!-- ===== QUESTIONS ===== -->
     <section *ngIf="activeSection === 'questions'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>❓ Questions des Étudiants</h2>
         <p>Répondez aux questions posées sur vos formations</p>

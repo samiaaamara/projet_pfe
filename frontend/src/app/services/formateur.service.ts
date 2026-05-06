@@ -8,10 +8,9 @@ export interface Formation {
   date_debut: string;
   date_fin?: string;
   duree?: number;
-  niveau?: string;
   specialite?: string;
   nb_places?: number;
-  status?: 'draft' | 'published';
+  status?: 'draft' | 'pending_approval' | 'accepted' | 'published';
   formateur_id: number;
 }
 
@@ -87,17 +86,57 @@ export class FormateurService {
     });
   }
   // 🔹 Ajouter un support avec upload de fichier
-uploadSupport(formationId: number, type: string, file: File): Observable<any> {
-  const formData = new FormData();
-  formData.append('formation_id', formationId.toString());
-  formData.append('type', type);
-  formData.append('fichier', file);
-  return this.http.post(`${this.api}/supports`, formData);
-}
+  uploadSupport(formationId: number, type: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('formation_id', formationId.toString());
+    formData.append('type', type);
+    formData.append('fichier', file);
+    return this.http.post(`${this.api}/supports`, formData);
+  }
+
 
 
   // 🔹 Supprimer un support
   supprimerSupport(supportId: number): Observable<any> {
     return this.http.delete(`${this.api}/supports/${supportId}`);
+  }
+
+  // 🔹 Progression modulaire
+  getProgression(formationId: number, etudiantId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/progression/${formationId}/${etudiantId}`);
+  }
+
+  updateProgression(formationId: number, etudiantId: number, moduleId: number, statut: string): Observable<any> {
+    return this.http.put(`${this.api}/progression/${formationId}/${etudiantId}/${moduleId}`, { statut });
+  }
+
+  // 🔹 Séances
+  getSeances(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/seances/${formationId}`);
+  }
+  creerSeance(data: any): Observable<any> {
+    return this.http.post(`${this.api}/seances`, data);
+  }
+  modifierSeance(seanceId: number, data: any): Observable<any> {
+    return this.http.put(`${this.api}/seances/${seanceId}`, data);
+  }
+  supprimerSeance(seanceId: number): Observable<any> {
+    return this.http.delete(`${this.api}/seances/${seanceId}`);
+  }
+
+  // 🔹 Présences
+  getFeuillePresence(seanceId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/presences/${seanceId}`);
+  }
+  enregistrerPresence(seanceId: number, etudiantId: number, statut: string): Observable<any> {
+    return this.http.put(`${this.api}/presences/${seanceId}/${etudiantId}`, { statut });
+  }
+
+  // Justificatifs
+  getJustificatifs(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/justificatifs/${formationId}`);
+  }
+  traiterJustificatif(justifId: number, statut: 'accepté' | 'refusé'): Observable<any> {
+    return this.http.put(`${this.api}/justificatifs/${justifId}`, { statut });
   }
 }

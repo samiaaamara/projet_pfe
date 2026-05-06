@@ -36,3 +36,25 @@ h2, h3, h4 {
 .alert {
   border-radius: 6px;
 }
+
+/* Bouton retour global pour tous les dashboards */
+.btn-back-dash {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: white;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-bottom: 18px;
+}
+.btn-back-dash:hover {
+  border-color: #3d6aff;
+  color: #3d6aff;
+  background: #f0f4ff;
+}

@@ -158,4 +158,12 @@ router.put('/change-password', verifyToken, async (req, res) => {
   });
 });
 
+// 🔹 Liste des spécialités (publique, utilisée dans le formulaire d'inscription)
+router.get('/specialites', (req, res) => {
+  db.query('SELECT id, nom FROM specialites ORDER BY nom ASC', (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
+  });
+});
+
 module.exports = router;
