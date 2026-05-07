@@ -107,7 +107,7 @@ export class ExterneComponent implements OnInit {
   logout() { localStorage.clear(); this.router.navigate(['/login']); }
 
   loadFormations() {
-    this.externeService.getFormations(this.page).subscribe({
+    this.externeService.getFormations(this.externeId, this.page).subscribe({
       next: (res: any) => {
         this.formations = res.data;
         this.totalPages = res.pagination.pages;

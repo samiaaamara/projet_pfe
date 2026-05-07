@@ -6,6 +6,7 @@
       <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
       <div class="sidebar-role">Étudiant</div>
+      <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
     </div>
 
     <nav class="sidebar-nav">
@@ -402,7 +403,11 @@
       <h5 class="section-title">Informations personnelles</h5>
       <div class="profile-avatar-row">
         <div class="profile-avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
-        <div><div class="profile-name">{{ user?.nom }}</div><div class="profile-role-chip">Étudiant</div></div>
+        <div>
+          <div class="profile-name">{{ user?.nom }}</div>
+          <div class="profile-role-chip">Étudiant</div>
+          <div class="profile-specialite-chip" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
+        </div>
       </div>
       <div class="form-group">
         <label>Nom complet</label>

@@ -7,8 +7,9 @@ export class ExterneService {
 
   constructor(private http: HttpClient) {}
 
-  getFormations(page = 1) {
-    return this.http.get<any>(`${this.apiUrl}/formations?page=${page}`);
+  getFormations(externeId: number | null, page = 1) {
+    const params = externeId ? `?page=${page}&externeId=${externeId}` : `?page=${page}`;
+    return this.http.get<any>(`${this.apiUrl}/formations${params}`);
   }
 
   getMesInscriptions(externeId: number) {

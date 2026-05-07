@@ -186,7 +186,7 @@
         </select>
         <select class="filter-select" [(ngModel)]="specialiteFilter">
           <option value="">Toutes les spécialités</option>
-          <option>Informatique</option><option>Réseaux</option><option>Génie logiciel</option><option>Intelligence artificielle</option><option>Cybersécurité</option><option>Marketing</option><option>Finance</option><option>Mécanique</option><option>Génie civil</option><option>Génie électrique</option>
+          <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
         </select>
       </div>
       <div class="card-section">
@@ -350,7 +350,8 @@
           <div class="form-group">
             <label>Spécialité *</label>
             <select class="form-input" [(ngModel)]="formData.specialite">
-              <option value="">--</option><option>Informatique</option><option>Réseaux</option><option>Génie logiciel</option><option>Intelligence artificielle</option><option>Cybersécurité</option><option>Marketing</option><option>Finance</option><option>Mécanique</option><option>Génie civil</option><option>Génie électrique</option>
+              <option value="">-- Sélectionnez une spécialité --</option>
+              <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
             </select>
             <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
           </div>

@@ -466,10 +466,15 @@ get filteredUsers() {
   }
 
   deleteUser(id: number) {
-    if (!confirm('Supprimer cet utilisateur ?')) return;
-    this.adminService.deleteUser(id).subscribe(() => {
-      this.showMessage('Utilisateur supprimé ✅', 'success');
-      this.loadUsers();
+    if (!confirm('Voulez-vous vraiment supprimer cet utilisateur ? Cette action est irréversible.')) return;
+    this.adminService.deleteUser(id).subscribe({
+      next: () => {
+        this.showMessage('Utilisateur supprimé avec succès ✅', 'success');
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.showMessage(err?.error?.message || 'Erreur lors de la suppression ❌', 'danger');
+      }
     });
   }
 

@@ -49,6 +49,45 @@ router.get('/users', (req, res) => {
   });
 });
 
+/* ========================= DELETE USER ========================= */
+router.delete('/users/:id', (req, res) => {
+  const targetId = parseInt(req.params.id);
+  if (isNaN(targetId)) return res.status(400).json({ message: 'ID invalide.' });
+
+  // Empêcher l'admin de se supprimer lui-même
+  db.query('SELECT role FROM users WHERE id = ?', [targetId], (err, rows) => {
+    if (err) return res.status(500).json({ error: err });
+    if (rows.length === 0) return res.status(404).json({ message: 'Utilisateur introuvable.' });
+    if (rows[0].role === 'admin') return res.status(403).json({ message: 'Impossible de supprimer un compte administrateur.' });
+
+    // Vérifier si formateur avec formations actives
+    if (rows[0].role === 'formateur') {
+      db.query(
+        `SELECT COUNT(*) AS cnt FROM formations f
+         JOIN formateurs fo ON f.formateur_id = fo.id
+         WHERE fo.user_id = ?`,
+        [targetId],
+        (err2, result) => {
+          if (err2) return res.status(500).json({ error: err2 });
+          if (result[0].cnt > 0)
+            return res.status(400).json({ message: 'Impossible de supprimer ce formateur : il possède des formations actives.' });
+
+          db.query('DELETE FROM users WHERE id = ?', [targetId], (err3) => {
+            if (err3) return res.status(500).json({ error: err3 });
+            res.json({ message: 'Utilisateur supprimé avec succès.' });
+          });
+        }
+      );
+    } else {
+      // étudiant ou externe : suppression directe (CASCADE gère les tables liées)
+      db.query('DELETE FROM users WHERE id = ?', [targetId], (err2) => {
+        if (err2) return res.status(500).json({ error: err2 });
+        res.json({ message: 'Utilisateur supprimé avec succès.' });
+      });
+    }
+  });
+});
+
 /* ========================= FORMATIONS (ADMIN VIEW) ========================= */
 router.get('/formations', (req, res) => {
   const sql = `

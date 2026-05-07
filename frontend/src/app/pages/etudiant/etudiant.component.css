@@ -33,6 +33,7 @@
 
 .sidebar-username { font-size: 15px; font-weight: 600; }
 .sidebar-role { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+.sidebar-specialite { font-size: 11px; margin-top: 4px; background: rgba(255,255,255,0.15); color: #fff; padding: 2px 10px; border-radius: 20px; display: inline-block; }
 
 .sidebar-nav {
   flex: 1; padding: 20px 12px;
@@ -345,6 +346,16 @@
   color: #1565c0;
   font-size: 11px;
   font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+.profile-specialite-chip {
+  display: inline-block;
+  background: #f3e5f5;
+  color: #6a1b9a;
+  font-size: 11px;
+  font-weight: 600;
   padding: 2px 10px;
   border-radius: 20px;
   margin-top: 4px;

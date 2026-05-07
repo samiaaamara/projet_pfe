@@ -136,13 +136,16 @@
             </div>
 
             <div class="form-group">
-              <label>Spécialité</label>
-              <div class="input-wrapper select-wrapper">
+              <label>Spécialité *</label>
+              <div class="input-wrapper select-wrapper" [class.is-invalid]="specEtudRef.invalid && (specEtudRef.dirty || specEtudRef.touched)">
                 <span class="input-icon">&#128161;</span>
-                <select [(ngModel)]="specialite" name="specialite">
+                <select [(ngModel)]="specialite" name="specialite" #specEtudRef="ngModel" required>
                   <option value="">-- Sélectionnez une spécialité --</option>
                   <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
                 </select>
+              </div>
+              <div *ngIf="specEtudRef.invalid && (specEtudRef.dirty || specEtudRef.touched)" class="field-error">
+                <span>La spécialité est obligatoire.</span>
               </div>
             </div>
           </div>
@@ -170,13 +173,16 @@
           </div>
 
           <div class="form-group">
-            <label>Spécialité</label>
-            <div class="input-wrapper select-wrapper">
+            <label>Spécialité *</label>
+            <div class="input-wrapper select-wrapper" [class.is-invalid]="specFormRef.invalid && (specFormRef.dirty || specFormRef.touched)">
               <span class="input-icon">&#128161;</span>
-              <select [(ngModel)]="specialite" name="specialite_formateur">
+              <select [(ngModel)]="specialite" name="specialite_formateur" #specFormRef="ngModel" required>
                 <option value="">-- Sélectionnez une spécialité --</option>
                 <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
               </select>
+            </div>
+            <div *ngIf="specFormRef.invalid && (specFormRef.dirty || specFormRef.touched)" class="field-error">
+              <span>La spécialité est obligatoire.</span>
             </div>
           </div>
 
@@ -239,11 +245,16 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Specialite</label>
-              <div class="input-wrapper">
+              <label>Spécialité *</label>
+              <div class="input-wrapper select-wrapper" [class.is-invalid]="specExtRef.invalid && (specExtRef.dirty || specExtRef.touched)">
                 <span class="input-icon">&#128161;</span>
-                <input type="text" [(ngModel)]="specialite" name="specialite_externe"
-                       placeholder="Ex: Marketing, Finance..." maxlength="100">
+                <select [(ngModel)]="specialite" name="specialite_externe" #specExtRef="ngModel" required>
+                  <option value="">-- Sélectionnez une spécialité --</option>
+                  <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
+                </select>
+              </div>
+              <div *ngIf="specExtRef.invalid && (specExtRef.dirty || specExtRef.touched)" class="field-error">
+                <span>La spécialité est obligatoire.</span>
               </div>
             </div>
 

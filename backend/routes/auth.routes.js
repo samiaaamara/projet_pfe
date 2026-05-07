@@ -40,6 +40,8 @@ router.post('/register', async (req, res) => {
   const { nom, email, mot_de_passe, role, specialite, niveau, cin, telephone, entreprise, date_naissance } = req.body;
   try {
     if (!nom || !email || !mot_de_passe || !role) return res.status(400).json({ message: "Champs manquants ❌" });
+      if (['etudiant', 'formateur', 'externe'].includes(role) && !specialite)
+        return res.status(400).json({ message: "La spécialité est obligatoire ❌" });
     db.query('SELECT * FROM users WHERE email = ?', [email], async (err, users) => {
       if (err) return res.status(500).send(err);
       if (users.length > 0) return res.status(400).json({ message: "Email déjà utilisé ❌" });
@@ -160,10 +162,21 @@ router.put('/change-password', verifyToken, async (req, res) => {
 
 // 🔹 Liste des spécialités (publique, utilisée dans le formulaire d'inscription)
 router.get('/specialites', (req, res) => {
-  db.query('SELECT id, nom FROM specialites ORDER BY nom ASC', (err, rows) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json(rows);
-  });
+  const specialites = [
+    { id: 1,  nom: 'Informatique' },
+    { id: 2,  nom: 'Développement Web' },
+    { id: 3,  nom: 'Réseaux et Télécommunications' },
+    { id: 4,  nom: 'Génie Logiciel' },
+    { id: 5,  nom: 'Intelligence Artificielle' },
+    { id: 6,  nom: 'Génie Mécanique' },
+    { id: 7,  nom: 'Génie Civil' },
+    { id: 8,  nom: 'Génie Électrique' },
+    { id: 9,  nom: 'Électronique' },
+    { id: 10, nom: 'Finance et Comptabilité' },
+    { id: 11, nom: 'Commerce et Marketing' },
+    { id: 12, nom: 'Gestion des Entreprises' },
+  ];
+  res.json(specialites);
 });
 
 module.exports = router;

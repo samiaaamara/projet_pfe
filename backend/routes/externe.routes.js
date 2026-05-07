@@ -79,15 +79,18 @@ router.get('/formations', (req, res) => {
   const page = Math.max(1, parseInt(req.query.page) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 10));
   const offset = (page - 1) * limit;
+  const externeId = parseInt(req.query.externeId) || null;
 
-  db.query(
-    `SELECT COUNT(*) AS total FROM formations
-     WHERE status = 'published' AND date_debut >= CURDATE()`,
-    (err, countResult) => {
-    if (err) return res.status(500).json(err);
-    const total = countResult[0].total;
+  const buildQuery = (specialite) => {
+    const specFilter = specialite
+      ? `AND f.specialite = '${specialite.replace(/'/g, "''")}'`
+      : '';
 
-    const sql = `
+    const countSql = `
+      SELECT COUNT(*) AS total FROM formations f
+      WHERE f.status = 'published' AND f.date_debut >= CURDATE() ${specFilter}
+    `;
+    const dataSql = `
       SELECT f.*,
         u.nom AS formateur_nom,
         (SELECT COUNT(*) FROM inscriptions WHERE formation_id = f.id) +
@@ -95,15 +98,34 @@ router.get('/formations', (req, res) => {
       FROM formations f
       JOIN formateurs fo ON f.formateur_id = fo.id
       JOIN users u ON fo.user_id = u.id
-      WHERE f.status = 'published' AND f.date_debut >= CURDATE()
+      WHERE f.status = 'published' AND f.date_debut >= CURDATE() ${specFilter}
       ORDER BY f.date_debut ASC
       LIMIT ? OFFSET ?
     `;
-    db.query(sql, [limit, offset], (err2, results) => {
-      if (err2) return res.status(500).json(err2);
-      res.json({ data: results, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+
+    db.query(countSql, (err, countResult) => {
+      if (err) return res.status(500).json(err);
+      const total = countResult[0].total;
+      db.query(dataSql, [limit, offset], (err2, results) => {
+        if (err2) return res.status(500).json(err2);
+        res.json({
+          data: results,
+          pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+          filtre_specialite: specialite || null
+        });
+      });
     });
-  });
+  };
+
+  if (externeId) {
+    db.query('SELECT specialite FROM externes WHERE id = ?', [externeId], (err, rows) => {
+      if (err) return res.status(500).json(err);
+      const specialite = rows[0]?.specialite || null;
+      buildQuery(specialite);
+    });
+  } else {
+    buildQuery(null);
+  }
 });
 
 /* ─── GET /mes-inscriptions/:externeId ───────────────────────────────────── */

@@ -6,6 +6,7 @@
       <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
       <div class="sidebar-role">Utilisateur Externe</div>
+      <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
     </div>
 
     <nav class="sidebar-nav">
@@ -255,6 +256,7 @@
             <div>
               <div class="profile-name">{{ user?.nom }}</div>
               <div class="profile-role-chip">Utilisateur Externe</div>
+              <div class="profile-specialite-chip" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
             </div>
           </div>
           <div class="form-group">
