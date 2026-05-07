@@ -7,11 +7,12 @@ import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
+import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-widget.component';
 
 @Component({
   selector: 'app-externe',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChatWidgetComponent],
   templateUrl: './externe.component.html',
   styleUrl: './externe.component.css',
 })
@@ -65,6 +66,13 @@ export class ExterneComponent implements OnInit {
   contactSelectionne: any = null;
   nouveauMessage = '';
   unreadMessages = 0;
+  externeContactSearch = '';
+
+  get filteredExterneContacts() {
+    if (!this.externeContactSearch.trim()) return this.contacts;
+    const q = this.externeContactSearch.toLowerCase();
+    return this.contacts.filter(c => c.nom?.toLowerCase().includes(q));
+  }
 
   constructor(
     private externeService: ExterneService,
@@ -112,6 +120,7 @@ export class ExterneComponent implements OnInit {
         this.formations = res.data;
         this.totalPages = res.pagination.pages;
         this.totalFormations = res.pagination.total;
+        this.loadMesInscriptions();
       },
       error: () => this.showMessage('Erreur chargement des formations', 'danger')
     });
@@ -135,7 +144,10 @@ export class ExterneComponent implements OnInit {
   }
 
   estDejaInscrit(formationId: number): boolean {
-    return this.mesInscriptions.some(i => i.formation_id === formationId && i.statut_paiement === 'payé');
+    return this.mesInscriptions.some(i =>
+      Number(i.formation_id) === Number(formationId) &&
+      (i.statut_paiement === 'payé' || i.statut_inscription === 'confirmé')
+    );
   }
 
   placesRestantes(f: any): number {

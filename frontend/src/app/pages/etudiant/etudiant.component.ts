@@ -8,11 +8,12 @@ import { Auth } from '../../services/auth';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
 import { QuestionsService } from '../../services/questions.service';
+import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-widget.component';
 
 @Component({
   selector: 'app-etudiant',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ChatWidgetComponent],
   templateUrl: './etudiant.component.html',
   styleUrl: './etudiant.component.css',
 })
@@ -67,6 +68,13 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   contactSelectionne: any = null;
   nouveauMessage = '';
   unreadMessages = 0;
+  etudiantContactSearch = '';
+
+  get filteredEtudiantContacts() {
+    if (!this.etudiantContactSearch.trim()) return this.contacts;
+    const q = this.etudiantContactSearch.toLowerCase();
+    return this.contacts.filter(c => c.nom?.toLowerCase().includes(q));
+  }
 
   // Questions
   mesQuestions: any[] = [];
@@ -86,10 +94,12 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   formationProgressionSelectionnee: any = null;
   progressionModulesFormation: any[] = [];
   progressionPourcentageFormation = 0;
+  showProgressionModal = false;
 
   // Présences
   presencesFormation: any = null;
   presencesData: any = null;
+  showPresencesModal = false;
 
   // Liste d'attente
   enAttente: any[] = [];
@@ -521,6 +531,7 @@ sauvegarderProfil() {
   voirProgressionFormation(f: any) {
     if (!this.etudiantId) return;
     this.formationProgressionSelectionnee = f;
+    this.showProgressionModal = true;
     this.etudiantService.getProgressionModules(this.etudiantId, f.formation_id).subscribe({
       next: (res: any) => {
         this.progressionModulesFormation = res.modules || [];
@@ -534,6 +545,7 @@ sauvegarderProfil() {
     this.formationProgressionSelectionnee = null;
     this.progressionModulesFormation = [];
     this.progressionPourcentageFormation = 0;
+    this.showProgressionModal = false;
   }
 
   countTerminesFormation(): number {
@@ -567,6 +579,7 @@ sauvegarderProfil() {
     if (!this.etudiantId) return;
     this.presencesFormation = f;
     this.presencesData = null;
+    this.showPresencesModal = true;
     this.etudiantService.getMesPresences(this.etudiantId, f.formation_id).subscribe({
       next: (res: any) => this.presencesData = res,
       error: () => this.showMessage('Erreur chargement des présences', 'danger')
@@ -576,6 +589,7 @@ sauvegarderProfil() {
   fermerPresences() {
     this.presencesFormation = null;
     this.presencesData = null;
+    this.showPresencesModal = false;
   }
 
   getPresenceClass(statut: string): string {

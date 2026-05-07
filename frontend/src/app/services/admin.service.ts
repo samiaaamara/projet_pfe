@@ -67,8 +67,8 @@ export class AdminService {
     return this.http.put(`${this.apiUrl}/formations/${formationId}/accept`, {}, this.getAuthHeaders());
   }
 
-  publishAcceptedFormation(formationId: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/formations/${formationId}/publish-accepted`, {}, this.getAuthHeaders());
+  publishAcceptedFormation(formationId: number, prix?: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/formations/${formationId}/publish-accepted`, { prix: prix ?? null }, this.getAuthHeaders());
   }
 
   // ❌ Rejeter une formation

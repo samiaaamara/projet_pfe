@@ -63,6 +63,11 @@ export class FormateurComponent implements OnInit, OnDestroy {
     return this.formations.filter(f => f.status === 'pending_approval').length;
   }
 
+  // Modales
+  showFormationModal = false;
+  showInscriptionsModal = false;
+  showSeancesModal = false;
+
   // Message général
   message = '';
 
@@ -87,6 +92,16 @@ export class FormateurComponent implements OnInit, OnDestroy {
   contactSelectionne: any = null;
   nouveauMessage = '';
   unreadMessages = 0;
+  formateurContactSearch = '';
+  formateurContactRole = '';
+
+  get filteredFormateurContacts() {
+    return this.contacts.filter(c => {
+      const matchSearch = !this.formateurContactSearch.trim() || c.nom?.toLowerCase().includes(this.formateurContactSearch.toLowerCase());
+      const matchRole = !this.formateurContactRole || c.role === this.formateurContactRole;
+      return matchSearch && matchRole;
+    });
+  }
 
   // Questions
   questionsFormation: any[] = [];
@@ -279,8 +294,8 @@ export class FormateurComponent implements OnInit, OnDestroy {
 
     this.formateurService.creerFormation(payload).subscribe({
       next: () => {
-         this.showMessage('Formation créée avec succès ✅', 'success');
-           this.resetFormationForm();
+        this.showMessage('Formation créée avec succès ✅', 'success');
+        this.closeFormationModal();
         this.loadFormations();
         this.activeSection = 'mesFormations';
       },
@@ -291,21 +306,37 @@ export class FormateurComponent implements OnInit, OnDestroy {
     });
   }
 
+  openFormationModal(formation?: any) {
+    this.formErrors = {};
+    if (formation) {
+      this.editMode = true;
+      this.editedFormationId = formation.id;
+      this.titre = formation.titre;
+      this.description = formation.description;
+      this.date_debut = formation.date_debut;
+      this.date_fin = formation.date_fin || '';
+      this.duree = formation.duree || null;
+      this.specialite = formation.specialite || '';
+      this.nb_places = formation.nb_places || null;
+    } else {
+      this.editMode = false;
+      this.resetFormationForm();
+    }
+    this.showFormationModal = true;
+  }
+
+  closeFormationModal() {
+    this.showFormationModal = false;
+    this.editMode = false;
+    this.resetFormationForm();
+  }
+
   ouvrirEditionFormation(formation: any) {
-    this.editMode = true;
-    this.editedFormationId = formation.id;
-    this.titre = formation.titre;
-    this.description = formation.description;
-    this.date_debut = formation.date_debut;
-    this.date_fin = formation.date_fin || '';
-    this.duree = formation.duree || null;
-    this.specialite = formation.specialite || '';
-    this.nb_places = formation.nb_places || null;
-    this.activeSection = 'creerFormation';
+    this.openFormationModal(formation);
   }
 
   annulerEditionFormation() {
-    this.resetFormationForm();
+    this.closeFormationModal();
   }
 
   modifierFormation() {
@@ -328,18 +359,14 @@ export class FormateurComponent implements OnInit, OnDestroy {
       formateur_id: this.formateurId
     }).subscribe({
       next: () => {
-         this.showMessage('Formation modifiée avec succès ✅', 'success');
-           this.editMode = false;
-        this.editedFormationId = null;
-        this.titre = '';
-        this.description = '';
-        this.date_debut = '';
+        this.showMessage('Formation modifiée avec succès ✅', 'success');
+        this.closeFormationModal();
         this.loadFormations();
         this.activeSection = 'mesFormations';
       },
       error: (err) => {
         console.error('Erreur modification formation:', err);
-        this.showMessage('❌ Erreur lors de la modification de la formation', 'danger');
+        this.showMessage(err?.error?.error || '❌ Erreur lors de la modification de la formation', 'danger');
       }
     });
   }
@@ -358,7 +385,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           console.error('Erreur suppression formation:', err);
-          this.showMessage('❌ Erreur lors de la suppression de la formation', 'danger');
+          this.showMessage(err?.error?.error || '❌ Erreur lors de la suppression de la formation', 'danger');
         }
       });
   }
@@ -404,13 +431,19 @@ export class FormateurComponent implements OnInit, OnDestroy {
   voirInscriptions(formationId: number) {
     const formation = this.formations.find(f => f.id === formationId);
     this.formationSelectionnee = formation;
-    this.activeSection = 'mesFormations';
-
+    this.progressionEtudiant = null;
+    this.showInscriptionsModal = true;
     this.formateurService.getInscriptions(formationId)
       .subscribe({
         next: (data) => this.inscriptions = data,
         error: (err) => console.error('Erreur chargement inscriptions:', err)
       });
+  }
+
+  fermerInscriptionsModal() {
+    this.showInscriptionsModal = false;
+    this.inscriptions = [];
+    this.progressionEtudiant = null;
   }
 
   voirSupports(formationId: number) {
@@ -793,6 +826,7 @@ logout() {
   ouvrirSeances(formation: any) {
     this.formationSelectionnee = formation;
     this.showSeancesPanel = true;
+    this.showSeancesModal = true;
     this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
     this.editSeanceMode = false;
     this.editSeanceId = null;
@@ -807,6 +841,7 @@ logout() {
 
   fermerSeances() {
     this.showSeancesPanel = false;
+    this.showSeancesModal = false;
     this.seancesFormation = [];
     this.seanceSelectionnee = null;
     this.feuillePresence = [];

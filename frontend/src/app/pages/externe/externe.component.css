@@ -207,6 +207,11 @@
 .chat-container { display: flex; height: calc(100vh - 200px); min-height: 500px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
 .contacts-panel { width: 280px; min-width: 280px; border-right: 1px solid #e8edf2; display: flex; flex-direction: column; background: #f0fdfa; }
 .contacts-header { padding: 14px 18px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; border-bottom: 1px solid #b2ebf2; }
+.contacts-title { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+.contacts-count { background: #e0f7fa; color: #0a9396; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.contacts-search-wrap { padding: 4px 12px 8px; }
+.contacts-search { width: 100%; box-sizing: border-box; padding: 7px 12px; border: 1px solid #b2ebf2; border-radius: 20px; font-size: 13px; outline: none; background: #fff; transition: border-color 0.2s; }
+.contacts-search:focus { border-color: #0a9396; }
 .contacts-list { flex: 1; overflow-y: auto; }
 .contact-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #e0f7f4; transition: background 0.2s; position: relative; }
 .contact-item:hover { background: #e0f7fa; }

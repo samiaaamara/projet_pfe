@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { MessagesService } from '../../services/messages.service';
 import { Auth } from '../../services/auth';
-
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -24,7 +23,14 @@ export class AdminComponent implements OnInit, OnDestroy {
   contactSelectionne: any = null;
   nouveauMessage = '';
   unreadMessages = 0;
+  adminContactSearch = '';
   private msgPollingInterval: any;
+
+  get filteredAdminContacts() {
+    if (!this.adminContactSearch.trim()) return this.contacts;
+    const q = this.adminContactSearch.toLowerCase();
+    return this.contacts.filter(c => c.nom?.toLowerCase().includes(q));
+  }
 
   users: any[] = [];
   formations: any[] = [];
@@ -32,6 +38,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   formationsPending: any[] = [];
   formationsAccepted: any[] = [];
   stats: any = {};
+  prixPublication: { [id: number]: number } = {};
 
   userSearch: string = '';
   userRoleFilter: string = '';
@@ -509,10 +516,13 @@ acceptFormation(formationId: number) {
 
 publishAcceptedFormation(formationId: number) {
   if (!confirm('Publier cette formation dans le catalogue ?')) return;
+  const prix = this.prixPublication[formationId] ?? undefined;
 
-  this.adminService.publishAcceptedFormation(formationId).subscribe({
+  this.adminService.publishAcceptedFormation(formationId, prix).subscribe({
     next: () => {
-      this.showMessage('Formation publiée dans le catalogue 🚀 — Le formateur a été notifié.', 'success');
+      const label = (!prix || prix === 0) ? 'gratuite' : `payante (${prix} EUR)`;
+      this.showMessage(`Formation publiée dans le catalogue 🚀 — Formation ${label}. Le formateur a été notifié.`, 'success');
+      delete this.prixPublication[formationId];
       this.loadFormationsAccepted();
       this.loadFormations();
     },

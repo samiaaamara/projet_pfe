@@ -192,6 +192,15 @@
 .chat-container { display: flex; height: calc(100vh - 200px); min-height: 500px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
 .contacts-panel { width: 280px; min-width: 280px; border-right: 1px solid #e8edf2; display: flex; flex-direction: column; background: #f4faf5; }
 .contacts-header { padding: 14px 18px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; border-bottom: 1px solid #d4edda; }
+.contacts-title { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+.contacts-count { background: #d4edda; color: #2e7d32; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.contacts-search-wrap { padding: 4px 12px 8px; }
+.contacts-search { width: 100%; box-sizing: border-box; padding: 7px 12px; border: 1px solid #d4edda; border-radius: 20px; font-size: 13px; outline: none; background: #fff; transition: border-color 0.2s; }
+.contacts-search:focus { border-color: #2e7d32; }
+.contacts-role-tabs { display: flex; gap: 4px; padding: 0 12px 10px; flex-wrap: wrap; }
+.role-tab { flex: 1; padding: 5px 4px; border: 1px solid #d4edda; border-radius: 16px; font-size: 11px; font-weight: 600; cursor: pointer; background: #fff; color: #555; transition: all 0.2s; white-space: nowrap; }
+.role-tab:hover { background: #e8f5e9; border-color: #2e7d32; }
+.role-tab.active { background: #2e7d32; color: #fff; border-color: #2e7d32; }
 .contacts-list { flex: 1; overflow-y: auto; }
 .contact-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; border-bottom: 1px solid #f0f4f0; transition: background 0.2s; position: relative; }
 .contact-item:hover { background: #e8f5e9; }
@@ -258,6 +267,77 @@
 /* ===== Progression Panel ===== */
 .btn-action.teal { background: #e0f2f1; color: #00695c; border: 1px solid #b2dfdb; }
 .btn-action.teal:hover { background: #b2dfdb; }
+.published-lock-badge { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: #f3e5f5; color: #6a1b9a; font-size: 12px; font-weight: 600; border-radius: 8px; border: 1px solid #ce93d8; cursor: default; }
+
+/* ===== MODALES ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: modalFadeIn 0.2s ease;
+}
+.modal-box {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 32px 36px;
+  width: 90%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+  position: relative;
+  animation: modalSlideUp 0.25s ease;
+}
+.modal-box-lg { max-width: 880px; }
+.modal-empty { text-align: center; padding: 32px; color: #999; font-size: 15px; }
+.modal-empty span { font-size: 32px; display: block; margin-bottom: 8px; }
+.modal-sub-panel { background: #f7f9fc; border-radius: 12px; padding: 20px; margin-top: 16px; border: 1px solid #e0e7ff; }
+.modal-sub-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.modal-sub-header h5 { margin: 0; font-size: 15px; color: #1b5e20; }
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f4f8;
+}
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1b5e20;
+  margin: 0;
+}
+.modal-close {
+  background: #f0f4f8;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: #ffebee; color: #c62828; }
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f4f8;
+}
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlideUp { from { transform: translateY(24px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
 .progression-panel { background: white; border-radius: 14px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); padding: 24px 28px; margin-top: 20px; }
 .prog-panel-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; border-bottom: 1px solid #e8edf2; padding-bottom: 14px; }

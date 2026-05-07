@@ -341,9 +341,18 @@ router.put('/formations/:id/publish-accepted', (req, res) => {
   const formationId = parseInt(req.params.id);
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
 
+  const prix = req.body.prix !== undefined && req.body.prix !== null && req.body.prix !== ''
+    ? parseFloat(req.body.prix)
+    : null;
+
+  const updateSql = prix !== null
+    ? "UPDATE formations SET status = 'published', prix = ? WHERE id = ? AND status = 'accepted'"
+    : "UPDATE formations SET status = 'published' WHERE id = ? AND status = 'accepted'";
+  const updateParams = prix !== null ? [prix, formationId] : [formationId];
+
   db.query(
-    "UPDATE formations SET status = 'published' WHERE id = ? AND status = 'accepted'",
-    [formationId],
+    updateSql,
+    updateParams,
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation introuvable ou non encore acceptée' });

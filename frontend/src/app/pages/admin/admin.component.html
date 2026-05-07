@@ -231,151 +231,6 @@
         </div>
          </div>
 
-      <!-- ===== ÉDITEUR DE PROGRAMME ===== -->
-      <div class="programme-editor" *ngIf="showProgrammeEditor && programmeFormation">
-        <div class="programme-editor-header">
-          <h4>📋 Programme — <em>{{ programmeFormation.titre }}</em></h4>
-          <button class="btn-close-prog" (click)="fermerProgrammeEditor()">✕ Fermer</button>
-        </div>
-
-        <!-- Description globale -->
-        <div class="prog-section">
-          <h5 class="prog-section-title">Description globale du programme</h5>
-          <div class="form-grid">
-            <div class="form-group full">
-              <label>Description générale</label>
-              <textarea class="form-input" rows="3" [(ngModel)]="programmeData.description_globale"
-                        placeholder="Décrivez le contenu global de la formation..."></textarea>
-            </div>
-            <div class="form-group full">
-              <label>Objectifs pédagogiques</label>
-              <textarea class="form-input" rows="3" [(ngModel)]="programmeData.objectifs"
-                        placeholder="À la fin de cette formation, les apprenants seront capables de..."></textarea>
-            </div>
-            <div class="form-group full">
-              <label>Prérequis</label>
-              <textarea class="form-input" rows="2" [(ngModel)]="programmeData.prerequis"
-                        placeholder="Connaissances ou compétences requises avant de suivre cette formation..."></textarea>
-            </div>
-          </div>
-          <button class="btn-save" (click)="sauvegarderProgramme()">💾 Sauvegarder la description</button>
-        </div>
-
-        <!-- Modules -->
-        <div class="prog-section">
-          <h5 class="prog-section-title">Modules / Chapitres</h5>
-
-          <!-- Liste des modules existants -->
-          <div class="modules-list" *ngIf="programmeModules.length > 0">
-            <div class="module-item" *ngFor="let m of programmeModules; let i = index">
-              <div class="module-num">{{ i + 1 }}</div>
-              <div class="module-info">
-                <strong>{{ m.titre }}</strong>
-                <span class="module-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
-                <p class="module-desc" *ngIf="m.description">{{ m.description }}</p>
-              </div>
-              <div class="module-actions">
-                <button class="btn-mod-edit" (click)="editerModule(m)">✏️</button>
-                <button class="btn-mod-del" (click)="supprimerModule(m.id)">🗑️</button>
-              </div>
-            </div>
-          </div>
-          <p class="empty-modules" *ngIf="programmeModules.length === 0">Aucun module pour l'instant. Ajoutez le premier ci-dessous.</p>
-
-          <!-- Formulaire d'ajout / modification de module -->
-          <div class="module-form">
-            <h6>{{ editModuleMode ? '✏️ Modifier le module' : '➕ Ajouter un module' }}</h6>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Titre du module *</label>
-                <input class="form-input" [(ngModel)]="moduleForm.titre" placeholder="Ex : Introduction au Python">
-              </div>
-              <div class="form-group">
-                <label>Durée (heures)</label>
-                <input class="form-input" type="number" min="0" step="0.5" [(ngModel)]="moduleForm.duree_heures" placeholder="Ex : 3">
-              </div>
-              <div class="form-group full">
-                <label>Description</label>
-                <textarea class="form-input" rows="2" [(ngModel)]="moduleForm.description"
-                          placeholder="Contenu abordé dans ce module..."></textarea>
-              </div>
-              <div class="form-group">
-                <label>Ordre</label>
-                <input class="form-input" type="number" min="0" [(ngModel)]="moduleForm.ordre">
-              </div>
-            </div>
-            <div class="form-actions">
-              <button class="btn-save" (click)="soumettrModule()">
-                {{ editModuleMode ? '💾 Mettre à jour' : '➕ Ajouter le module' }}
-              </button>
-              <button class="btn-cancel" *ngIf="editModuleMode" (click)="annulerEditModule()">Annuler</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Formulaire -->
-      <div class="form-card" *ngIf="showFormationForm">
-        <h5 class="section-title">{{ editFormationMode ? '✏️ Modifier la formation' : '➕ Nouvelle formation' }}</h5>
-        <div class="form-grid">
-          <div class="form-group full">
-            <label>Titre *</label>
-            <input class="form-input" [(ngModel)]="formData.titre" placeholder="Titre">
-            <small class="error-msg" *ngIf="formDataErrors.titre">{{ formDataErrors.titre }}</small>
-          </div>
-           <div class="form-group full">
-            <label>Description</label>
-            <textarea class="form-input" rows="2" [(ngModel)]="formData.description"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Date début *</label>
-            <input class="form-input" type="date" [(ngModel)]="formData.date_debut">
-            <small class="error-msg" *ngIf="formDataErrors.date_debut">{{ formDataErrors.date_debut }}</small>
-          </div>
-            <div class="form-group">
-            <label>Date fin</label>
-            <input class="form-input" type="date" [(ngModel)]="formData.date_fin">
-            <small class="error-msg" *ngIf="formDataErrors.date_fin">{{ formDataErrors.date_fin }}</small>
-          </div>
-           <div class="form-group">
-            <label>Durée (h) *</label>
-            <input class="form-input" type="number" [(ngModel)]="formData.duree">
-            <small class="error-msg" *ngIf="formDataErrors.duree">{{ formDataErrors.duree }}</small>
-          </div>
-             <div class="form-group">
-            <label>Places *</label>
-            <input class="form-input" type="number" [(ngModel)]="formData.nb_places">
-            <small class="error-msg" *ngIf="formDataErrors.nb_places">{{ formDataErrors.nb_places }}</small>
-          </div>
-          <div class="form-group">
-            <label>Spécialité *</label>
-            <select class="form-input" [(ngModel)]="formData.specialite">
-              <option value="">-- Sélectionnez une spécialité --</option>
-              <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
-            </select>
-            <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
-          </div>
-          <div class="form-group">
-            <label>Prix (EUR)</label>
-            <input class="form-input" type="number" min="0" step="0.01" [(ngModel)]="formData.prix" placeholder="0.00">
-            <small class="field-hint">Laisser 0 pour une formation gratuite</small>
-          </div>
-          <div class="form-group full">
-            <label>Formateur *</label>
-            <select class="form-input" [(ngModel)]="formData.formateur_id">
-              <option value="">-- Choisir --</option>
-              <option *ngFor="let f of formateurs" [value]="f.id">{{ f.nom }}</option>
-            </select>
-            <small class="error-msg" *ngIf="formDataErrors.formateur_id">{{ formDataErrors.formateur_id }}</small>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-save" (click)="saveFormation()" [disabled]="loading">
-            <span *ngIf="loading" class="spinner"></span> 💾 Enregistrer
-          </button>
-          <button class="btn-cancel" (click)="closeForm()">Annuler</button>
-        </div>
-      </div>
     </section>
 
 
@@ -431,39 +286,6 @@
         </div>
       </div>
  
-        <!-- Formulaire formateur -->
-      <div class="form-card" *ngIf="showFormateurForm">
-        <h5 class="section-title">{{ editFormateurMode ? '✏️ Modifier le formateur' : '➕ Nouveau formateur' }}</h5>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Nom *</label>
-            <input class="form-input" [(ngModel)]="formateurForm.nom">
-            <small class="error-msg" *ngIf="formateurErrors.nom">{{ formateurErrors.nom }}</small>
-          </div>
-          <div class="form-group">
-            <label>Email *</label>
-            <input class="form-input" type="email" [(ngModel)]="formateurForm.email">
-            <small class="error-msg" *ngIf="formateurErrors.email">{{ formateurErrors.email }}</small>
-          </div>
-          <div class="form-group">
-            <label>Mot de passe</label>
-            <input class="form-input" type="password" [(ngModel)]="formateurForm.mot_de_passe" placeholder="Laisser vide = inchangé">
-          </div>
-          <div class="form-group">
-            <label>Spécialité</label>
-            <select class="form-input" [(ngModel)]="formateurForm.specialite">
-              <option value="">--</option>
-              <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-actions">
-          <button class="btn-save" (click)="saveFormateur()" [disabled]="loading">
-            <span *ngIf="loading" class="spinner"></span> 💾 Enregistrer
-          </button>
-          <button class="btn-cancel" (click)="closeFormateurForm()">Annuler</button>
-        </div>
-      </div>
     </section>
  
    <!-- ===== APPROBATIONS ===== -->
@@ -528,6 +350,17 @@
         <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
       </div>
       <div class="approval-actions">
+        <div class="prix-publication-row">
+          <label class="prix-label">💰 Prix de publication</label>
+          <div class="prix-input-group">
+            <input type="number" min="0" step="0.01"
+                   class="prix-input"
+                   [(ngModel)]="prixPublication[f.id]"
+                   placeholder="0.00">
+            <span class="prix-devise">EUR</span>
+          </div>
+          <small class="prix-hint">Laisser vide ou 0 = formation gratuite</small>
+        </div>
         <button class="btn-publish" (click)="publishAcceptedFormation(f.id)">🚀 Publier dans le catalogue</button>
       </div>
     </div>
@@ -544,9 +377,14 @@
   <div class="chat-container">
     <!-- Contacts -->
     <div class="contacts-panel">
-      <div class="contacts-header">Mes formateurs</div>
+      <div class="contacts-title">Mes formateurs
+        <span class="contacts-count">{{ filteredAdminContacts.length }}</span>
+      </div>
+      <div class="contacts-search-wrap">
+        <input class="contacts-search" type="text" [(ngModel)]="adminContactSearch" placeholder="🔍 Rechercher un formateur…">
+      </div>
       <div class="contacts-list">
-        <div *ngFor="let c of contacts"
+        <div *ngFor="let c of filteredAdminContacts"
              class="contact-item"
              [class.active]="contactSelectionne?.id === c.id"
              (click)="ouvrirConversation(c)">
@@ -556,6 +394,9 @@
             <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
           </div>
           <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
+        </div>
+        <div *ngIf="filteredAdminContacts.length === 0 && adminContactSearch" class="no-contacts">
+          Aucun résultat pour "{{ adminContactSearch }}"
         </div>
         <div *ngIf="contacts.length === 0" class="no-contacts">
           Aucun formateur disponible
@@ -603,4 +444,191 @@
 </section>
 
   </main>
+
+  <!-- ===== MODAL PROGRAMME ===== -->
+  <div class="modal-overlay" *ngIf="showProgrammeEditor && programmeFormation" (click)="fermerProgrammeEditor()">
+    <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4 class="modal-title">📋 Programme — <em>{{ programmeFormation.titre }}</em></h4>
+        <button class="modal-close" (click)="fermerProgrammeEditor()">✕</button>
+      </div>
+
+      <!-- Description globale -->
+      <div class="prog-section">
+        <h5 class="prog-section-title">Description globale du programme</h5>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Description générale</label>
+            <textarea class="form-input" rows="3" [(ngModel)]="programmeData.description_globale" placeholder="Décrivez le contenu global..."></textarea>
+          </div>
+          <div class="form-group full">
+            <label>Objectifs pédagogiques</label>
+            <textarea class="form-input" rows="3" [(ngModel)]="programmeData.objectifs" placeholder="À la fin de cette formation, les apprenants seront capables de..."></textarea>
+          </div>
+          <div class="form-group full">
+            <label>Prérequis</label>
+            <textarea class="form-input" rows="2" [(ngModel)]="programmeData.prerequis" placeholder="Connaissances requises avant la formation..."></textarea>
+          </div>
+        </div>
+        <button class="btn-save" (click)="sauvegarderProgramme()">💾 Sauvegarder la description</button>
+      </div>
+
+      <!-- Modules -->
+      <div class="prog-section">
+        <h5 class="prog-section-title">Modules / Chapitres</h5>
+        <div class="modules-list" *ngIf="programmeModules.length > 0">
+          <div class="module-item" *ngFor="let m of programmeModules; let i = index">
+            <div class="module-num">{{ i + 1 }}</div>
+            <div class="module-info">
+              <strong>{{ m.titre }}</strong>
+              <span class="module-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+              <p class="module-desc" *ngIf="m.description">{{ m.description }}</p>
+            </div>
+            <div class="module-actions">
+              <button class="btn-mod-edit" (click)="editerModule(m)">✏️</button>
+              <button class="btn-mod-del" (click)="supprimerModule(m.id)">🗑️</button>
+            </div>
+          </div>
+        </div>
+        <p class="empty-modules" *ngIf="programmeModules.length === 0">Aucun module pour l'instant.</p>
+        <div class="module-form">
+          <h6>{{ editModuleMode ? '✏️ Modifier le module' : '➕ Ajouter un module' }}</h6>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Titre *</label>
+              <input class="form-input" [(ngModel)]="moduleForm.titre" placeholder="Ex : Introduction au Python">
+            </div>
+            <div class="form-group">
+              <label>Durée (h)</label>
+              <input class="form-input" type="number" min="0" step="0.5" [(ngModel)]="moduleForm.duree_heures" placeholder="Ex : 3">
+            </div>
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea class="form-input" rows="2" [(ngModel)]="moduleForm.description" placeholder="Contenu du module..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Ordre</label>
+              <input class="form-input" type="number" min="0" [(ngModel)]="moduleForm.ordre">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-save" (click)="soumettrModule()">{{ editModuleMode ? '💾 Mettre à jour' : '➕ Ajouter le module' }}</button>
+            <button class="btn-cancel" *ngIf="editModuleMode" (click)="annulerEditModule()">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="fermerProgrammeEditor()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL FORMATION ===== -->
+  <div class="modal-overlay" *ngIf="showFormationForm" (click)="closeForm()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ editFormationMode ? '✏️ Modifier la formation' : '➕ Nouvelle formation' }}</h4>
+        <button class="modal-close" (click)="closeForm()">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Titre *</label>
+          <input class="form-input" [(ngModel)]="formData.titre" placeholder="Titre de la formation">
+          <small class="error-msg" *ngIf="formDataErrors.titre">{{ formDataErrors.titre }}</small>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea class="form-input" rows="3" [(ngModel)]="formData.description" placeholder="Description détaillée..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Date début *</label>
+          <input class="form-input" type="date" [(ngModel)]="formData.date_debut">
+          <small class="error-msg" *ngIf="formDataErrors.date_debut">{{ formDataErrors.date_debut }}</small>
+        </div>
+        <div class="form-group">
+          <label>Date fin</label>
+          <input class="form-input" type="date" [(ngModel)]="formData.date_fin">
+          <small class="error-msg" *ngIf="formDataErrors.date_fin">{{ formDataErrors.date_fin }}</small>
+        </div>
+        <div class="form-group">
+          <label>Durée (h) *</label>
+          <input class="form-input" type="number" [(ngModel)]="formData.duree" placeholder="Ex: 20">
+          <small class="error-msg" *ngIf="formDataErrors.duree">{{ formDataErrors.duree }}</small>
+        </div>
+        <div class="form-group">
+          <label>Places *</label>
+          <input class="form-input" type="number" [(ngModel)]="formData.nb_places" placeholder="Ex: 30">
+          <small class="error-msg" *ngIf="formDataErrors.nb_places">{{ formDataErrors.nb_places }}</small>
+        </div>
+        <div class="form-group">
+          <label>Spécialité *</label>
+          <select class="form-input" [(ngModel)]="formData.specialite">
+            <option value="">-- Sélectionnez une spécialité --</option>
+            <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
+          </select>
+          <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
+        </div>
+        <div class="form-group">
+          <label>Prix (EUR)</label>
+          <input class="form-input" type="number" min="0" step="0.01" [(ngModel)]="formData.prix" placeholder="0.00">
+          <small class="field-hint">Laisser 0 pour une formation gratuite</small>
+        </div>
+        <div class="form-group full">
+          <label>Formateur *</label>
+          <select class="form-input" [(ngModel)]="formData.formateur_id">
+            <option value="">-- Choisir un formateur --</option>
+            <option *ngFor="let f of formateurs" [value]="f.id">{{ f.nom }}</option>
+          </select>
+          <small class="error-msg" *ngIf="formDataErrors.formateur_id">{{ formDataErrors.formateur_id }}</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeForm()">Annuler</button>
+        <button class="btn-save" (click)="saveFormation()" [disabled]="loading">
+          <span *ngIf="loading" class="spinner"></span> 💾 Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL FORMATEUR ===== -->
+  <div class="modal-overlay" *ngIf="showFormateurForm" (click)="closeFormateurForm()">
+    <div class="modal-box modal-box-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ editFormateurMode ? '✏️ Modifier le formateur' : '➕ Nouveau formateur' }}</h4>
+        <button class="modal-close" (click)="closeFormateurForm()">✕</button>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nom *</label>
+          <input class="form-input" [(ngModel)]="formateurForm.nom" placeholder="Nom complet">
+          <small class="error-msg" *ngIf="formateurErrors.nom">{{ formateurErrors.nom }}</small>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input class="form-input" type="email" [(ngModel)]="formateurForm.email" placeholder="email@exemple.com">
+          <small class="error-msg" *ngIf="formateurErrors.email">{{ formateurErrors.email }}</small>
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input class="form-input" type="password" [(ngModel)]="formateurForm.mot_de_passe" placeholder="Laisser vide = inchangé">
+        </div>
+        <div class="form-group">
+          <label>Spécialité</label>
+          <select class="form-input" [(ngModel)]="formateurForm.specialite">
+            <option value="">-- Sélectionnez --</option>
+            <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeFormateurForm()">Annuler</button>
+        <button class="btn-save" (click)="saveFormateur()" [disabled]="loading">
+          <span *ngIf="loading" class="spinner"></span> 💾 Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

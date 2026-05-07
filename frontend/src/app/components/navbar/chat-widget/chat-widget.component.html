@@ -1,42 +1,79 @@
-<!-- bouton flottant -->
-<div class="chat-button" (click)="toggleChat()">
-  💬
-</div>
+<!-- ===== BOUTON FLOTTANT ===== -->
+<button class="chat-fab" (click)="toggleChat()" [class.is-open]="isOpen" title="Assistant IA">
+  <span class="fab-icon-open">🤖</span>
+  <span class="fab-icon-close">✕</span>
+</button>
 
-<!-- fenêtre chat -->
-<div class="chat-container" *ngIf="isOpen">
+<!-- ===== FENÊTRE CHAT ===== -->
+<div class="chat-window" [class.visible]="isOpen">
 
-  <!-- header -->
-  <div class="chat-header">
-    Assistant IA 🤖
-    <span class="close-btn" (click)="toggleChat()">✖</span>
+  <!-- Header -->
+  <div class="chat-win-header">
+    <div class="chat-win-info">
+      <div class="chat-win-avatar">🤖</div>
+      <div>
+        <div class="chat-win-name">Assistant IA</div>
+        <div class="chat-win-status">
+          <span class="status-dot"></span>
+          Ollama · {{ modelLabel }}
+        </div>
+      </div>
+    </div>
+    <button class="chat-win-clear" (click)="clearChat()" title="Réinitialiser la conversation">
+      🗑
+    </button>
   </div>
 
-  <!-- messages -->
-  <div class="chat-body" #chatBody>
+  <!-- Messages -->
+  <div class="chat-win-body" #chatBody>
 
-    <div *ngFor="let msg of messages"
-         class="message"
-         [ngClass]="msg.sender">
+    <div *ngFor="let m of uiMessages"
+         class="chat-msg"
+         [class.chat-msg-user]="m.role === 'user'"
+         [class.chat-msg-bot]="m.role === 'assistant'">
 
-      {{ msg.text }}
+      <div class="chat-msg-avatar">
+        <span *ngIf="m.role === 'assistant'">🤖</span>
+        <span *ngIf="m.role === 'user'">{{ userInitial }}</span>
+      </div>
+
+      <div class="chat-msg-body">
+        <div class="chat-msg-bubble">{{ m.content }}</div>
+        <div class="chat-msg-time">{{ m.time | date:'HH:mm' }}</div>
+      </div>
+
     </div>
 
-    <!-- typing -->
-    <div class="typing" *ngIf="isTyping">
-      L'IA écrit...
+    <!-- Indicateur de frappe -->
+    <div class="chat-typing" *ngIf="isTyping">
+      <div class="chat-msg-avatar">🤖</div>
+      <div class="typing-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Aucun message -->
+    <div class="chat-empty" *ngIf="uiMessages.length === 0 && !isTyping">
+      Démarrez une conversation avec l'assistant IA
     </div>
 
   </div>
 
-  <!-- input -->
-  <div class="chat-footer">
-    <input
-      [(ngModel)]="userMessage"
-      (keydown.enter)="send()"
-      placeholder="Pose ta question..." />
-
-    <button (click)="send()">➤</button>
+  <!-- Footer / Input -->
+  <div class="chat-win-footer">
+    <textarea
+      class="chat-input"
+      [(ngModel)]="userInput"
+      placeholder="Posez votre question…"
+      rows="1"
+      (keydown.enter)="$any($event).shiftKey ? null : send($event)"></textarea>
+    <button
+      class="chat-send-btn"
+      (click)="send()"
+      [disabled]="!userInput.trim() || isTyping"
+      title="Envoyer">
+      ➤
+    </button>
   </div>
 
 </div>

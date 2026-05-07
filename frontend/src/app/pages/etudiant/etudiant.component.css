@@ -534,6 +534,11 @@
   color: #666;
   border-bottom: 1px solid #e8edf2;
 }
+.contacts-title { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 8px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: #555; }
+.contacts-count { background: #e8edfb; color: #1a237e; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
+.contacts-search-wrap { padding: 4px 12px 8px; }
+.contacts-search { width: 100%; box-sizing: border-box; padding: 7px 12px; border: 1px solid #e0e4f0; border-radius: 20px; font-size: 13px; outline: none; background: #fff; transition: border-color 0.2s; }
+.contacts-search:focus { border-color: #1a237e; }
 
 .contacts-list { flex: 1; overflow-y: auto; }
 
@@ -981,3 +986,16 @@
 .input-wrap-select { position: relative; }
 .input-select { width: 100%; padding: 10px 12px 10px 38px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 14px; background: white; appearance: none; cursor: pointer; color: #1a2744; }
 .input-select:focus { outline: none; border-color: #2e7d32; box-shadow: 0 0 0 3px rgba(46,125,50,0.1); }
+
+/* ===== MODALES ===== */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.50); display: flex; align-items: center; justify-content: center; z-index: 1000; animation: modalFadeIn 0.2s ease; }
+.modal-box { background: #fff; border-radius: 18px; padding: 32px 36px; width: 90%; max-width: 720px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,0.22); animation: modalSlideUp 0.25s ease; }
+.modal-box-md { max-width: 640px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid #f0f4f8; }
+.modal-title { font-size: 17px; font-weight: 700; color: #1a2744; margin: 0; }
+.modal-close { background: #f0f4f8; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; color: #555; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
+.modal-close:hover { background: #ffebee; color: #c62828; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 14px; border-top: 1px solid #f0f4f8; }
+.modal-loading { text-align: center; padding: 40px; color: #999; font-size: 15px; }
+@keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

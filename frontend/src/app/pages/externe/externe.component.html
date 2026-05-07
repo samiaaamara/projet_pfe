@@ -366,9 +366,14 @@
       <div class="chat-container">
         <!-- Contacts -->
         <div class="contacts-panel">
-          <div class="contacts-header">Mes formateurs</div>
+          <div class="contacts-title">Mes formateurs
+            <span class="contacts-count">{{ filteredExterneContacts.length }}</span>
+          </div>
+          <div class="contacts-search-wrap">
+            <input class="contacts-search" type="text" [(ngModel)]="externeContactSearch" placeholder="🔍 Rechercher un formateur…">
+          </div>
           <div class="contacts-list">
-            <div *ngFor="let c of contacts"
+            <div *ngFor="let c of filteredExterneContacts"
                  class="contact-item"
                  [class.active]="contactSelectionne?.id === c.id"
                  (click)="ouvrirConversation(c)">
@@ -378,6 +383,9 @@
                 <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
               </div>
               <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
+            </div>
+            <div *ngIf="filteredExterneContacts.length === 0 && externeContactSearch" class="no-contacts">
+              Aucun résultat pour "{{ externeContactSearch }}"
             </div>
             <div *ngIf="contacts.length === 0" class="no-contacts">
               Inscrivez-vous à une formation payante pour contacter un formateur
@@ -536,3 +544,6 @@
     </div>
   </div>
 </div>
+
+<!-- ===== CHATBOT IA ===== -->
+<app-chat-widget [role]="'externe'" [userName]="user?.nom"></app-chat-widget>

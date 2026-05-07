@@ -231,23 +231,30 @@ router.put('/formations/:id', (req, res) => {
   if (nb_places !== undefined && nb_places !== null && nb_places !== '' && Number(nb_places) <= 0) return res.status(400).json({ error: 'Le nombre de places doit être > 0.' });
   if (!specialite || !specialite.trim()) return res.status(400).json({ error: 'La spécialité est obligatoire.' });
   if (!formateur_id) return res.status(400).json({ error: 'Le formateur est obligatoire.' });
-  
 
-  const sql = `
-    UPDATE formations
-    SET titre = ?, description = ?, date_debut = ?, date_fin = ?, duree = ?, specialite = ?, nb_places = ?
-    WHERE id = ? AND formateur_id = ?
-  `;
+  db.query('SELECT status FROM formations WHERE id = ? AND formateur_id = ?', [formationId, formateur_id], (checkErr, checkResult) => {
+    if (checkErr) return res.status(500).json({ error: checkErr.message });
+    if (checkResult.length === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
+    if (checkResult[0].status === 'published') {
+      return res.status(403).json({ error: 'Impossible de modifier une formation publiée. Contactez l\'administrateur.' });
+    }
 
-  db.query(sql, [titre, description, date_debut, date_fin || null, duree || null, specialite || null, nb_places || null, formationId, formateur_id], (err, result) => {
-    if (err) {
-      console.error('Erreur SQL /formations/:id PUT:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
-    }
-    res.json({ message: 'Formation mise à jour ✅' });
+    const sql = `
+      UPDATE formations
+      SET titre = ?, description = ?, date_debut = ?, date_fin = ?, duree = ?, specialite = ?, nb_places = ?
+      WHERE id = ? AND formateur_id = ?
+    `;
+
+    db.query(sql, [titre, description, date_debut, date_fin || null, duree || null, specialite || null, nb_places || null, formationId, formateur_id], (err, result) => {
+      if (err) {
+        console.error('Erreur SQL /formations/:id PUT:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
+      }
+      res.json({ message: 'Formation mise à jour ✅' });
+    });
   });
 });
 
@@ -331,16 +338,24 @@ router.delete('/formations/:id', (req, res) => {
     return res.status(400).json({ error: 'Formateur ID obligatoire' });
   }
 
-  const sql = 'DELETE FROM formations WHERE id = ? AND formateur_id = ?';
-  db.query(sql, [formationId, formateur_id], (err, result) => {
-    if (err) {
-      console.error('Erreur SQL DELETE formation:', err);
-      return res.status(500).json({ error: err.message });
+  db.query('SELECT status FROM formations WHERE id = ? AND formateur_id = ?', [formationId, formateur_id], (checkErr, checkResult) => {
+    if (checkErr) return res.status(500).json({ error: checkErr.message });
+    if (checkResult.length === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
+    if (checkResult[0].status === 'published') {
+      return res.status(403).json({ error: 'Impossible de supprimer une formation publiée. Contactez l\'administrateur.' });
     }
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
-    }
-    res.json({ message: 'Formation supprimée ❌' });
+
+    const sql = 'DELETE FROM formations WHERE id = ? AND formateur_id = ?';
+    db.query(sql, [formationId, formateur_id], (err, result) => {
+      if (err) {
+        console.error('Erreur SQL DELETE formation:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
+      }
+      res.json({ message: 'Formation supprimée ❌' });
+    });
   });
 });
 

@@ -302,89 +302,12 @@
               <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
             </div>
             <div class="mes-formations-btns">
-              <button class="btn-prog-detail"
-                      [class.active]="formationProgressionSelectionnee?.formation_id === f.formation_id"
-                      (click)="formationProgressionSelectionnee?.formation_id === f.formation_id ? fermerProgressionFormation() : voirProgressionFormation(f)">
-                📈 {{ formationProgressionSelectionnee?.formation_id === f.formation_id ? 'Masquer' : 'Progression' }}
+              <button class="btn-prog-detail" (click)="voirProgressionFormation(f)">
+                📈 Progression
               </button>
-              <button class="btn-prog-detail pres-btn"
-                      [class.active]="presencesFormation?.formation_id === f.formation_id"
-                      (click)="presencesFormation?.formation_id === f.formation_id ? fermerPresences() : voirMesPresences(f)">
-                📋 {{ presencesFormation?.formation_id === f.formation_id ? 'Masquer' : 'Présences' }}
+              <button class="btn-prog-detail pres-btn" (click)="voirMesPresences(f)">
+                📋 Présences
               </button>
-            </div>
-
-            <!-- Détail progression pour cette formation -->
-            <div class="prog-detail-box" *ngIf="formationProgressionSelectionnee?.formation_id === f.formation_id">
-              <!-- Barre -->
-              <div class="prog-detail-bar-wrap">
-                <div class="prog-detail-track">
-                  <div class="prog-detail-fill"
-                       [style.width.%]="progressionPourcentageFormation"
-                       [style.background]="getProgressBarColor(progressionPourcentageFormation)">
-                    {{ progressionPourcentageFormation }}%
-                  </div>
-                </div>
-                <span class="prog-detail-count">
-                  {{ countTerminesFormation() }} / {{ progressionModulesFormation.length }} modules terminés
-                </span>
-              </div>
-
-              <!-- Modules -->
-              <div class="prog-detail-modules" *ngIf="progressionModulesFormation.length > 0">
-                <div class="prog-detail-mod" *ngFor="let m of progressionModulesFormation; let i = index">
-                  <span class="prog-detail-icon"
-                        [class.icon-nc]="m.statut === 'non_commence'"
-                        [class.icon-ec]="m.statut === 'en_cours'"
-                        [class.icon-t]="m.statut === 'termine'">
-                    {{ m.statut === 'termine' ? '✅' : m.statut === 'en_cours' ? '🔄' : '⬜' }}
-                  </span>
-                  <span class="prog-detail-mod-title">{{ m.titre }}</span>
-                  <span class="prog-detail-mod-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
-                </div>
-              </div>
-
-              <p class="prog-detail-empty" *ngIf="progressionModulesFormation.length === 0">
-                Aucun module défini pour cette formation.
-              </p>
-
-              <div class="cert-banner-sm" *ngIf="progressionPourcentageFormation === 100">
-                🎓 Formation complétée à 100% !
-              </div>
-            </div>
-
-            <!-- Taux de présence pour cette formation -->
-            <div class="presence-box" *ngIf="presencesFormation?.formation_id === f.formation_id && presencesData">
-              <div class="presence-box-header">
-                <span>📋 Mes présences — <strong>{{ f.titre }}</strong></span>
-                <span class="taux-badge" [class.taux-good]="presencesData.taux >= 75" [class.taux-mid]="presencesData.taux >= 50 && presencesData.taux < 75" [class.taux-low]="presencesData.taux < 50">
-                  Taux : {{ presencesData.taux !== null ? presencesData.taux + '%' : 'N/A' }}
-                </span>
-              </div>
-              <div class="presence-stats">
-                <span>📅 {{ presencesData.total }} séance(s)</span>
-                <span>✅ {{ presencesData.presents }} présent(s)</span>
-                <span>❌ {{ presencesData.total - presencesData.presents }} absent(s)</span>
-              </div>
-              <div class="presence-seances-list" *ngIf="presencesData.seances?.length > 0">
-                <div class="presence-seance-row" *ngFor="let s of presencesData.seances">
-                  <span class="seance-dt">{{ s.date_seance | date:'dd/MM/yyyy' }} {{ s.heure_debut }}</span>
-                  <span *ngIf="s.salle" class="seance-room">🏫 {{ s.salle }}</span>
-                  <span class="pres-badge" [ngClass]="getPresenceClass(s.statut_presence)">{{ s.statut_presence }}</span>
-                  <button *ngIf="s.statut_presence === 'absent'" class="btn-justifier"
-                          (click)="justifSeanceId === s.seance_id ? fermerJustificatif() : ouvrirJustificatif(s.seance_id)">
-                    📝 {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Justifier' }}
-                  </button>
-                  <!-- Formulaire justificatif inline -->
-                  <div class="justif-form" *ngIf="justifSeanceId === s.seance_id">
-                    <textarea [(ngModel)]="justifMotif" placeholder="Décrivez le motif de votre absence..." rows="3"></textarea>
-                    <button class="btn-justif-submit" (click)="soumettreJustificatif()">Envoyer</button>
-                  </div>
-                </div>
-              </div>
-              <p class="prog-detail-empty" *ngIf="presencesData.seances?.length === 0">
-                Aucune séance enregistrée pour cette formation.
-              </p>
             </div>
           </div>
         </div>
@@ -586,32 +509,74 @@
   <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title">
     <h2>💬 Messagerie</h2>
+    <p>Échangez des messages avec vos formateurs</p>
   </div>
-
   <div class="chat-container">
-
-    <!-- CONTACTS -->
+    <!-- Contacts -->
     <div class="contacts-panel">
-      <div *ngFor="let c of contacts"
-           class="contact-item"
-           (click)="ouvrirConversation(c)">
-        {{ c.nom }}
+      <div class="contacts-title">Mes formateurs
+        <span class="contacts-count">{{ filteredEtudiantContacts.length }}</span>
+      </div>
+      <div class="contacts-search-wrap">
+        <input class="contacts-search" type="text" [(ngModel)]="etudiantContactSearch" placeholder="🔍 Rechercher un formateur…">
+      </div>
+      <div class="contacts-list">
+        <div *ngFor="let c of filteredEtudiantContacts"
+             class="contact-item"
+             [class.active]="contactSelectionne?.id === c.id"
+             (click)="ouvrirConversation(c)">
+          <div class="contact-avatar">{{ c.nom?.charAt(0)?.toUpperCase() }}</div>
+          <div class="contact-info">
+            <div class="contact-name">{{ c.nom }}</div>
+            <div class="contact-preview">{{ c.dernier_message || 'Démarrer la conversation' }}</div>
+          </div>
+          <span class="msg-unread-badge" *ngIf="c.non_lus > 0">{{ c.non_lus }}</span>
+        </div>
+        <div *ngIf="filteredEtudiantContacts.length === 0 && etudiantContactSearch" class="no-contacts">
+          Aucun résultat pour "{{ etudiantContactSearch }}"
+        </div>
+        <div *ngIf="contacts.length === 0" class="no-contacts">
+          Inscrivez-vous à une formation pour contacter un formateur
+        </div>
       </div>
     </div>
-
-    <!-- CONVERSATION -->
-    <div *ngIf="contactSelectionne">
-      <div *ngFor="let m of messagesConversation">
-        {{ m.contenu }}
+    <!-- Conversation -->
+    <div class="conversation-panel" *ngIf="contactSelectionne; else noConvEtu">
+      <div class="conv-header">
+        <div class="contact-avatar conv-avatar">{{ contactSelectionne.nom?.charAt(0)?.toUpperCase() }}</div>
+        <div class="conv-info">
+          <div class="conv-name">{{ contactSelectionne.nom }}</div>
+          <div class="conv-role-label">Formateur</div>
+        </div>
       </div>
-
-      <textarea [(ngModel)]="nouveauMessage"
-                (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)">
-      </textarea>
-
-      <button (click)="envoyerMessage()">Envoyer</button>
+      <div class="messages-list">
+        <div *ngFor="let m of messagesConversation"
+             class="msg-item"
+             [class.msg-sent]="m.expediteur_id === user?.id"
+             [class.msg-received]="m.expediteur_id !== user?.id">
+          <div class="msg-bubble">{{ m.contenu }}</div>
+          <div class="msg-time">{{ m.date_envoi | date:'dd/MM HH:mm' }}</div>
+        </div>
+        <div *ngIf="messagesConversation.length === 0" class="no-msgs">
+          Aucun message. Commencez la conversation !
+        </div>
+      </div>
+      <div class="msg-input-area">
+        <textarea [(ngModel)]="nouveauMessage"
+                  placeholder="Votre message…"
+                  rows="2"
+                  (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
+        <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
+          Envoyer ✉️
+        </button>
+      </div>
     </div>
-
+    <ng-template #noConvEtu>
+      <div class="no-conv-placeholder">
+        <div class="no-conv-icon">💬</div>
+        <p>Sélectionnez un formateur pour démarrer une conversation</p>
+      </div>
+    </ng-template>
   </div>
 </section>
 
@@ -627,6 +592,108 @@
   </div>
 </section>
   </main>
+</div>
+
+<!-- ===== MODAL PROGRESSION ===== -->
+<div class="modal-overlay" *ngIf="showProgressionModal" (click)="fermerProgressionFormation()">
+  <div class="modal-box modal-box-md" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h4 class="modal-title">📈 Progression — {{ formationProgressionSelectionnee?.titre }}</h4>
+      </div>
+      <button class="modal-close" (click)="fermerProgressionFormation()">✕</button>
+    </div>
+
+    <div class="prog-detail-bar-wrap" style="margin-bottom:20px">
+      <div class="prog-detail-track">
+        <div class="prog-detail-fill"
+             [style.width.%]="progressionPourcentageFormation"
+             [style.background]="getProgressBarColor(progressionPourcentageFormation)">
+          {{ progressionPourcentageFormation }}%
+        </div>
+      </div>
+      <span class="prog-detail-count">
+        {{ countTerminesFormation() }} / {{ progressionModulesFormation.length }} modules terminés
+      </span>
+    </div>
+
+    <div class="prog-detail-modules" *ngIf="progressionModulesFormation.length > 0">
+      <div class="prog-detail-mod" *ngFor="let m of progressionModulesFormation; let i = index">
+        <span class="prog-detail-icon"
+              [class.icon-nc]="m.statut === 'non_commence'"
+              [class.icon-ec]="m.statut === 'en_cours'"
+              [class.icon-t]="m.statut === 'termine'">
+          {{ m.statut === 'termine' ? '✅' : m.statut === 'en_cours' ? '🔄' : '⬜' }}
+        </span>
+        <span class="prog-detail-mod-title">{{ m.titre }}</span>
+        <span class="prog-detail-mod-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
+      </div>
+    </div>
+
+    <p class="prog-detail-empty" *ngIf="progressionModulesFormation.length === 0">
+      Aucun module défini pour cette formation.
+    </p>
+
+    <div class="cert-banner-sm" *ngIf="progressionPourcentageFormation === 100">
+      🎓 Formation complétée à 100% !
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="fermerProgressionFormation()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL PRÉSENCES ===== -->
+<div class="modal-overlay" *ngIf="showPresencesModal" (click)="fermerPresences()">
+  <div class="modal-box modal-box-md" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h4 class="modal-title">📋 Mes présences — {{ presencesFormation?.titre }}</h4>
+      <button class="modal-close" (click)="fermerPresences()">✕</button>
+    </div>
+
+    <div *ngIf="!presencesData" class="modal-loading">Chargement...</div>
+
+    <div *ngIf="presencesData">
+      <div class="presence-box-header">
+        <div class="presence-stats">
+          <span>📅 {{ presencesData.total }} séance(s)</span>
+          <span>✅ {{ presencesData.presents }} présent(s)</span>
+          <span>❌ {{ presencesData.total - presencesData.presents }} absent(s)</span>
+        </div>
+        <span class="taux-badge"
+              [class.taux-good]="presencesData.taux >= 75"
+              [class.taux-mid]="presencesData.taux >= 50 && presencesData.taux < 75"
+              [class.taux-low]="presencesData.taux < 50">
+          Taux : {{ presencesData.taux !== null ? presencesData.taux + '%' : 'N/A' }}
+        </span>
+      </div>
+
+      <div class="presence-seances-list" *ngIf="presencesData.seances?.length > 0" style="margin-top:16px">
+        <div class="presence-seance-row" *ngFor="let s of presencesData.seances">
+          <span class="seance-dt">{{ s.date_seance | date:'dd/MM/yyyy' }} {{ s.heure_debut }}</span>
+          <span *ngIf="s.salle" class="seance-room">🏫 {{ s.salle }}</span>
+          <span class="pres-badge" [ngClass]="getPresenceClass(s.statut_presence)">{{ s.statut_presence }}</span>
+          <button *ngIf="s.statut_presence === 'absent'" class="btn-justifier"
+                  (click)="justifSeanceId === s.seance_id ? fermerJustificatif() : ouvrirJustificatif(s.seance_id)">
+            📝 {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Justifier' }}
+          </button>
+          <div class="justif-form" *ngIf="justifSeanceId === s.seance_id">
+            <textarea [(ngModel)]="justifMotif" placeholder="Motif de votre absence..." rows="3"></textarea>
+            <button class="btn-justif-submit" (click)="soumettreJustificatif()">Envoyer</button>
+          </div>
+        </div>
+      </div>
+
+      <p class="prog-detail-empty" *ngIf="presencesData.seances?.length === 0">
+        Aucune séance enregistrée.
+      </p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="fermerPresences()">Fermer</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== MODAL PROGRAMME ===== -->
@@ -678,3 +745,6 @@
     </div>
   </div>
 </div>
+
+<!-- ===== CHATBOT IA ===== -->
+<app-chat-widget [role]="'etudiant'" [userName]="user?.nom"></app-chat-widget>

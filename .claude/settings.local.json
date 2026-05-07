@@ -3,7 +3,8 @@
     "allow": [
       "Bash(Get-ChildItem \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Name)",
       "PowerShell($bytes = [System.IO.File]::ReadAllBytes\\(\"c:\\\\Users\\\\User\\\\Desktop\\\\rapport_pfe.md\"\\); \"BOM bytes: $\\($bytes[0]\\) $\\($bytes[1]\\) $\\($bytes[2]\\)\"; \"File size: $\\($bytes.Length\\)\")",
-      "Bash(xargs ls)"
+      "Bash(xargs ls)",
+      "Bash(npx tsc *)"
     ]
   }
 }
