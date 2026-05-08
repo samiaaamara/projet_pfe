@@ -11,7 +11,9 @@
       "Bash(git update-ref *)",
       "Bash(git reflog *)",
       "Bash(git gc *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Force)",
+      "Bash(Select-Object Name, FullName)"
     ]
   }
 }
