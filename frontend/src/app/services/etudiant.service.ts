@@ -98,4 +98,9 @@ export class EtudiantService {
   getAttestationData(etudiantId: number, formationId: number) {
     return this.http.get<any>(`${this.apiUrl}/attestation-data/${etudiantId}/${formationId}`);
   }
+
+  // Vérification d'éligibilité à l'attestation
+  getEligibiliteAttestation(etudiantId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/eligibilite-attestation/${etudiantId}/${formationId}`);
+  }
 }

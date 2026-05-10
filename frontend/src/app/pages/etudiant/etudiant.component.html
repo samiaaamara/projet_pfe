@@ -219,7 +219,21 @@
             <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
             <button class="btn-supports" (click)="voirSupports(f)">📂 Supports</button>
           
-            <button class="btn-attestation" (click)="ouvrirAttestation(f)">🏆 Attestation</button>
+            <!-- Indicateur d'éligibilité à l'attestation -->
+            <div class="attest-eligibility-row" *ngIf="eligibiliteMap[f.formation_id]">
+              <span class="elig-chip" [class.elig-ok]="eligibiliteMap[f.formation_id]?.progression === 100" [class.elig-ko]="eligibiliteMap[f.formation_id]?.progression < 100">
+                {{ eligibiliteMap[f.formation_id]?.progression === 100 ? '✅' : '🔄' }} Modules {{ eligibiliteMap[f.formation_id]?.progression }}%
+              </span>
+              <span class="elig-chip" [class.elig-ok]="eligibiliteMap[f.formation_id]?.presences_ok" [class.elig-ko]="!eligibiliteMap[f.formation_id]?.presences_ok">
+                {{ eligibiliteMap[f.formation_id]?.presences_ok ? '✅' : '❌' }} Présences {{ eligibiliteMap[f.formation_id]?.seances_presentes }}/{{ eligibiliteMap[f.formation_id]?.total_seances }}
+              </span>
+            </div>
+            <button class="btn-attestation"
+                    *ngIf="eligibiliteMap[f.formation_id]?.eligible"
+                    (click)="ouvrirAttestation(f)">🏆 Attestation</button>
+            <button class="btn-attestation-locked"
+                    *ngIf="!eligibiliteMap[f.formation_id]?.eligible"
+                    disabled>🔒 Attestation non disponible</button>
           </div>
         </div>
       </div>
@@ -747,4 +761,4 @@
 </div>
 
 <!-- ===== CHATBOT IA ===== -->
-<app-chat-widget [role]="'etudiant'" [userName]="user?.nom"></app-chat-widget>
+<app-chat-widget [role]="'etudiant'" [userName]="user?.nom" [formations]="mesFormations" [progression]="progression"></app-chat-widget>

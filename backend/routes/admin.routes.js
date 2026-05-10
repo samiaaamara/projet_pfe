@@ -359,6 +359,12 @@ router.put('/formations/:id/publish-accepted', (req, res) => {
 
       res.json({ message: 'Formation publiée dans le catalogue 🚀' });
 
+      // Auto-créer une entrée programme_formations si absente
+      db.query(
+        `INSERT IGNORE INTO programme_formations (formation_id) VALUES (?)`,
+        [formationId], () => {}
+      );
+
       db.query(
         `SELECT f.titre, u.id AS formateur_user_id
          FROM formations f
@@ -385,7 +391,8 @@ router.get('/formations-accepted', (req, res) => {
   const sql = `
     SELECT f.id, f.titre, f.description, f.date_debut, f.date_fin,
            f.duree, f.specialite, f.nb_places, f.status, f.formateur_id,
-           u.nom AS formateur, u.email AS formateur_email
+           u.nom AS formateur, u.email AS formateur_email,
+           (SELECT COUNT(*) FROM modules_formation WHERE formation_id = f.id) AS module_count
     FROM formations f
     LEFT JOIN formateurs fo ON f.formateur_id = fo.id
     LEFT JOIN users u ON fo.user_id = u.id

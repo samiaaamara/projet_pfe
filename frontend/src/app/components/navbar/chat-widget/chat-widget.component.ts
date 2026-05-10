@@ -20,6 +20,8 @@ export class ChatWidgetComponent implements OnChanges {
 
   @Input() role: string = '';
   @Input() userName: string = '';
+  @Input() formations: any[] = [];
+  @Input() progression: number = 0;
 
   @ViewChild('chatBody') chatBody!: ElementRef;
 
@@ -83,12 +85,12 @@ export class ChatWidgetComponent implements OnChanges {
     this.isTyping = true;
     this.scrollToBottom();
 
-    // Add role context once at the start of each user message if history is short
-    const contextualHistory: OllamaMessage[] = this.history.length === 1 && this.role
-      ? [{ role: 'user', content: `[Contexte: je suis un ${this.role}, mon nom est ${this.userName || 'inconnu'}] ${text}` }]
+    // Pour les petits modèles, le contexte est injecté dans le 1er message utilisateur
+    const historyToSend: OllamaMessage[] = this.history.length === 1
+      ? [{ role: 'user', content: `[CONTEXTE UTILISATEUR:\n${this.buildContext()}\n]\n\nQuestion: ${text}` }]
       : this.history;
 
-    this.aiService.chat(contextualHistory).subscribe({
+    this.aiService.chat(historyToSend, this.buildContext()).subscribe({
       next: (response) => {
         this.isTyping = false;
         this.uiMessages.push({ role: 'assistant', content: response, time: new Date() });
@@ -102,6 +104,33 @@ export class ChatWidgetComponent implements OnChanges {
         this.scrollToBottom();
       }
     });
+  }
+
+  private buildContext(): string {
+    const lines: string[] = [];
+    lines.push(`Rôle de l'utilisateur : ${this.role}`);
+    lines.push(`Nom : ${this.userName || 'non renseigné'}`);
+
+    if (this.progression > 0) {
+      lines.push(`Progression globale sur la plateforme : ${this.progression}%`);
+    }
+
+    if (this.formations && this.formations.length > 0) {
+      lines.push(`Formations inscrites (${this.formations.length}) :`);
+      this.formations.forEach((f, i) => {
+        const titre = f.titre || '(sans titre)';
+        const specialite = f.specialite ? ` — Spécialité : ${f.specialite}` : '';
+        const debut = f.date_debut ? ` — Début : ${new Date(f.date_debut).toLocaleDateString('fr-FR')}` : '';
+        const fin = f.date_fin ? ` — Fin : ${new Date(f.date_fin).toLocaleDateString('fr-FR')}` : '';
+        const statut = f.statut ? ` — Statut : ${f.statut}` : '';
+        const prix = f.prix != null ? ` — Prix : ${f.prix === 0 ? 'Gratuit' : f.prix + ' EUR'}` : '';
+        lines.push(`  ${i + 1}. "${titre}"${specialite}${debut}${fin}${statut}${prix}`);
+      });
+    } else {
+      lines.push('Formations inscrites : aucune pour le moment.');
+    }
+
+    return lines.join('\n');
   }
 
   clearChat() {

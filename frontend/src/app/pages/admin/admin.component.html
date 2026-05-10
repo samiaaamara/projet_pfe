@@ -348,6 +348,13 @@
         <span>👨‍🏫 {{ f.formateur }}</span>
         <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
         <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
+        <span class="approval-modules-count" (click)="ouvrirProgramme(f)" title="Gérer les modules">
+          📚 {{ f.module_count || 0 }} module(s)
+        </span>
+      </div>
+      <div *ngIf="!f.module_count || f.module_count === 0" class="approval-no-modules-warn">
+        ⚠️ Aucun module défini — ajoutez des modules avant de publier.
+        <button class="btn-add-modules-link" (click)="ouvrirProgramme(f)">Ajouter des modules</button>
       </div>
       <div class="approval-actions">
         <div class="prix-publication-row">

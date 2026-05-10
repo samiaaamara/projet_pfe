@@ -418,6 +418,60 @@ router.get('/mes-justificatifs/:etudiantId', (req, res) => {
   });
 });
 
+/* ========================= ELIGIBILITE ATTESTATION ========================= */
+
+router.get('/eligibilite-attestation/:etudiantId/:formationId', (req, res) => {
+  const { etudiantId, formationId } = req.params;
+
+  const progressionSql = `
+    SELECT
+      COUNT(m.id) AS total_modules,
+      SUM(CASE WHEN COALESCE(p.statut, 'non_commence') = 'termine' THEN 1 ELSE 0 END) AS modules_termines
+    FROM modules_formation m
+    LEFT JOIN progression_etudiants p
+           ON p.module_id = m.id AND p.etudiant_id = ? AND p.formation_id = ?
+    WHERE m.formation_id = ?
+  `;
+
+  const presencesSql = `
+    SELECT
+      COUNT(s.id) AS total_seances,
+      SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS seances_ok
+    FROM seances s
+    LEFT JOIN presences p ON p.seance_id = s.id AND p.etudiant_id = ?
+    WHERE s.formation_id = ? AND s.statut = 'terminée'
+  `;
+
+  db.query(progressionSql, [etudiantId, formationId, formationId], (err1, progRows) => {
+    if (err1) return res.status(500).json({ error: err1.message });
+
+    db.query(presencesSql, [etudiantId, formationId], (err2, presRows) => {
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      const prog = progRows[0];
+      const pres = presRows[0];
+
+      const progression = prog.total_modules > 0
+        ? Math.round((prog.modules_termines / prog.total_modules) * 100)
+        : 0;
+
+      const presences_ok = pres.total_seances > 0 && Number(pres.seances_ok) >= Number(pres.total_seances);
+
+      const eligible = progression === 100 && presences_ok;
+
+      res.json({
+        eligible,
+        progression,
+        total_modules: prog.total_modules,
+        modules_termines: prog.modules_termines,
+        presences_ok,
+        total_seances: pres.total_seances,
+        seances_presentes: pres.seances_ok
+      });
+    });
+  });
+});
+
 /* ========================= ATTESTATION DATA ========================= */
 
 router.get('/attestation-data/:etudiantId/:formationId', (req, res) => {

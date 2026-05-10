@@ -629,6 +629,13 @@
           <div class="seance-form-group"><label>Heure début</label><input type="time" [(ngModel)]="seanceForm.heure_debut" class="form-input"/></div>
           <div class="seance-form-group"><label>Heure fin</label><input type="time" [(ngModel)]="seanceForm.heure_fin" class="form-input"/></div>
           <div class="seance-form-group"><label>Salle</label><input type="text" [(ngModel)]="seanceForm.salle" placeholder="ex: A12" class="form-input"/></div>
+          <div class="seance-form-group">
+            <label>Module concerné</label>
+            <select [(ngModel)]="seanceForm.module_id" class="form-input">
+              <option [ngValue]="null">— Aucun —</option>
+              <option *ngFor="let m of formationModules" [ngValue]="m.id">{{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}</option>
+            </select>
+          </div>
           <div class="seance-form-group" *ngIf="editSeanceMode">
             <label>Statut</label>
             <select [(ngModel)]="seanceForm.statut" class="form-input">
@@ -638,6 +645,9 @@
             </select>
           </div>
         </div>
+        <p class="seance-no-modules" *ngIf="formationModules.length === 0">
+          ⚠️ Aucun module défini. Demandez à l'administrateur d'ajouter les modules dans le programme.
+        </p>
         <div class="seance-form-btns">
           <button class="btn-save-seance" (click)="soumettreSeance()">{{ editSeanceMode ? '💾 Enregistrer' : '➕ Ajouter' }}</button>
           <button class="btn-cancel-seance" *ngIf="editSeanceMode" (click)="annulerEditSeance()">Annuler</button>
@@ -651,6 +661,7 @@
             <span class="seance-date">📆 {{ s.date_seance | date:'dd/MM/yyyy' }}</span>
             <span class="seance-hours">🕐 {{ s.heure_debut }} – {{ s.heure_fin }}</span>
             <span class="seance-salle" *ngIf="s.salle">🏫 {{ s.salle }}</span>
+            <span class="seance-module-tag" *ngIf="s.module_titre">📚 {{ s.module_titre }}</span>
             <span class="seance-statut" [ngClass]="'statut-' + s.statut?.replace('é','e').replace('è','e')">{{ s.statut }}</span>
           </div>
           <div class="seance-actions">

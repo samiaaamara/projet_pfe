@@ -118,7 +118,8 @@ export class FormateurComponent implements OnInit, OnDestroy {
   // Séances
   showSeancesPanel = false;
   seancesFormation: any[] = [];
-  seanceForm: any = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
+  formationModules: any[] = [];
+  seanceForm: any = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée', module_id: null };
   editSeanceMode = false;
   editSeanceId: number | null = null;
 
@@ -827,14 +828,19 @@ logout() {
     this.formationSelectionnee = formation;
     this.showSeancesPanel = true;
     this.showSeancesModal = true;
-    this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
+    this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée', module_id: null };
     this.editSeanceMode = false;
     this.editSeanceId = null;
     this.seanceSelectionnee = null;
     this.feuillePresence = [];
+    this.formationModules = [];
     this.formateurService.getSeances(formation.id).subscribe({
       next: (data) => this.seancesFormation = data,
       error: () => this.showMessage('Erreur chargement des séances', 'danger')
+    });
+    this.formateurService.getFormationModules(formation.id).subscribe({
+      next: (data) => this.formationModules = data,
+      error: () => {}
     });
     this.chargerJustificatifs();
   }
@@ -858,7 +864,7 @@ logout() {
           this.showMessage('Séance modifiée ✅');
           this.editSeanceMode = false;
           this.editSeanceId = null;
-          this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
+          this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée', module_id: null };
           this.formateurService.getSeances(this.formationSelectionnee.id).subscribe({ next: d => this.seancesFormation = d });
         },
         error: () => this.showMessage('Erreur modification séance', 'danger')
@@ -868,7 +874,7 @@ logout() {
       this.formateurService.creerSeance(payload).subscribe({
         next: () => {
           this.showMessage('Séance créée ✅');
-          this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
+          this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée', module_id: null };
           this.formateurService.getSeances(this.formationSelectionnee.id).subscribe({ next: d => this.seancesFormation = d });
         },
         error: () => this.showMessage('Erreur création séance', 'danger')
@@ -884,14 +890,15 @@ logout() {
       heure_debut: seance.heure_debut,
       heure_fin: seance.heure_fin,
       salle: seance.salle || '',
-      statut: seance.statut
+      statut: seance.statut,
+      module_id: seance.module_id || null
     };
   }
 
   annulerEditSeance() {
     this.editSeanceMode = false;
     this.editSeanceId = null;
-    this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée' };
+    this.seanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', statut: 'planifiée', module_id: null };
   }
 
   supprimerSeance(seanceId: number) {

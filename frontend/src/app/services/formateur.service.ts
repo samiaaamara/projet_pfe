@@ -110,6 +110,11 @@ export class FormateurService {
     return this.http.put(`${this.api}/progression/${formationId}/${etudiantId}/${moduleId}`, { statut });
   }
 
+  // 🔹 Modules d'une formation (pour le sélecteur dans le formulaire séance)
+  getFormationModules(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/formation-modules/${formationId}`);
+  }
+
   // 🔹 Séances
   getSeances(formationId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/seances/${formationId}`);

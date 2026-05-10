@@ -478,14 +478,34 @@ router.put('/progression/:formationId/:etudiantId/:moduleId', (req, res) => {
   });
 });
 
+/* ========================= MODULES D'UNE FORMATION (pour formateur) ========================= */
+
+// 🔹 Récupérer les modules d'une formation (pour le dropdown séance)
+router.get('/formation-modules/:formationId', (req, res) => {
+  const formationId = parseInt(req.params.formationId);
+  if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
+  db.query(
+    'SELECT id, titre, ordre, duree_heures FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC',
+    [formationId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows);
+    }
+  );
+});
+
 /* ========================= SÉANCES ========================= */
 
-// 🔹 Lister les séances d'une formation
+// 🔹 Lister les séances d'une formation (avec nom du module lié)
 router.get('/seances/:formationId', (req, res) => {
   const formationId = parseInt(req.params.formationId);
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
   db.query(
-    'SELECT * FROM seances WHERE formation_id = ? ORDER BY date_seance ASC, heure_debut ASC',
+    `SELECT s.*, m.titre AS module_titre, m.ordre AS module_ordre
+     FROM seances s
+     LEFT JOIN modules_formation m ON s.module_id = m.id
+     WHERE s.formation_id = ?
+     ORDER BY s.date_seance ASC, s.heure_debut ASC`,
     [formationId],
     (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
@@ -496,12 +516,12 @@ router.get('/seances/:formationId', (req, res) => {
 
 // 🔹 Créer une séance
 router.post('/seances', (req, res) => {
-  const { formation_id, date_seance, heure_debut, heure_fin, salle } = req.body;
+  const { formation_id, date_seance, heure_debut, heure_fin, salle, module_id } = req.body;
   if (!formation_id || !date_seance || !heure_debut || !heure_fin)
     return res.status(400).json({ error: 'formation_id, date_seance, heure_debut et heure_fin sont obligatoires' });
   db.query(
-    'INSERT INTO seances (formation_id, date_seance, heure_debut, heure_fin, salle) VALUES (?, ?, ?, ?, ?)',
-    [formation_id, date_seance, heure_debut, heure_fin, salle || null],
+    'INSERT INTO seances (formation_id, date_seance, heure_debut, heure_fin, salle, module_id) VALUES (?, ?, ?, ?, ?, ?)',
+    [formation_id, date_seance, heure_debut, heure_fin, salle || null, module_id || null],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Séance créée ✅', id: result.insertId });
@@ -512,11 +532,11 @@ router.post('/seances', (req, res) => {
 // 🔹 Modifier une séance
 router.put('/seances/:id', (req, res) => {
   const seanceId = parseInt(req.params.id);
-  const { date_seance, heure_debut, heure_fin, salle, statut } = req.body;
+  const { date_seance, heure_debut, heure_fin, salle, statut, module_id } = req.body;
   if (isNaN(seanceId)) return res.status(400).json({ error: 'Séance ID invalide' });
   db.query(
-    'UPDATE seances SET date_seance = ?, heure_debut = ?, heure_fin = ?, salle = ?, statut = ? WHERE id = ?',
-    [date_seance, heure_debut, heure_fin, salle || null, statut || 'planifiée', seanceId],
+    'UPDATE seances SET date_seance = ?, heure_debut = ?, heure_fin = ?, salle = ?, statut = ?, module_id = ? WHERE id = ?',
+    [date_seance, heure_debut, heure_fin, salle || null, statut || 'planifiée', module_id || null, seanceId],
     (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       if (result.affectedRows === 0) return res.status(404).json({ error: 'Séance non trouvée' });
@@ -584,10 +604,67 @@ router.put('/presences/:seanceId/:etudiantId', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Présence enregistrée ✅' });
 
-      // Vérifier si le taux de présence est passé sous 75% → notifier l'étudiant
-      db.query('SELECT formation_id FROM seances WHERE id = ?', [seanceId], (e1, sr) => {
+      // Récupérer formation_id et module_id de la séance
+      db.query('SELECT formation_id, module_id FROM seances WHERE id = ?', [seanceId], (e1, sr) => {
         if (e1 || !sr.length) return;
         const formationId = sr[0].formation_id;
+        const moduleId = sr[0].module_id;
+
+        // ── Auto-mise à jour de la progression du module ──
+        if (moduleId) {
+          const checkSql = `
+            SELECT
+              COUNT(s.id) AS total,
+              SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS presents
+            FROM seances s
+            LEFT JOIN presences p ON p.seance_id = s.id AND p.etudiant_id = ?
+            WHERE s.module_id = ?
+          `;
+          db.query(checkSql, [etudiantId, moduleId], (e2, cr) => {
+            if (e2 || !cr.length) return;
+            const total = Number(cr[0].total);
+            const presents = Number(cr[0].presents);
+            const newStatut = presents === total && total > 0
+              ? 'termine'
+              : presents > 0 ? 'en_cours' : 'non_commence';
+
+            db.query(
+              `INSERT INTO progression_etudiants (etudiant_id, formation_id, module_id, statut)
+               VALUES (?, ?, ?, ?)
+               ON DUPLICATE KEY UPDATE statut = VALUES(statut), date_maj = NOW()`,
+              [etudiantId, formationId, moduleId, newStatut],
+              (e3) => {
+                if (e3 || newStatut !== 'termine') return;
+                // Vérifier si TOUS les modules de la formation sont terminés
+                db.query(
+                  `SELECT
+                     (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total_m,
+                     (SELECT COUNT(*) FROM progression_etudiants
+                      WHERE etudiant_id = ? AND formation_id = ? AND statut = 'termine') AS termines`,
+                  [formationId, etudiantId, formationId],
+                  (e4, rows) => {
+                    if (e4 || !rows.length) return;
+                    if (rows[0].total_m > 0 && rows[0].total_m === rows[0].termines) {
+                      db.query('SELECT user_id FROM etudiants WHERE id = ?', [etudiantId], (e5, er) => {
+                        if (e5 || !er.length) return;
+                        db.query('SELECT titre FROM formations WHERE id = ?', [formationId], (e6, fr) => {
+                          if (e6 || !fr.length) return;
+                          db.query(
+                            'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+                            [er[0].user_id, `🎓 Félicitations ! Vous avez complété 100% de la formation « ${fr[0].titre} ». Votre attestation est disponible !`, 'progression'],
+                            () => {}
+                          );
+                        });
+                      });
+                    }
+                  }
+                );
+              }
+            );
+          });
+        }
+
+        // ── Alerte taux de présence < 75% ──
         const tauxSql = `
           SELECT
             COUNT(*) AS total,

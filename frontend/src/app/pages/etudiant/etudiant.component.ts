@@ -56,6 +56,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   // Attestation
   formationAttestation: any = null;
+  eligibiliteMap: { [formationId: number]: any } = {};
 
   // Notifications
   notifications: any[] = [];
@@ -228,8 +229,22 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   loadMesFormations() {
     if (!this.etudiantId) return;
     this.etudiantService.getMesFormations(this.etudiantId).subscribe({
-      next: data => this.mesFormations = data,
+      next: data => {
+        this.mesFormations = data;
+        this.loadEligibilites(data);
+      },
       error: () => this.showMessage('Erreur chargement de vos formations', 'danger')
+    });
+  }
+
+  loadEligibilites(formations: any[]) {
+    if (!this.etudiantId) return;
+    formations.forEach(f => {
+      const fid = f.formation_id;
+      this.etudiantService.getEligibiliteAttestation(this.etudiantId!, fid).subscribe({
+        next: data => this.eligibiliteMap = { ...this.eligibiliteMap, [fid]: data },
+        error: () => {}
+      });
     });
   }
 

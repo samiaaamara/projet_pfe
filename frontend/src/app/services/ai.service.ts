@@ -11,21 +11,24 @@ export interface OllamaMessage {
 export class AiService {
 
   readonly ollamaUrl = 'http://localhost:11434/api/chat';
-  model = 'mistral'; // change to your installed model (e.g. llama3, phi3, gemma2)
+  model = 'gemma3:1b';
 
-  readonly systemPrompt = `Tu es un assistant IA intégré dans une plateforme de gestion de formations professionnelles.
-Tu aides les utilisateurs (étudiants, formateurs, externes, administrateurs) avec leurs questions sur :
-- Les formations disponibles et les inscriptions
-- La progression dans les modules de formation
-- Les séances, présences et justificatifs
-- L'utilisation de la plateforme
-Réponds toujours en français, de manière concise, claire et bienveillante.`;
+  readonly systemPrompt = `Tu es un assistant IA d'une plateforme de gestion de formations professionnelles. Réponds en français, de façon concise.
+
+RÈGLES :
+- Si le message contient un bloc [CONTEXTE UTILISATEUR:...], utilise ces données pour répondre. Ce sont les vraies données de l'utilisateur.
+- Ne jamais inventer de formations, dates ou statistiques qui ne sont pas dans le contexte.
+- Si une information n'est pas dans le contexte, dis-le clairement et redirige vers la section de la plateforme.`;
 
   constructor(private http: HttpClient) {}
 
-  chat(history: OllamaMessage[]): Observable<string> {
+  chat(history: OllamaMessage[], context?: string): Observable<string> {
+    const fullSystem = context
+      ? `${this.systemPrompt}\n\nDONNÉES RÉELLES DE L'UTILISATEUR (utilise ces données pour répondre aux questions spécifiques) :\n${context}`
+      : this.systemPrompt;
+
     const messages: OllamaMessage[] = [
-      { role: 'system', content: this.systemPrompt },
+      { role: 'system', content: fullSystem },
       ...history
     ];
 
