@@ -1,0 +1,53 @@
+@startuml Sprint1_CasUtilisation_Admin
+title Raffinement — Cas d'Utilisation Administrateur
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor Admin
+
+rectangle FormaPro {
+    usecase "S'authentifier Admin" as UC1
+    usecase "Accéder Dashboard" as UC2
+    
+    usecase "Consulter utilisateurs" as UC3
+    usecase "Filtrer par rôle" as UC3a
+    usecase "Filtrer par spécialité" as UC3b
+    usecase "Supprimer utilisateur" as UC4
+    
+    usecase "Consulter formateurs" as UC5
+    usecase "Créer formateur" as UC6
+    usecase "Modifier formateur" as UC7
+    usecase "Supprimer formateur" as UC8
+    
+    usecase "Consulter statistiques" as UC9
+    usecase "Voir nombre étudiants" as UC9a
+    usecase "Voir nombre formateurs" as UC9b
+    usecase "Voir formations publiées" as UC9c
+    usecase "Voir formations en attente" as UC9d
+}
+
+Admin --> UC1
+UC1 --> UC2
+
+Admin --> UC3 : Gestion Utilisateurs
+UC3 --> UC3a
+UC3 --> UC3b
+UC3 --> UC4
+
+Admin --> UC5 : Gestion Formateurs
+UC5 --> UC6
+UC5 --> UC7
+UC5 --> UC8
+
+Admin --> UC9 : Statistiques
+UC9 --> UC9a
+UC9 --> UC9b
+UC9 --> UC9c
+UC9 --> UC9d
+
+UC2 --> UC3
+UC2 --> UC5
+UC2 --> UC9
+
+@enduml

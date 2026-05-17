@@ -1,0 +1,56 @@
+@startuml Sprint1_CasUtilisation_Utilisateur
+title Raffinement — Cas d'Utilisation Utilisateur (Étudiant/Formateur/Externe)
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor Utilisateur
+
+rectangle FormaPro {
+    usecase "Accéder page inscription" as UC1
+    usecase "Remplir formulaire" as UC2
+    usecase "Valider données" as UC3
+    usecase "Créer compte" as UC4
+    usecase "Recevoir confirmation" as UC5
+    
+    usecase "Accéder page connexion" as UC6
+    usecase "Saisir identifiants" as UC7
+    usecase "Vérifier authentification" as UC8
+    usecase "Générer JWT token" as UC9
+    usecase "Rediriger dashboard" as UC10
+    
+    usecase "Consulter profil" as UC11
+    usecase "Modifier informations" as UC12
+    usecase "Valider modifications" as UC13
+    
+    usecase "Accéder changement MDP" as UC14
+    usecase "Saisir ancien MDP" as UC14b
+    usecase "Valider ancien MDP" as UC14c
+    usecase "Hacher nouveau MDP" as UC14d
+    usecase "Enregistrer nouveau MDP" as UC14e
+}
+
+Utilisateur --> UC1 : Inscription
+Utilisateur --> UC6 : Authentification
+Utilisateur --> UC11 : Gestion Profil
+Utilisateur --> UC14 : Changement MDP
+
+UC1 --> UC2
+UC2 --> UC3
+UC3 --> UC4
+UC4 --> UC5
+
+UC6 --> UC7
+UC7 --> UC8
+UC8 --> UC9
+UC9 --> UC10
+
+UC11 --> UC12
+UC12 --> UC13
+
+UC14 --> UC14b
+UC14b --> UC14c
+UC14c --> UC14d
+UC14d --> UC14e
+
+@enduml

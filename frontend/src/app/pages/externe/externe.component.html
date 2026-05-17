@@ -3,7 +3,8 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-profile">
-      <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+      <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="avatar avatar-img" alt="Photo de profil">
+      <div *ngIf="!profilePhotoUrl" class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
       <div class="sidebar-role">Utilisateur Externe</div>
       <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
@@ -20,6 +21,12 @@
       <a class="nav-item" [class.active]="activeSection === 'mesInscriptions'" (click)="setSection('mesInscriptions')">
         <span class="nav-icon">🎓</span> Mes formations
         <span class="nav-badge" *ngIf="mesInscriptions.length > 0">{{ mesInscriptions.length }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'progression'" (click)="setSection('progression')">
+        <span class="nav-icon">📈</span> Ma progression
+      </a>
+      <a class="nav-item" [class.active]="activeSection === 'attestation'" (click)="setSection('attestation')">
+        <span class="nav-icon">🏆</span> Attestations
       </a>
       <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
         <span class="nav-icon">👤</span> Mon profil
@@ -64,10 +71,27 @@
           <div class="stat-value">{{ inscriptionsPayees }}</div>
           <div class="stat-label">Formations achetées</div>
         </div>
+        <div class="stat-card green" (click)="setSection('progression')">
+          <div class="stat-icon">📈</div>
+          <div class="stat-value">{{ progression }}%</div>
+          <div class="stat-label">Progression globale</div>
+        </div>
         <div class="stat-card orange">
           <div class="stat-icon">💰</div>
           <div class="stat-value">{{ totalDepense | number:'1.0-2' }} EUR</div>
           <div class="stat-label">Total dépensé</div>
+        </div>
+      </div>
+
+      <div class="card-section" *ngIf="progression > 0">
+        <h5 class="section-title">📈 Progression globale</h5>
+        <div class="progression-bar-wrap">
+          <div class="progression-bar-track">
+            <div class="progression-bar-fill"
+                 [style.width.%]="progression"
+                 [style.background]="getProgressColor()"></div>
+          </div>
+          <span class="progression-pct">{{ progression }}%</span>
         </div>
       </div>
 
@@ -83,6 +107,11 @@
             <div class="qc-icon">📖</div>
             <div class="qc-title">Mes formations</div>
             <div class="qc-desc">Accédez aux supports de vos formations achetées</div>
+          </div>
+          <div class="quick-card" (click)="setSection('progression')">
+            <div class="qc-icon">📈</div>
+            <div class="qc-title">Ma progression</div>
+            <div class="qc-desc">Suivez votre avancement par formation</div>
           </div>
         </div>
       </div>
@@ -117,6 +146,10 @@
 
       <div class="formations-grid">
         <div class="formation-card" *ngFor="let f of formationsFiltrees">
+          <div class="formation-card-img-wrapper">
+            <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="formation-card-img" [alt]="f.titre">
+            <div *ngIf="!f.photo" class="formation-card-img-placeholder">📚</div>
+          </div>
           <div class="formation-header">
             <span class="formation-niveau" *ngIf="f.niveau">{{ f.niveau }}</span>
             <span class="formation-dept" *ngIf="f.departement">{{ f.departement }}</span>
@@ -131,7 +164,6 @@
 
           <div class="formation-meta">
             <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
             <span *ngIf="f.formateur_nom">👨‍🏫 {{ f.formateur_nom }}</span>
           </div>
 
@@ -146,14 +178,27 @@
 
           <div class="formation-footer">
             <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
-            <span *ngIf="estComplet(f)" class="badge-complet">Complet</span>
             <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Acheté</span>
-            <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)"
-                    class="btn-payer"
-                    [class.btn-gratuit]="!f.prix || f.prix == 0"
-                    (click)="ouvrirPaiement(f)">
-              {{ (!f.prix || f.prix == 0) ? 'S\'inscrire' : '💳 Acheter — ' + f.prix + ' EUR' }}
-            </button>
+            <ng-container *ngIf="!estDejaInscrit(f.id)">
+              <ng-container *ngIf="estComplet(f)">
+                <span class="badge-complet">Complet</span>
+                <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
+                  ⏳ Liste d'attente
+                </button>
+                <span *ngIf="estEnAttente(f.id)" class="badge-en-attente">
+                  En attente #{{ positionAttente(f.id) }}
+                </span>
+                <button *ngIf="estEnAttente(f.id)" class="btn-quitter-attente" (click)="quitterListeAttente(f.id)">
+                  ✕ Quitter
+                </button>
+              </ng-container>
+              <button *ngIf="!estComplet(f)"
+                      class="btn-payer"
+                      [class.btn-gratuit]="!f.prix || f.prix == 0"
+                      (click)="ouvrirPaiement(f)">
+                {{ (!f.prix || f.prix == 0) ? "S'inscrire" : '💳 Acheter — ' + f.prix + ' EUR' }}
+              </button>
+            </ng-container>
           </div>
         </div>
       </div>
@@ -175,7 +220,7 @@
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>🎓 Mes formations</h2>
-        <p>{{ mesInscriptions.length }} formation(s) achetée(s)</p>
+        <p>{{ inscriptionsPayees }} formation(s) achetée(s)</p>
       </div>
 
       <div *ngIf="mesInscriptions.length === 0" class="empty-state">
@@ -184,31 +229,69 @@
         <button class="btn-primary" (click)="setSection('formations')">Explorer le catalogue</button>
       </div>
 
-      <div class="inscriptions-list" *ngIf="mesInscriptions.length > 0">
-        <div class="inscription-card" *ngFor="let i of mesInscriptions">
-          <div class="inscription-left">
-            <div class="inscription-icon">📘</div>
-            <div>
-              <div class="inscription-title">{{ i.titre }}</div>
-              <div class="inscription-meta">
-                <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
-                <span *ngIf="i.duree"> · ⏱ {{ i.duree }}h</span>
-                <span *ngIf="i.formateur_nom"> · 👨‍🏫 {{ i.formateur_nom }}</span>
-              </div>
-              <div class="inscription-date">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
-            </div>
-          </div>
-          <div class="inscription-right">
-            <div class="price-paid">
-              {{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}
-            </div>
-            <span class="badge-paiement" [ngClass]="getStatutBadgeClass(i.statut_paiement)">
+      <div class="my-formations-grid" *ngIf="mesInscriptions.length > 0">
+        <div class="my-formation-card" *ngFor="let i of mesInscriptions"
+             [class.card-pending]="i.statut_paiement !== 'payé'">
+
+          <!-- Photo / Bannière -->
+          <div class="myf-img-wrapper">
+            <img *ngIf="i.photo" [src]="'http://localhost:3000' + i.photo" class="myf-img" [alt]="i.titre">
+            <div *ngIf="!i.photo" class="myf-img-placeholder">📘</div>
+            <span class="myf-status-badge" [ngClass]="getStatutBadgeClass(i.statut_paiement)">
               {{ i.statut_paiement === 'payé' ? '✅ Payé' : i.statut_paiement === 'en_attente' ? '⏳ En attente' : '↩️ Remboursé' }}
             </span>
-            <button class="btn-supports" (click)="voirSupports(i)"
-                    *ngIf="i.statut_paiement === 'payé'">
-              📂 Supports
-            </button>
+          </div>
+
+          <!-- Corps -->
+          <div class="myf-body">
+            <div class="myf-specialite" *ngIf="i.specialite">{{ i.specialite }}</div>
+            <h4 class="myf-title">{{ i.titre }}</h4>
+            <p class="myf-desc" *ngIf="i.description">{{ i.description }}</p>
+
+            <div class="myf-meta">
+              <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}<ng-container *ngIf="i.date_fin"> → {{ i.date_fin | date:'dd/MM/yyyy' }}</ng-container></span>
+              <span *ngIf="i.formateur_nom">👨‍🏫 {{ i.formateur_nom }}</span>
+            </div>
+
+            <!-- Barre de progression (si inscrit et payé) -->
+            <ng-container *ngIf="i.statut_paiement === 'payé' && eligibiliteMap[i.formation_id] as elig">
+              <div class="myf-prog-row">
+                <span class="myf-prog-label">Progression</span>
+                <div class="myf-prog-track">
+                  <div class="myf-prog-fill"
+                       [style.width.%]="elig.progression"
+                       [style.background]="getProgressColor()"></div>
+                </div>
+                <span class="myf-prog-pct">{{ elig.progression }}%</span>
+              </div>
+            </ng-container>
+
+            <!-- Notation étoiles -->
+            <div class="myf-stars" *ngIf="i.statut_paiement === 'payé'">
+              <span *ngFor="let star of [1,2,3,4,5]"
+                    class="star"
+                    [class.filled]="star <= getNoteAffichee(i.formation_id)"
+                    (mouseenter)="setNoteHover(i.formation_id, star)"
+                    (mouseleave)="clearNoteHover(i.formation_id)"
+                    (click)="noterFormation(i.formation_id, star)">★</span>
+              <span class="myf-stars-hint">{{ mesNotes[i.formation_id] ? 'Ma note : ' + mesNotes[i.formation_id] + '/5' : 'Noter cette formation' }}</span>
+            </div>
+          </div>
+
+          <!-- Pied de carte -->
+          <div class="myf-footer">
+            <div class="myf-price">
+              {{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}
+              <span class="myf-date-achat">· Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="myf-actions" *ngIf="i.statut_paiement === 'payé'">
+              <button class="btn-supports" (click)="voirSupports(i)" title="Supports pédagogiques">📂</button>
+              <button class="btn-presences" (click)="voirMesPresences(i)" title="Mes présences">📋</button>
+              <button class="btn-progression" (click)="voirProgressionFormation(i)" title="Progression par module">📈</button>
+              <button class="btn-attestation"
+                      *ngIf="eligibiliteMap[i.formation_id]?.eligible"
+                      (click)="ouvrirAttestation(i)" title="Télécharger l'attestation">🏆</button>
+            </div>
           </div>
         </div>
       </div>
@@ -240,6 +323,136 @@
       </div>
     </section>
 
+    <!-- ===== PROGRESSION ===== -->
+    <section *ngIf="activeSection === 'progression'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
+      <div class="page-title">
+        <h2>📈 Ma progression</h2>
+        <p>Suivez votre avancement dans chaque formation</p>
+      </div>
+
+      <div class="progression-global-card">
+        <div class="prog-global-label">Progression globale (tous modules)</div>
+        <div class="progression-bar-wrap">
+          <div class="progression-bar-track">
+            <div class="progression-bar-fill"
+                 [style.width.%]="progression"
+                 [style.background]="getProgressColor()"></div>
+          </div>
+          <span class="progression-pct">{{ progression }}%</span>
+        </div>
+      </div>
+
+      <div *ngIf="mesInscriptions.length === 0" class="empty-state">
+        <span>📭</span>
+        <p>Achetez une formation pour suivre votre progression.</p>
+      </div>
+
+      <div class="inscriptions-list" *ngIf="mesInscriptions.length > 0">
+        <div class="inscription-card" *ngFor="let i of mesInscriptions">
+          <div class="inscription-left">
+            <div class="inscription-icon">📘</div>
+            <div>
+              <div class="inscription-title">{{ i.titre }}</div>
+              <div class="inscription-meta">
+                <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="inscription-right" *ngIf="i.statut_paiement === 'payé'">
+            <button class="btn-progression" (click)="voirProgressionFormation(i)">📈 Voir les modules</button>
+            <button class="btn-presences" (click)="voirMesPresences(i)">📋 Présences</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ATTESTATION ===== -->
+    <section *ngIf="activeSection === 'attestation' && !formationAttestation">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
+      <div class="page-title">
+        <h2>🏆 Attestations de réussite</h2>
+        <p>Téléchargez vos attestations pour les formations complétées</p>
+      </div>
+
+      <div *ngIf="inscriptionsPayees === 0" class="empty-state">
+        <span>📭</span>
+        <p>Aucune formation achetée pour le moment.</p>
+      </div>
+
+      <div class="inscriptions-list">
+        <div class="inscription-card" *ngFor="let i of mesInscriptions">
+          <ng-container *ngIf="i.statut_paiement === 'payé'">
+            <div class="inscription-left">
+              <div class="inscription-icon">📘</div>
+              <div>
+                <div class="inscription-title">{{ i.titre }}</div>
+                <div class="inscription-meta">
+                  <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="inscription-right">
+              <ng-container *ngIf="eligibiliteMap[i.formation_id] as elig">
+                <div class="elig-info">
+                  <span>Progression : {{ elig.progression }}%</span>
+                  <span>Présences : {{ elig.presences_ok ? '✅' : '❌' }}</span>
+                </div>
+                <button class="btn-attestation" *ngIf="elig.eligible" (click)="ouvrirAttestation(i)">
+                  🏆 Télécharger l'attestation
+                </button>
+                <span class="badge-non-eligible" *ngIf="!elig.eligible">Non éligible</span>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ATTESTATION CERTIFICAT ===== -->
+    <section *ngIf="activeSection === 'attestation' && formationAttestation" class="attestation-print-section">
+      <div class="no-print">
+        <button class="btn-back-dash" (click)="formationAttestation = null">&#8592; Retour aux attestations</button>
+        <button class="btn-print" (click)="imprimerAttestation()">🖨️ Imprimer / Télécharger PDF</button>
+      </div>
+
+      <div *ngIf="attestationLoading" class="empty-state"><span>⏳</span><p>Chargement...</p></div>
+
+      <div class="attestation-certificate" *ngIf="attestationData && !attestationLoading">
+        <div class="cert-header">
+          <div class="cert-logo">🎓</div>
+          <div class="cert-institution">ISET — Institut Supérieur des Études Technologiques</div>
+        </div>
+        <div class="cert-title">ATTESTATION DE RÉUSSITE</div>
+        <div class="cert-body">
+          <p class="cert-intro">Nous certifions que</p>
+          <p class="cert-name">{{ attestationData.etudiant_nom }}</p>
+          <p class="cert-intro">a suivi et validé avec succès la formation</p>
+          <p class="cert-formation">« {{ attestationData.titre }} »</p>
+          <div class="cert-details">
+            <span *ngIf="attestationData.date_debut">Du {{ attestationData.date_debut | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="attestationData.date_fin"> au {{ attestationData.date_fin | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="cert-stats">
+            <div class="cert-stat-item">
+              <span class="cert-stat-val">{{ attestationData.taux ?? 'N/A' }}%</span>
+              <span class="cert-stat-lbl">Taux de présence</span>
+            </div>
+            <div class="cert-stat-item">
+              <span class="cert-stat-val">{{ attestationData.seances_presentes }}/{{ attestationData.total_seances }}</span>
+              <span class="cert-stat-lbl">Séances</span>
+            </div>
+          </div>
+          <p class="cert-formateur">Formateur : {{ attestationData.formateur_nom }}</p>
+        </div>
+        <div class="cert-footer">
+          <div class="cert-date">Délivré le {{ getTodayStr() }}</div>
+          <div class="cert-seal">✅ Certifié ISET</div>
+        </div>
+      </div>
+    </section>
+
+
     <!-- ===== PROFIL ===== -->
     <section *ngIf="activeSection === 'profil'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
@@ -252,11 +465,17 @@
         <div class="form-card">
           <h5 class="section-title">Informations personnelles</h5>
           <div class="profile-avatar-row">
-            <div class="profile-avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div class="profile-photo-wrapper" (click)="photoInputExt.click()" title="Changer la photo de profil">
+              <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="profile-photo-img" alt="Photo de profil">
+              <div *ngIf="!profilePhotoUrl" class="profile-photo-placeholder">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+              <div class="profile-photo-overlay">📷</div>
+            </div>
+            <input #photoInputExt type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden (change)="onPhotoSelected($event)">
             <div>
               <div class="profile-name">{{ user?.nom }}</div>
               <div class="profile-role-chip">Utilisateur Externe</div>
               <div class="profile-specialite-chip" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
+              <div class="profile-photo-hint">Cliquez sur la photo pour la modifier</div>
             </div>
           </div>
           <div class="form-group">
@@ -450,10 +669,6 @@
           <span>📅 Date de début</span>
           <span>{{ formationPaiement?.date_debut | date:'dd/MM/yyyy' }}</span>
         </div>
-        <div class="modal-row" *ngIf="formationPaiement?.duree">
-          <span>⏱ Durée</span>
-          <span>{{ formationPaiement?.duree }}h</span>
-        </div>
         <div class="modal-row" *ngIf="formationPaiement?.formateur_nom">
           <span>👨‍🏫 Formateur</span>
           <span>{{ formationPaiement?.formateur_nom }}</span>
@@ -527,9 +742,7 @@
             <div class="prog-module-item" *ngFor="let m of programmeData.modules; let i = index">
               <div class="prog-module-num">{{ i + 1 }}</div>
               <div class="prog-module-info">
-                <div class="prog-module-titre">{{ m.titre }}
-                  <span class="prog-module-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span>
-                </div>
+                <div class="prog-module-titre">{{ m.titre }}</div>
                 <div class="prog-module-desc" *ngIf="m.description">{{ m.description }}</div>
               </div>
             </div>
@@ -541,6 +754,110 @@
           <p>Le programme de cette formation n'a pas encore été renseigné.</p>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL PROGRESSION MODULES ===== -->
+<div class="modal-backdrop" *ngIf="showProgressionModal" (click)="fermerProgressionFormation()">
+  <div class="modal-box modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>📈 Progression — {{ formationProgressionSelectionnee?.titre }}</h3>
+      <button class="modal-close" (click)="fermerProgressionFormation()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="prog-modal-summary">
+        <div class="progression-bar-wrap">
+          <div class="progression-bar-track">
+            <div class="progression-bar-fill"
+                 [style.width.%]="progressionPourcentageFormation"
+                 [style.background]="getProgressBarColor(progressionPourcentageFormation)"></div>
+          </div>
+          <span class="progression-pct">{{ progressionPourcentageFormation }}%</span>
+        </div>
+        <p class="prog-modal-stats">{{ countTerminesFormation() }} / {{ progressionModulesFormation.length }} module(s) terminé(s)</p>
+      </div>
+      <div class="modules-list" *ngIf="progressionModulesFormation.length > 0">
+        <div class="module-item" *ngFor="let m of progressionModulesFormation; let idx = index">
+          <div class="module-num">{{ idx + 1 }}</div>
+          <div class="module-info">
+            <div class="module-titre">{{ m.titre }}</div>
+          </div>
+          <span class="module-statut" [ngClass]="{
+            'mod-termine': m.statut === 'termine',
+            'mod-encours': m.statut === 'en_cours',
+            'mod-noncommence': m.statut === 'non_commence'
+          }">
+            {{ m.statut === 'termine' ? '✅ Terminé' : m.statut === 'en_cours' ? '🔄 En cours' : '⬜ Non commencé' }}
+          </span>
+        </div>
+      </div>
+      <div *ngIf="progressionModulesFormation.length === 0" class="empty-state">
+        <p>Aucun module défini pour cette formation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL PRÉSENCES ===== -->
+<div class="modal-backdrop" *ngIf="showPresencesModal" (click)="fermerPresences()">
+  <div class="modal-box modal-large" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>📋 Présences — {{ presencesFormation?.titre }}</h3>
+      <button class="modal-close" (click)="fermerPresences()">×</button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="!presencesData" class="empty-state"><span>⏳</span><p>Chargement...</p></div>
+      <ng-container *ngIf="presencesData">
+        <div class="presences-summary">
+          <span>{{ presencesData.presents }} / {{ presencesData.total }} présence(s)</span>
+          <span *ngIf="presencesData.taux !== null"> · Taux : {{ presencesData.taux }}%</span>
+        </div>
+        <div class="seances-list" *ngIf="presencesData.seances?.length > 0">
+          <div class="seance-row" *ngFor="let s of presencesData.seances">
+            <div class="seance-info">
+              <span class="seance-date">{{ s.date_seance | date:'dd/MM/yyyy' }}</span>
+              <span class="seance-heure" *ngIf="s.heure_debut">{{ s.heure_debut }} – {{ s.heure_fin }}</span>
+              <span class="seance-salle" *ngIf="s.salle">📍 {{ s.salle }}</span>
+            </div>
+            <span class="presence-badge" [ngClass]="getPresenceClass(s.statut_presence)">
+              {{ s.statut_presence === 'présent' ? '✅ Présent' :
+                 s.statut_presence === 'retard' ? '⚠️ Retard' :
+                 s.statut_presence === 'excusé' ? '📋 Excusé' : '❌ Absent' }}
+            </span>
+            <button class="btn-justif" *ngIf="s.statut_presence === 'absent'"
+                    (click)="ouvrirJustificatif(s.seance_id)">
+              📝 Justifier
+            </button>
+          </div>
+        </div>
+        <div *ngIf="presencesData.seances?.length === 0" class="empty-state">
+          <p>Aucune séance enregistrée pour cette formation.</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL JUSTIFICATIF ===== -->
+<div class="modal-backdrop" *ngIf="justifSeanceId !== null" (click)="fermerJustificatif()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>📝 Soumettre un justificatif</h3>
+      <button class="modal-close" (click)="fermerJustificatif()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Motif de l'absence</label>
+        <textarea class="form-textarea" [(ngModel)]="justifMotif" rows="4"
+                  placeholder="Expliquez le motif de votre absence..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel-modal" (click)="fermerJustificatif()">Annuler</button>
+      <button class="btn-confirm-pay" (click)="soumettreJustificatif()" [disabled]="!justifMotif.trim()">
+        Envoyer ✅
+      </button>
     </div>
   </div>
 </div>

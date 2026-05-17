@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
-import { EtudiantComponent } from './pages/etudiant/etudiant.component';
+import { CandidatComponent } from './pages/candidat/candidat.component';
 import { FormateurComponent } from './pages/formateur/formateur.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { AdminGuard } from './guards/admin.guard';
@@ -16,7 +16,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'inscription', component: InscriptionComponent },
-  { path: 'etudiant', component: EtudiantComponent },
+  { path: 'candidat', component: CandidatComponent },
   { path: 'formateur', component: FormateurComponent, canActivate: [FormateurGuard] },
   { path: 'admin', component: AdminComponent, canActivate: [AdminGuard] },
   { path: 'admin-login', component: AdminLoginComponent },

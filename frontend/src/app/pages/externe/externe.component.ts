@@ -1,10 +1,11 @@
 +320 -0
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
 import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-widget.component';
@@ -16,7 +17,8 @@ import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-wi
   templateUrl: './externe.component.html',
   styleUrl: './externe.component.css',
 })
-export class ExterneComponent implements OnInit {
+export class ExterneComponent implements OnInit, OnDestroy {
+  readonly environment = environment;
 
   user: any = null;
   externeId: number | null = null;
@@ -27,7 +29,7 @@ export class ExterneComponent implements OnInit {
   totalPages = 1;
   totalFormations = 0;
   recherche = '';
- 
+
   // Mes inscriptions
   mesInscriptions: any[] = [];
 
@@ -39,7 +41,6 @@ export class ExterneComponent implements OnInit {
   formationPaiement: any = null;
   showPaiementModal = false;
 
-  
   // Profil
   profileNom = '';
   profileEmail = '';
@@ -47,6 +48,7 @@ export class ExterneComponent implements OnInit {
   profileEntreprise = '';
   profileSpecialite = '';
   profileDateNaissance = '';
+  profilePhotoUrl: string | null = null;
   ancienMdp = '';
   nouveauMdp = '';
   confirmMdp = '';
@@ -58,7 +60,7 @@ export class ExterneComponent implements OnInit {
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
-  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'profil' | 'notifications' | 'messages' = 'accueil';
+  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' = 'accueil';
 
   // Messagerie
   contacts: any[] = [];
@@ -73,6 +75,38 @@ export class ExterneComponent implements OnInit {
     const q = this.externeContactSearch.toLowerCase();
     return this.contacts.filter(c => c.nom?.toLowerCase().includes(q));
   }
+
+  // Progression globale
+  progression = 0;
+
+  // Progression par formation (modal)
+  formationProgressionSelectionnee: any = null;
+  progressionModulesFormation: any[] = [];
+  progressionPourcentageFormation = 0;
+  showProgressionModal = false;
+
+  // Présences
+  presencesFormation: any = null;
+  presencesData: any = null;
+  showPresencesModal = false;
+
+  // Notation
+  mesNotes: { [formationId: number]: number } = {};
+  noteHover: { [formationId: number]: number } = {};
+
+  // Attestation
+  formationAttestation: any = null;
+  eligibiliteMap: { [formationId: number]: any } = {};
+  attestationData: any = null;
+  attestationLoading = false;
+
+  // Liste d'attente
+  enAttente: any[] = [];
+
+  // Justificatifs
+  justifSeanceId: number | null = null;
+  justifMotif = '';
+
 
   constructor(
     private externeService: ExterneService,
@@ -95,12 +129,15 @@ export class ExterneComponent implements OnInit {
     this.loadProfilComplet();
     this.loadFormations();
     this.loadMesInscriptions();
+    this.chargerProgression();
+    this.loadEnAttente();
     this.loadUnreadCount();
     this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
     this.loadUnreadMessages();
     setInterval(() => this.loadUnreadMessages(), 30000);
   }
-    ngOnDestroy() {
+
+  ngOnDestroy() {
     if (this.pollingInterval) clearInterval(this.pollingInterval);
   }
 
@@ -214,7 +251,7 @@ export class ExterneComponent implements OnInit {
   loadMesInscriptions() {
     if (!this.externeId) return;
     this.externeService.getMesInscriptions(this.externeId).subscribe({
-      next: data => this.mesInscriptions = data,
+      next: data => { this.mesInscriptions = data; this.loadEligibilites(data); },
       error: () => {}
     });
   }
@@ -229,6 +266,184 @@ export class ExterneComponent implements OnInit {
     };
     return map[statut] || 'badge-attente';
   }
+
+  loadEligibilites(inscriptions: any[]) {
+    if (!this.externeId) return;
+    inscriptions.filter(i => i.statut_paiement === 'payé').forEach(i => {
+      const fid = i.formation_id;
+      this.externeService.getEligibiliteAttestation(this.externeId!, fid).subscribe({
+        next: data => this.eligibiliteMap = { ...this.eligibiliteMap, [fid]: data },
+        error: () => {}
+      });
+      this.chargerMaNote(fid);
+    });
+  }
+
+  // ===== Progression =====
+  chargerProgression() {
+    if (!this.externeId) return;
+    this.externeService.getProgression(this.externeId).subscribe({
+      next: data => this.progression = data?.progression || 0,
+      error: () => {}
+    });
+  }
+
+  get formationsTerminees(): number {
+    return this.mesInscriptions.filter(i => i.statut_paiement === 'payé').length;
+  }
+
+  getProgressColor(): string {
+    if (this.progression >= 75) return '#28a745';
+    if (this.progression >= 40) return '#ffc107';
+    return '#dc3545';
+  }
+
+  voirProgressionFormation(inscription: any) {
+    if (!this.externeId) return;
+    this.formationProgressionSelectionnee = inscription;
+    this.showProgressionModal = true;
+    this.externeService.getProgressionModules(this.externeId, inscription.formation_id).subscribe({
+      next: (res: any) => {
+        this.progressionModulesFormation = res.modules || [];
+        this.progressionPourcentageFormation = res.pourcentage || 0;
+      },
+      error: () => {}
+    });
+  }
+
+  fermerProgressionFormation() {
+    this.formationProgressionSelectionnee = null;
+    this.progressionModulesFormation = [];
+    this.progressionPourcentageFormation = 0;
+    this.showProgressionModal = false;
+  }
+
+  countTerminesFormation(): number {
+    return this.progressionModulesFormation.filter(m => m.statut === 'termine').length;
+  }
+
+  getProgressBarColor(pct: number): string {
+    if (pct >= 80) return 'linear-gradient(90deg, #2e7d32, #66bb6a)';
+    if (pct >= 40) return 'linear-gradient(90deg, #f57c00, #ffb74d)';
+    return 'linear-gradient(90deg, #e53935, #ef9a9a)';
+  }
+
+  // ===== Notation =====
+  chargerMaNote(formationId: number) {
+    if (!this.externeId) return;
+    this.externeService.getMaNote(this.externeId, formationId).subscribe({
+      next: data => { if (data?.note) this.mesNotes[formationId] = data.note; },
+      error: () => {}
+    });
+  }
+
+  setNoteHover(formationId: number, note: number) { this.noteHover[formationId] = note; }
+  clearNoteHover(formationId: number) { delete this.noteHover[formationId]; }
+
+  noterFormation(formationId: number, note: number) {
+    if (!this.externeId) return;
+    this.externeService.noter(this.externeId, formationId, note).subscribe({
+      next: () => { this.mesNotes[formationId] = note; this.showMessage('Formation notée ' + '⭐'.repeat(note)); },
+      error: () => this.showMessage('Erreur lors de la notation', 'danger')
+    });
+  }
+
+  getNoteAffichee(formationId: number): number {
+    return this.noteHover[formationId] ?? this.mesNotes[formationId] ?? 0;
+  }
+
+  // ===== Présences =====
+  voirMesPresences(inscription: any) {
+    if (!this.externeId) return;
+    this.presencesFormation = inscription;
+    this.presencesData = null;
+    this.showPresencesModal = true;
+    this.externeService.getMesPresences(this.externeId, inscription.formation_id).subscribe({
+      next: (res: any) => this.presencesData = res,
+      error: () => this.showMessage('Erreur chargement des présences', 'danger')
+    });
+  }
+
+  fermerPresences() {
+    this.presencesFormation = null;
+    this.presencesData = null;
+    this.showPresencesModal = false;
+  }
+
+  getPresenceClass(statut: string): string {
+    const map: any = { 'présent': 'pres-present', 'retard': 'pres-retard', 'excusé': 'pres-excuse', 'absent': 'pres-absent' };
+    return map[statut] || 'pres-absent';
+  }
+
+  // ===== Justificatifs =====
+  ouvrirJustificatif(seanceId: number) { this.justifSeanceId = seanceId; this.justifMotif = ''; }
+  fermerJustificatif() { this.justifSeanceId = null; this.justifMotif = ''; }
+
+  soumettreJustificatif() {
+    if (!this.externeId || !this.justifSeanceId || !this.justifMotif.trim()) {
+      this.showMessage('Veuillez rédiger un motif', 'danger'); return;
+    }
+    this.externeService.soumettreJustificatif(this.externeId, this.justifSeanceId, this.justifMotif).subscribe({
+      next: () => {
+        this.showMessage('Justificatif envoyé ✅');
+        this.fermerJustificatif();
+        if (this.presencesFormation) this.voirMesPresences(this.presencesFormation);
+      },
+      error: () => this.showMessage("Erreur lors de l'envoi", 'danger')
+    });
+  }
+
+  // ===== Attestation =====
+  ouvrirAttestation(inscription: any) {
+    this.formationAttestation = inscription;
+    this.attestationData = null;
+    this.attestationLoading = true;
+    this.activeSection = 'attestation';
+    this.externeService.getAttestationData(this.externeId!, inscription.formation_id).subscribe({
+      next: data => { this.attestationData = data; this.attestationLoading = false; },
+      error: () => { this.attestationLoading = false; }
+    });
+  }
+
+  imprimerAttestation() { window.print(); }
+
+  getTodayStr(): string {
+    return new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  // ===== Liste d'attente =====
+  loadEnAttente() {
+    if (!this.externeId) return;
+    this.externeService.getEnAttente(this.externeId).subscribe({
+      next: data => this.enAttente = data,
+      error: () => {}
+    });
+  }
+
+  estEnAttente(formationId: number): boolean {
+    return this.enAttente.some(f => f.formation_id === formationId);
+  }
+
+  positionAttente(formationId: number): number {
+    return this.enAttente.find(f => f.formation_id === formationId)?.position ?? 0;
+  }
+
+  rejoindreListeAttente(formationId: number) {
+    if (!this.externeId) return;
+    this.externeService.rejoindreListeAttente(this.externeId, formationId).subscribe({
+      next: () => { this.showMessage("Vous avez rejoint la liste d'attente ✅"); this.loadEnAttente(); },
+      error: (err) => this.showMessage(err?.error?.error || 'Erreur', 'danger')
+    });
+  }
+
+  quitterListeAttente(formationId: number) {
+    if (!this.externeId) return;
+    this.externeService.quitterListeAttente(this.externeId, formationId).subscribe({
+      next: () => { this.showMessage("Retiré de la liste d'attente"); this.loadEnAttente(); },
+      error: () => this.showMessage('Erreur', 'danger')
+    });
+  }
+
 
   // ===== Supports =====
   voirSupports(inscription: any) {
@@ -254,7 +469,7 @@ export class ExterneComponent implements OnInit {
 
   getLienSupport(fichier: string): string {
     if (!fichier) return '#';
-    if (fichier.startsWith('/uploads/')) return `http://localhost:3000${fichier}`;
+    if (fichier.startsWith('/uploads/')) return `${environment.baseUrl}${fichier}`;
     return fichier;
   }
 
@@ -266,6 +481,7 @@ export class ExterneComponent implements OnInit {
         this.profileEntreprise = data.entreprise || '';
         this.profileSpecialite = data.specialite || '';
         this.profileDateNaissance = data.date_naissance ? data.date_naissance.substring(0, 10) : '';
+        this.profilePhotoUrl = data.photo_profil || null;
       },
       error: () => {}
     });
@@ -290,6 +506,22 @@ export class ExterneComponent implements OnInit {
         this.showMessage('Profil mis à jour avec succès');
       },
       error: (err) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
+    });
+  }
+
+  onPhotoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('photo', file);
+    this.authService.uploadProfilePhoto(formData).subscribe({
+      next: (res: any) => {
+        this.profilePhotoUrl = res.photo_profil;
+        this.user.photo_profil = res.photo_profil;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.showMessage('Photo de profil mise à jour');
+      },
+      error: () => this.showMessage('Erreur lors du téléchargement de la photo', 'danger')
     });
   }
 

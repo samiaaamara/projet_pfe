@@ -1,0 +1,50 @@
+@startuml Sprint1_Sequence_Inscription
+title Diagramme de Séquence — Inscription Utilisateur
+
+actor Utilisateur as User
+participant "Page Inscription\nFrontend" as Frontend
+participant "Backend\nExpress" as Backend
+database "Base de Données\nMySQL" as DB
+
+User -> Frontend: Sélectionne rôle (Étudiant/Formateur/Externe)
+activate Frontend
+Frontend --> User: Affiche formulaire adapté
+User -> Frontend: Remplit données\n(nom, email, pwd, spécialité...)
+activate Frontend
+
+Frontend -> Frontend: Validation frontend\n(champs requis, format email)
+
+Frontend -> Backend: POST /api/auth/register\n{role, données}
+activate Backend
+
+Backend -> Backend: Validation données
+Backend -> DB: SELECT user WHERE email = ?
+activate DB
+DB --> Backend: null ou user_existant
+deactivate DB
+
+alt Email déjà utilisé
+    Backend --> Frontend: {error: "Email déjà utilisé"}
+    Frontend --> User: Message d'erreur
+else Email unique
+    Backend -> Backend: bcrypt.hash(mot_de_passe)
+    Backend -> DB: INSERT INTO users\n(nom, email, hashed_pwd, role)
+    activate DB
+    DB --> Backend: user_id
+    deactivate DB
+    
+    Backend -> DB: INSERT INTO [etudiants|formateurs|externes]\n(user_id, spécialité, ...)
+    activate DB
+    DB --> Backend: profile_id
+    deactivate DB
+    
+    Backend -> Backend: jwt.sign(payload)
+    Backend --> Frontend: {success, token, user}
+    deactivate Backend
+    
+    Frontend --> User: Redirection Login\nMessage confirmation
+end
+
+deactivate Frontend
+
+@enduml

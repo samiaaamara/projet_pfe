@@ -1,0 +1,47 @@
+@startuml Sprint1_Activite_Authentification
+title Diagramme d'Activité — Authentification et Redirection
+
+start
+:Utilisateur saisit email + mot de passe;
+
+:Envoie requête login au serveur;
+
+:Vérifier email en base de données;
+
+if (Email trouvé?) then (non)
+    :Erreur: Email incorrect;
+    :Affiche message utilisateur;
+    end
+else (oui)
+    :Récupère hash du mot de passe;
+    
+    :Utilise bcrypt.compare();
+    
+    if (Mot de passe valide?) then (non)
+        :Erreur: Mot de passe incorrect;
+        :Affiche message utilisateur;
+        end
+    else (oui)
+        :Génère JWT token;
+        
+        :Récupère rôle utilisateur;
+        
+        if (Rôle?) then (admin)
+            :Redirige vers Dashboard Admin;
+        else (formateur)
+            :Redirige vers Dashboard Formateur;
+        else (etudiant)
+            :Redirige vers Dashboard Étudiant;
+        else (externe)
+            :Redirige vers Dashboard Externe;
+        endif
+        
+        :Stocke token en localStorage;
+        :Affiche dashboard personnalisé;
+        end
+    endif
+endif
+
+stop
+
+@enduml

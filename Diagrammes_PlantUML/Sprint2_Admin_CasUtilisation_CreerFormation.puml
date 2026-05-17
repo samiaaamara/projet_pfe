@@ -1,0 +1,33 @@
+@startuml Admin_CreerFormation_CasUtilisation
+title Cas d'Utilisation — Admin Crée une Formation et Assigne Formateur
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor Admin
+
+rectangle FormaPro {
+    usecase "S'authentifier" as UC1
+    usecase "Accéder Dashboard" as UC2
+    usecase "Aller section Formations" as UC3
+    usecase "Créer nouvelle formation" as UC4
+    usecase "Remplir détails" as UC5
+    usecase "Sélectionner formateur" as UC6
+    usecase "Valider création" as UC7
+    usecase "Assigner formateur" as UC8
+    usecase "Confirmer création" as UC9
+    usecase "Formation créée directement" as UC10
+}
+
+Admin --> UC1
+UC1 --> UC2
+UC2 --> UC3
+UC3 --> UC4
+UC4 --> UC5
+UC5 --> UC6
+UC6 --> UC7
+UC7 --> UC8
+UC8 --> UC9
+UC9 --> UC10
+
+@enduml

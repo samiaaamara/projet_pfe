@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FormateurService } from '../../services/formateur.service';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
-import { QuestionsService } from '../../services/questions.service';
 @Component({
   selector: 'app-formateur',
   standalone: true,
@@ -15,6 +15,7 @@ import { QuestionsService } from '../../services/questions.service';
   styleUrls: ['./formateur.component.css'],
 })
 export class FormateurComponent implements OnInit, OnDestroy {
+  readonly environment = environment;
 
   formateurId: number | null = null;
   user: any = null;
@@ -25,22 +26,40 @@ export class FormateurComponent implements OnInit, OnDestroy {
   // Champs formulaire création formation
   titre = '';
   description = '';
-  date_debut = '';
-  date_fin = '';
-  duree: number | null = null;
   specialite = '';
   nb_places: number | null = null;
+  photoFile: File | null = null;
+  photoPreview: string | null = null;
+  photoExistante: string = '';
   editMode = false;
   editedFormationId: number | null = null;
 
   searchTerm = '';
- statusFilter: '' | 'draft' | 'pending_approval' | 'accepted' | 'published' = '';
+  statusFilter: '' | 'draft' | 'pending_approval' | 'accepted' | 'published' | 'archivée' = '';
   specialites: string[] = [];
 
-  formErrors: { titre?: string; description?: string; date_debut?: string; date_fin?: string; duree?: string; nb_places?: string; specialite?: string } = {};
+  formErrors: { titre?: string; description?: string; nb_places?: string } = {};
+
+  // Stepper création
+  creationStep: 1 | 2 | 3 = 1;
+  creationFormationId: number | null = null;
+
+  // Programme editor
+  showProgrammeModal = false;
+  programmeFormation: any = null;
+  programmeData: { description_globale: string; objectifs: string; prerequis: string } = { description_globale: '', objectifs: '', prerequis: '' };
+  programmeModules: any[] = [];
+  moduleForm: { titre: string; description: string; ordre: number | null } = { titre: '', description: '', ordre: null };
+  editModuleMode = false;
+  editModuleId: number | null = null;
 
   get today(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  get canSubmit(): boolean {
+    const f = this.programmeFormation;
+    return f && f.module_count > 0;
   }
 
   // Support pédagogique
@@ -76,6 +95,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
   profileSpecialite = '';
   profileTelephone = '';
   profileDateNaissance = '';
+  profilePhotoUrl: string | null = null;
   ancienMdp = '';
   nouveauMdp = '';
   confirmMdp = '';
@@ -103,9 +123,6 @@ export class FormateurComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Questions
-  questionsFormation: any[] = [];
-  formationQuestionsId: number | null = null;
 
   // Progression
   progressionEtudiant: any = null;
@@ -129,13 +146,12 @@ export class FormateurComponent implements OnInit, OnDestroy {
 
   // Section active (menu sidebar)
 
-  activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' | 'messages' | 'questions' = 'accueil';
+  activeSection: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' | 'messages' = 'accueil';
 
   constructor(
     private formateurService: FormateurService,
      private authService: Auth,
      private msgService: MessagesService,
-    private questService: QuestionsService,
       private notificationsService: NotificationsService,
     private router: Router
   ) {}
@@ -177,6 +193,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
         this.profileSpecialite = profile.specialite || '';
         this.profileTelephone = profile.telephone || '';
         this.profileDateNaissance = profile.date_naissance ? profile.date_naissance.substring(0, 10) : '';
+        this.profilePhotoUrl = profile.photo_profil || null;
         console.log('✅ Profil formateur chargé:', profile);
         this.loadFormations();
         this.loadUnreadCount();
@@ -217,17 +234,44 @@ export class FormateurComponent implements OnInit, OnDestroy {
   resetFormationForm() {
     this.titre = '';
     this.description = '';
-    this.date_debut = '';
-    this.date_fin = '';
-    this.duree = null;
-    this.specialite = '';
+    this.specialite = this.profileSpecialite;
     this.nb_places = null;
+    this.photoFile = null;
+    this.photoPreview = null;
+    this.photoExistante = '';
     this.editMode = false;
     this.editedFormationId = null;
     this.formErrors = {};
+    this.creationStep = 1;
+    this.creationFormationId = null;
+    this.programmeData = { description_globale: '', objectifs: '', prerequis: '' };
+    this.programmeModules = [];
+    this.moduleForm = { titre: '', description: '', ordre: null };
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.supports = [];
+    this.supportType = '';
+    this.supportFichier = '';
+    this.supportFile = null;
   }
 
-  validateFormation(checkDateToday = true): boolean {
+  onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.photoFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => { this.photoPreview = e.target?.result as string; };
+      reader.readAsDataURL(this.photoFile);
+    }
+  }
+
+  supprimerPhoto() {
+    this.photoFile = null;
+    this.photoPreview = null;
+    this.photoExistante = '';
+  }
+
+  validateFormation(): boolean {
     this.formErrors = {};
     let valid = true;
     if (!this.titre || !this.titre.trim()) {
@@ -236,25 +280,8 @@ export class FormateurComponent implements OnInit, OnDestroy {
     if (!this.description || !this.description.trim()) {
       this.formErrors.description = 'La description est obligatoire.'; valid = false;
     }
-    if (!this.date_debut) {
-      this.formErrors.date_debut = 'La date de début est obligatoire.'; valid = false;
-    } else if (checkDateToday) {
-      const today = new Date(); today.setHours(0, 0, 0, 0);
-      if (new Date(this.date_debut) < today) {
-        this.formErrors.date_debut = 'La date de début doit être aujourd\'hui ou dans le futur.'; valid = false;
-      }
-    }
-    if (this.date_fin && this.date_debut && new Date(this.date_fin) < new Date(this.date_debut)) {
-      this.formErrors.date_fin = 'La date de fin doit être après la date de début.'; valid = false;
-    }
-     if (this.duree !== null && this.duree !== undefined && this.duree <= 0) {
-      this.formErrors.duree = 'La durée doit être supérieure à 0.'; valid = false;
-    }
     if (this.nb_places !== null && this.nb_places !== undefined && this.nb_places <= 0) {
       this.formErrors.nb_places = 'Le nombre de places doit être supérieur à 0.'; valid = false;
-    }
-    if (!this.specialite || !this.specialite.trim()) {
-      this.formErrors.specialite = 'La spécialité est obligatoire.'; valid = false;
     }
     return valid;
   }
@@ -275,36 +302,69 @@ export class FormateurComponent implements OnInit, OnDestroy {
 
   /** =================== Création formation =================== */
   creerFormation() {
-    if (!this.validateFormation(true)) return;
+    if (!this.validateFormation()) return;
 
     if (this.formateurId === null) {
       this.message = 'Impossible de créer la formation : profil formateur introuvable.';
        return;
     }
 
-    const payload = {
-      titre: this.titre,
-      description: this.description,
-      date_debut: this.date_debut,
-      date_fin: this.date_fin || undefined,
-      duree: this.duree || undefined,
-      specialite: this.specialite,
-      nb_places: this.nb_places || undefined,
-      formateur_id: this.formateurId
-    };
+    const formData = new FormData();
+    formData.append('titre', this.titre);
+    formData.append('description', this.description);
+    if (this.specialite) formData.append('specialite', this.specialite);
+    if (this.nb_places) formData.append('nb_places', this.nb_places.toString());
+    formData.append('formateur_id', this.formateurId!.toString());
+    if (this.photoFile) formData.append('photo', this.photoFile);
 
-    this.formateurService.creerFormation(payload).subscribe({
-      next: () => {
-        this.showMessage('Formation créée avec succès ✅', 'success');
-        this.closeFormationModal();
-        this.loadFormations();
-        this.activeSection = 'mesFormations';
+    this.formateurService.creerFormation(formData).subscribe({
+      next: (res: any) => {
+        this.creationFormationId = res.id;
+        this.programmeFormation = { id: res.id, titre: this.titre };
+        this.programmeData = { description_globale: '', objectifs: '', prerequis: '' };
+        this.programmeModules = [];
+        this.moduleForm = { titre: '', description: '', ordre: null };
+        this.editModuleMode = false;
+        this.editModuleId = null;
+        this.creationStep = 2;
       },
       error: (err) => {
         console.error('Erreur création formation:', err);
         this.showMessage(err?.error?.error || err?.error?.message || '❌ Erreur lors de la création de la formation', 'danger');
-         }
+      }
     });
+  }
+
+  passerEtape3() {
+    if (!this.creationFormationId) return;
+    const saveProg = () => {
+      this.formationSelectionnee = { id: this.creationFormationId, titre: this.titre };
+      this.supports = [];
+      this.supportType = '';
+      this.supportFichier = '';
+      this.supportFile = null;
+      this.formateurService.getSupports(this.creationFormationId!).subscribe({
+        next: (data) => this.supports = data,
+        error: () => {}
+      });
+      this.creationStep = 3;
+    };
+    const hasProg = this.programmeData.description_globale || this.programmeData.objectifs || this.programmeData.prerequis;
+    if (hasProg) {
+      this.formateurService.saveProgramme(this.creationFormationId, this.programmeData).subscribe({
+        next: saveProg,
+        error: () => this.showMessage('Erreur sauvegarde programme', 'danger')
+      });
+    } else {
+      saveProg();
+    }
+  }
+
+  terminerCreation() {
+    this.showMessage('Formation créée avec succès ✅', 'success');
+    this.closeFormationModal();
+    this.loadFormations();
+    this.activeSection = 'mesFormations';
   }
 
   openFormationModal(formation?: any) {
@@ -314,11 +374,11 @@ export class FormateurComponent implements OnInit, OnDestroy {
       this.editedFormationId = formation.id;
       this.titre = formation.titre;
       this.description = formation.description;
-      this.date_debut = formation.date_debut;
-      this.date_fin = formation.date_fin || '';
-      this.duree = formation.duree || null;
       this.specialite = formation.specialite || '';
       this.nb_places = formation.nb_places || null;
+      this.photoExistante = formation.photo || '';
+      this.photoPreview = formation.photo ? `${environment.baseUrl}${formation.photo}` : null;
+      this.photoFile = null;
     } else {
       this.editMode = false;
       this.resetFormationForm();
@@ -341,24 +401,23 @@ export class FormateurComponent implements OnInit, OnDestroy {
   }
 
   modifierFormation() {
-    if (!this.validateFormation(false)) return;
+    if (!this.validateFormation()) return;
 
     if (this.formateurId === null || this.editedFormationId === null) {
       this.message = 'Impossible de modifier cette formation.';
       return;
     }
 
+    const formData = new FormData();
+    formData.append('titre', this.titre);
+    formData.append('description', this.description);
+    if (this.specialite) formData.append('specialite', this.specialite);
+    if (this.nb_places) formData.append('nb_places', this.nb_places.toString());
+    formData.append('formateur_id', this.formateurId!.toString());
+    if (this.photoFile) formData.append('photo', this.photoFile);
+    else if (this.photoExistante) formData.append('photo_existante', this.photoExistante);
 
-    this.formateurService.modifierFormation(this.editedFormationId, {
-      titre: this.titre,
-      description: this.description,
-      date_debut: this.date_debut,
-      date_fin: this.date_fin,
-      duree: this.duree || undefined,
-      specialite: this.specialite,
-      nb_places: this.nb_places || undefined,
-      formateur_id: this.formateurId
-    }).subscribe({
+    this.formateurService.modifierFormation(this.editedFormationId, formData).subscribe({
       next: () => {
         this.showMessage('Formation modifiée avec succès ✅', 'success');
         this.closeFormationModal();
@@ -415,7 +474,7 @@ export class FormateurComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.formateurService.mettreAJourStatutInscription(inscription.id, statut)
+    this.formateurService.mettreAJourStatutInscription(inscription.id, statut, inscription.type_participant || 'étudiant')
       .subscribe({
         next: () => {
           inscription.statut = statut;
@@ -560,7 +619,7 @@ if (!this.supportType) {
   }
 
   /** =================== Changer de section (sidebar) =================== */
-  setSection(section: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' | 'messages' | 'questions') {
+  setSection(section: 'accueil' | 'creerFormation' | 'mesFormations' | 'supports' | 'profil' | 'notifications' | 'messages') {
     this.activeSection = section;
 
     // Reset inscriptions si on quitte mesFormations
@@ -595,6 +654,22 @@ if (!this.supportType) {
         this.showMessage('Profil mis à jour avec succès ✅');
       },
       error: (err: any) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
+    });
+  }
+
+  onProfilePhotoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('photo', file);
+    this.authService.uploadProfilePhoto(formData).subscribe({
+      next: (res: any) => {
+        this.profilePhotoUrl = res.photo_profil;
+        this.user.photo_profil = res.photo_profil;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.showMessage('Photo de profil mise à jour ✅');
+      },
+      error: () => this.showMessage('Erreur lors du téléchargement de la photo', 'danger')
     });
   }
 
@@ -736,37 +811,6 @@ if (!this.supportType) {
     });
   }
 
-  // ===== Questions =====
-  openQuestions() {
-    this.activeSection = 'questions';
-    this.message = '';
-  }
-
-  loadQuestionsFormation(formationId: number) {
-    if (!formationId) { this.questionsFormation = []; return; }
-    this.questService.getQuestionsFormation(formationId).subscribe({
-      next: data => this.questionsFormation = data.map((q: any) => ({ ...q, reponseTemp: '', isEditing: false })),
-      error: () => {}
-    });
-  }
-
-  repondreQuestion(q: any) {
-    if (!q.reponseTemp?.trim()) return;
-    this.questService.repondre(q.id, q.reponseTemp).subscribe({
-      next: () => {
-        q.reponse = q.reponseTemp;
-        q.reponseTemp = '';
-        q.isEditing = false;
-        this.showMessage('Réponse envoyée ✅');
-      },
-      error: () => this.showMessage('Erreur lors de la réponse', 'danger')
-    });
-  }
-
-  modifierReponse(q: any) {
-    q.reponseTemp = q.reponse;
-    q.isEditing = true;
-  }
 
 
 logout() {
@@ -776,9 +820,9 @@ logout() {
 
   /** =================== Progression modulaire =================== */
   ouvrirProgression(etudiant: any) {
-    if (!this.formationSelectionnee?.id || !etudiant.etudiant_id) return;
+    if (!this.formationSelectionnee?.id || !etudiant.candidat_id) return;
     this.progressionEtudiant = etudiant;
-    this.formateurService.getProgression(this.formationSelectionnee.id, etudiant.etudiant_id).subscribe({
+    this.formateurService.getProgression(this.formationSelectionnee.id, etudiant.candidat_id).subscribe({
       next: (res: any) => {
         this.progressionModules = res.modules || [];
         this.progressionPourcentage = res.pourcentage || 0;
@@ -794,12 +838,12 @@ logout() {
   }
 
   changerStatutModule(module: any, statut: string) {
-    if (!this.formationSelectionnee?.id || !this.progressionEtudiant?.etudiant_id) return;
+    if (!this.formationSelectionnee?.id || !this.progressionEtudiant?.candidat_id) return;
     const ancienStatut = module.statut;
     module.statut = statut;
     this.formateurService.updateProgression(
       this.formationSelectionnee.id,
-      this.progressionEtudiant.etudiant_id,
+      this.progressionEtudiant.candidat_id,
       module.id,
       statut
     ).subscribe({
@@ -933,7 +977,7 @@ logout() {
   changerPresence(etudiant: any, statut: string) {
     const ancien = etudiant.statut;
     etudiant.statut = statut;
-    this.formateurService.enregistrerPresence(this.seanceSelectionnee.id, etudiant.etudiant_id, statut).subscribe({
+    this.formateurService.enregistrerPresence(this.seanceSelectionnee.id, etudiant.candidat_id, statut).subscribe({
       error: () => {
         etudiant.statut = ancien;
         this.showMessage('Erreur enregistrement présence', 'danger');
@@ -957,7 +1001,7 @@ logout() {
         justif.statut = statut;
         if (statut === 'accepté') {
           // Mettre à jour localement dans la feuille de présence
-          const etudiant = this.feuillePresence.find(e => e.etudiant_id === justif.etudiant_id);
+          const etudiant = this.feuillePresence.find(e => e.candidat_id === justif.candidat_id);
           if (etudiant) etudiant.statut = 'excusé';
         }
       },
@@ -972,5 +1016,105 @@ logout() {
   getStatutPresenceClass(statut: string): string {
     const map: any = { 'présent': 'present', 'absent': 'absent', 'retard': 'retard', 'excusé': 'excuse' };
     return map[statut] || 'absent';
+  }
+
+  /** =================== Programme & Modules =================== */
+  ouvrirProgramme(formation: any) {
+    this.programmeFormation = formation;
+    this.showProgrammeModal = true;
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.moduleForm = { titre: '', description: '', ordre: null };
+    this.formateurService.getProgramme(formation.id).subscribe({
+      next: (res: any) => {
+        const prog = res.programme;
+        this.programmeData = {
+          description_globale: prog?.description_globale || '',
+          objectifs: prog?.objectifs || '',
+          prerequis: prog?.prerequis || ''
+        };
+        this.programmeModules = res.modules || [];
+      },
+      error: () => this.showMessage('Erreur chargement du programme', 'danger')
+    });
+  }
+
+  fermerProgramme() {
+    this.showProgrammeModal = false;
+    this.programmeFormation = null;
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.loadFormations();
+  }
+
+  sauvegarderProgramme() {
+    if (!this.programmeFormation) return;
+    this.formateurService.saveProgramme(this.programmeFormation.id, this.programmeData).subscribe({
+      next: () => this.showMessage('Programme sauvegardé ✅'),
+      error: () => this.showMessage('Erreur sauvegarde programme', 'danger')
+    });
+  }
+
+  soumettreModule() {
+    if (!this.programmeFormation) return;
+    if (!this.moduleForm.titre.trim()) {
+      this.showMessage('Le titre du module est obligatoire.', 'danger'); return;
+    }
+    if (this.editModuleMode && this.editModuleId) {
+      this.formateurService.updateModule(this.programmeFormation.id, this.editModuleId, this.moduleForm).subscribe({
+        next: () => {
+          this.showMessage('Module mis à jour ✅');
+          this.annulerEditModule();
+          this._rechargerModules();
+        },
+        error: (err: any) => this.showMessage(err?.error?.error || 'Erreur mise à jour module', 'danger')
+      });
+    } else {
+      this.formateurService.addModule(this.programmeFormation.id, this.moduleForm).subscribe({
+        next: () => {
+          this.showMessage('Module ajouté ✅');
+          this.moduleForm = { titre: '', description: '', ordre: null };
+          this._rechargerModules();
+        },
+        error: (err: any) => this.showMessage(err?.error?.error || 'Erreur ajout module', 'danger')
+      });
+    }
+  }
+
+  editerModule(m: any) {
+    this.editModuleMode = true;
+    this.editModuleId = m.id;
+    this.moduleForm = { titre: m.titre, description: m.description || '', ordre: m.ordre || null };
+  }
+
+  annulerEditModule() {
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.moduleForm = { titre: '', description: '', ordre: null };
+  }
+
+  supprimerModule(moduleId: number) {
+    if (!this.programmeFormation) return;
+    if (!confirm('Supprimer ce module ?')) return;
+    this.formateurService.deleteModule(this.programmeFormation.id, moduleId).subscribe({
+      next: () => {
+        this.showMessage('Module supprimé ✅');
+        this._rechargerModules();
+      },
+      error: () => this.showMessage('Erreur suppression module', 'danger')
+    });
+  }
+
+  private _rechargerModules() {
+    if (!this.programmeFormation) return;
+    this.formateurService.getProgramme(this.programmeFormation.id).subscribe({
+      next: (res: any) => {
+        this.programmeModules = res.modules || [];
+        this.programmeFormation.module_count = this.programmeModules.length;
+        const idx = this.formations.findIndex(f => f.id === this.programmeFormation.id);
+        if (idx >= 0) this.formations[idx].module_count = this.programmeModules.length;
+      },
+      error: () => {}
+    });
   }
 }

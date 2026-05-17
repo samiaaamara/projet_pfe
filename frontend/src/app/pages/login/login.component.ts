@@ -34,15 +34,18 @@ export class LoginComponent {
       localStorage.setItem('token', res.token);
       localStorage.setItem('user', JSON.stringify(user));
 
-      if (user.role === 'etudiant') {
-        this.router.navigate(['/etudiant']);
+      if (user.role === 'candidat') {
+        this.router.navigate(['/candidat']);
       } else if (user.role === 'formateur') {
         this.router.navigate(['/formateur']);
-        
       } else if (user.role === 'externe') {
         this.router.navigate(['/externe']);
-      } else {
+      } else if (user.role === 'admin') {
         this.router.navigate(['/admin']);
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        this.error = 'Rôle utilisateur non reconnu. Contactez l\'administrateur.';
       }
     },
     error: () => {

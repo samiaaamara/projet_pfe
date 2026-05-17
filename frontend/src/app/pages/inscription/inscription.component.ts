@@ -16,7 +16,7 @@ export class InscriptionComponent implements OnInit {
   nom = '';
   email = '';
   password = '';
-  role = 'etudiant';
+  role = 'candidat';
   cin = '';
   niveau = '';
   specialite = '';
@@ -66,17 +66,12 @@ export class InscriptionComponent implements OnInit {
       role: this.role
     };
 
-    if (this.role === 'etudiant') {
+    if (this.role === 'candidat') {
       data.cin = this.cin;
       data.niveau = this.niveau;
       data.specialite = this.specialite;
       data.telephone = this.telephone;
-      data.date_naissance = this.dateNaissance;
-    }
-
-    if (this.role === 'formateur') {
-      data.specialite = this.specialite;
-      data.telephone = this.telephone;
+      data.entreprise = this.entreprise;
       data.date_naissance = this.dateNaissance;
     }
 

@@ -1,0 +1,64 @@
+@startuml Admin_CreerFormation_Sequence
+title Diagramme de Séquence — Admin Crée une Formation et Assigne Formateur
+
+actor Admin as A
+participant "Dashboard Admin\nFrontend" as F
+participant "Backend\nExpress" as B
+database "Base de Données\nMySQL" as DB
+
+A -> F: Clique "Créer Formation"
+activate F
+F --> A: Affiche formulaire\n(titre, desc, durée, prix, places)
+
+A -> F: Sélectionne formateur
+F -> B: GET /api/admin/formateurs
+activate B
+B -> DB: SELECT * FROM formateurs f\nJOIN users u ON f.user_id = u.id
+activate DB
+DB --> B: [liste formateurs]
+deactivate DB
+B --> F: [{id, nom, specialite}, ...]
+deactivate B
+F --> A: Affiche liste formateurs
+
+A -> F: Remplit formulaire complet\n+ choisit formateur
+activate F
+
+F -> F: Validation frontend
+
+F -> B: POST /api/admin/formations\n{titre, description, formateur_id, prix, places, specialite}
+activate B
+
+B -> B: Vérification authentification admin
+
+B -> B: Validation données
+
+B -> DB: SELECT id FROM formateurs WHERE id = ?
+activate DB
+DB --> B: formateur_id valide
+deactivate DB
+
+B -> DB: INSERT INTO formations\n(titre, description, formateur_id, specialite, prix, places_disponibles, date_debut, status='draft')
+activate DB
+DB --> B: formation_id
+deactivate DB
+
+B -> DB: INSERT INTO programme_formations\n(formation_id, description_globale)
+activate DB
+DB --> B: programme_id
+deactivate DB
+
+alt Succès
+    B --> F: {success, formation, message: "Formation créée"}
+    deactivate B
+    F --> A: Message succès\n"Formation créée par Admin"
+    F --> A: Recharge liste formations
+else Erreur
+    B --> F: {error, message}
+    deactivate B
+    F --> A: Message erreur
+end
+
+deactivate F
+
+@enduml

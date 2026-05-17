@@ -8,6 +8,13 @@
 .sidebar { width: 260px; min-width: 260px; background: linear-gradient(160deg, #005f73 0%, #0a9396 100%); color: white; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; }
 .sidebar-profile { padding: 30px 20px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.15); }
 .avatar { width: 64px; height: 64px; border-radius: 50%; background: #94d2bd; color: #005f73; font-size: 26px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; border: 3px solid rgba(255,255,255,0.3); }
+.avatar-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px; border: 3px solid rgba(255,255,255,0.5); display: block; }
+.profile-photo-wrapper { position: relative; width: 80px; height: 80px; border-radius: 50%; cursor: pointer; flex-shrink: 0; }
+.profile-photo-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #0a9396; }
+.profile-photo-placeholder { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #005f73, #0a9396); display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; color: white; }
+.profile-photo-overlay { position: absolute; bottom: 0; right: 0; background: #0a9396; border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 2px solid white; transition: background 0.2s; }
+.profile-photo-wrapper:hover .profile-photo-overlay { background: #005f73; }
+.profile-photo-hint { font-size: 11px; color: #888; margin-top: 4px; }
 .sidebar-username { font-size: 15px; font-weight: 600; }
 .sidebar-role { font-size: 12px; opacity: 0.75; margin-top: 2px; }
 .sidebar-specialite { font-size: 11px; margin-top: 4px; background: rgba(255,255,255,0.15); color: #fff; padding: 2px 10px; border-radius: 20px; display: inline-block; }
@@ -74,6 +81,9 @@
 .formations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; margin-bottom: 24px; }
 .formation-card { background: white; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 10px; transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #e0f7f4; }
 .formation-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+.formation-card-img-wrapper { margin: -20px -20px 12px -20px; border-radius: 14px 14px 0 0; overflow: hidden; height: 160px; }
+.formation-card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.formation-card-img-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #e0f7f4, #b2dfdb); display: flex; align-items: center; justify-content: center; font-size: 40px; }
 .formation-header { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
 .badge-date { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
 .badge-urgent { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
@@ -271,6 +281,172 @@
 .prog-empty { text-align: center; padding: 30px; color: #aaa; font-size: 14px; }
 .prog-empty span { font-size: 36px; display: block; margin-bottom: 8px; }
 
+/* ===== MES FORMATIONS (grille de cartes) ===== */
+.my-formations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 22px; }
+
+.my-formation-card { background: white; border-radius: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.07); border: 1px solid #e0f7f4; display: flex; flex-direction: column; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+.my-formation-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,0.12); }
+.my-formation-card.card-pending { opacity: 0.75; border-color: #ffe0b2; }
+
+/* image */
+.myf-img-wrapper { position: relative; height: 170px; overflow: hidden; flex-shrink: 0; }
+.myf-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.myf-img-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #e0f7f4, #b2dfdb); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+
+.myf-status-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; backdrop-filter: blur(4px); }
+.myf-status-badge.badge-paye    { background: rgba(0,96,100,0.85); color: #fff; }
+.myf-status-badge.badge-attente { background: rgba(230,81,0,0.85);  color: #fff; }
+.myf-status-badge.badge-rembourse { background: rgba(106,27,154,0.85); color: #fff; }
+.myf-status-badge.badge-confirme  { background: rgba(46,125,50,0.85);  color: #fff; }
+.myf-status-badge.badge-annule    { background: rgba(198,40,40,0.85);  color: #fff; }
+
+.myf-niveau-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+/* corps */
+.myf-body { padding: 18px 18px 12px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.myf-specialite { font-size: 11px; font-weight: 700; color: #0a9396; text-transform: uppercase; letter-spacing: 0.5px; }
+.myf-title { font-size: 16px; font-weight: 800; color: #005f73; margin: 0; line-height: 1.3; }
+.myf-desc { font-size: 13px; color: #666; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.myf-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #888; }
+.myf-meta span { display: flex; align-items: center; gap: 3px; }
+
+/* barre de progression */
+.myf-prog-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.myf-prog-label { font-size: 11px; font-weight: 600; color: #555; white-space: nowrap; }
+.myf-prog-track { flex: 1; height: 7px; background: #e8ecef; border-radius: 4px; overflow: hidden; }
+.myf-prog-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+.myf-prog-pct { font-size: 11px; font-weight: 700; color: #005f73; min-width: 30px; text-align: right; }
+
+/* étoiles */
+.myf-stars { display: flex; align-items: center; gap: 3px; margin-top: 2px; }
+.myf-stars-hint { font-size: 11px; color: #aaa; margin-left: 6px; }
+
+/* pied */
+.myf-footer { padding: 12px 18px; border-top: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; background: #fafafa; }
+.myf-price { font-size: 14px; font-weight: 800; color: #005f73; }
+.myf-date-achat { font-size: 11px; color: #aaa; font-weight: 400; }
+.myf-actions { display: flex; gap: 6px; }
+.myf-actions button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid #e0e0e0; background: white; cursor: pointer; font-size: 16px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+.myf-actions button:hover { background: #e0f7fa; border-color: #0a9396; transform: scale(1.1); }
+.myf-actions .btn-attestation { background: linear-gradient(135deg, #f59e0b, #d97706); border-color: transparent; }
+.myf-actions .btn-attestation:hover { opacity: 0.85; }
+
+/* STATS CARD GREEN */
+.stat-card.green { border-top-color: #2e7d32; cursor: pointer; }
+
+/* NOTATION ÉTOILES */
+.notation-stars { display: flex; gap: 3px; margin-top: 6px; }
+.star { font-size: 20px; color: #ddd; cursor: pointer; transition: color 0.15s, transform 0.1s; }
+.star:hover, .star.filled { color: #f59e0b; }
+.star:hover { transform: scale(1.2); }
+
+/* INSCRIPTION ACTIONS */
+.inscription-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; margin-top: 4px; }
+.btn-presences { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+.btn-presences:hover { background: #c8e6c9; }
+.btn-progression { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+.btn-progression:hover { background: #bbdefb; }
+.btn-attestation { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
+.btn-attestation:hover { opacity: 0.9; box-shadow: 0 3px 10px rgba(217,119,6,0.3); }
+
+/* PROGRESSION BAR */
+.progression-global-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+.prog-global-label { font-size: 14px; font-weight: 600; color: #555; margin-bottom: 12px; }
+.progression-bar-wrap { display: flex; align-items: center; gap: 14px; }
+.progression-bar-track { flex: 1; height: 12px; background: #f0f0f0; border-radius: 6px; overflow: hidden; }
+.progression-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s ease; }
+.progression-pct { font-size: 16px; font-weight: 800; color: #005f73; min-width: 44px; text-align: right; }
+
+/* MODAL LARGE */
+.modal-large { max-width: 640px; max-height: 85vh; overflow-y: auto; }
+.prog-modal-summary { margin-bottom: 20px; padding: 16px; background: #f0fdfa; border-radius: 10px; }
+.prog-modal-stats { font-size: 13px; color: #666; margin: 8px 0 0; text-align: center; }
+
+/* MODULES LIST */
+.modules-list { display: flex; flex-direction: column; gap: 10px; }
+.module-item { display: flex; align-items: center; gap: 12px; background: #fafafa; border-radius: 10px; padding: 12px 14px; border: 1px solid #e0e0e0; }
+.module-num { width: 28px; height: 28px; min-width: 28px; border-radius: 50%; background: #0a9396; color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.module-info { flex: 1; }
+.module-titre { font-size: 14px; font-weight: 600; color: #333; }
+.module-duree { margin-left: 8px; font-size: 12px; color: #888; background: #e0f7fa; padding: 1px 8px; border-radius: 8px; font-weight: 400; }
+.module-statut { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+.mod-termine { background: #e8f5e9; color: #2e7d32; }
+.mod-encours { background: #fff8e1; color: #e65100; }
+.mod-noncommence { background: #f5f5f5; color: #888; }
+
+/* PRÉSENCES */
+.presences-summary { background: #f0fdfa; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #555; font-weight: 600; margin-bottom: 16px; display: flex; gap: 16px; }
+.seances-list { display: flex; flex-direction: column; gap: 8px; }
+.seance-row { display: flex; align-items: center; gap: 12px; background: #fafafa; border-radius: 10px; padding: 10px 14px; border: 1px solid #eee; flex-wrap: wrap; }
+.seance-info { flex: 1; display: flex; gap: 10px; flex-wrap: wrap; font-size: 13px; color: #555; align-items: center; }
+.seance-date { font-weight: 700; color: #333; }
+.seance-heure { color: #888; }
+.seance-salle { color: #0a9396; }
+.presence-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+.pres-present { background: #e8f5e9; color: #2e7d32; }
+.pres-retard  { background: #fff8e1; color: #e65100; }
+.pres-excuse  { background: #e3f2fd; color: #1565c0; }
+.pres-absent  { background: #ffebee; color: #c62828; }
+.btn-justif { background: #fff8e1; color: #e65100; border: 1px solid #ffcc02; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+.btn-justif:hover { background: #ffcc02; color: #333; }
+
+/* ELIGIBILITE */
+.elig-info { display: flex; gap: 12px; font-size: 12px; color: #666; margin-bottom: 6px; flex-wrap: wrap; }
+.badge-non-eligible { background: #ffebee; color: #c62828; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+/* ATTESTATION CERTIFICAT */
+.attestation-print-section .no-print { display: flex; gap: 12px; margin-bottom: 24px; }
+.btn-print { background: #005f73; color: white; border: none; padding: 10px 22px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; transition: background 0.2s; }
+.btn-print:hover { background: #003d4d; }
+.attestation-certificate { background: white; border: 2px solid #0a9396; border-radius: 18px; padding: 50px 60px; max-width: 780px; margin: 0 auto; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+.cert-header { text-align: center; margin-bottom: 30px; }
+.cert-logo { font-size: 54px; margin-bottom: 10px; }
+.cert-institution { font-size: 14px; font-weight: 700; color: #005f73; text-transform: uppercase; letter-spacing: 1px; }
+.cert-title { text-align: center; font-size: 28px; font-weight: 900; color: #005f73; letter-spacing: 2px; margin: 20px 0; text-transform: uppercase; border-top: 2px solid #0a9396; border-bottom: 2px solid #0a9396; padding: 14px 0; }
+.cert-body { text-align: center; }
+.cert-intro { font-size: 15px; color: #666; margin: 10px 0; }
+.cert-name { font-size: 26px; font-weight: 800; color: #005f73; margin: 10px 0; }
+.cert-formation { font-size: 18px; font-weight: 700; color: #0a9396; font-style: italic; margin: 10px 0; }
+.cert-details { font-size: 14px; color: #555; margin: 16px 0; display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+.cert-stats { display: flex; justify-content: center; gap: 30px; margin: 24px 0; }
+.cert-stat-item { text-align: center; }
+.cert-stat-val { display: block; font-size: 26px; font-weight: 900; color: #005f73; }
+.cert-stat-lbl { display: block; font-size: 12px; color: #888; margin-top: 4px; }
+.cert-formateur { font-size: 14px; color: #555; margin-top: 20px; font-style: italic; }
+.cert-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0f7f4; }
+.cert-date { font-size: 13px; color: #888; }
+.cert-seal { font-size: 14px; font-weight: 700; color: #005f73; background: #e0f7fa; padding: 6px 16px; border-radius: 20px; }
+@media print {
+  .no-print { display: none !important; }
+  .sidebar, .main-content > section:not(.attestation-print-section) { display: none !important; }
+  .attestation-certificate { box-shadow: none; border: 2px solid #000; }
+}
+
+/* QUESTIONS */
+.questions-list { display: flex; flex-direction: column; gap: 14px; }
+.question-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e0f7f4; }
+.question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+.question-formation { background: #e0f7fa; color: #006064; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.question-date { font-size: 12px; color: #aaa; }
+.question-texte { font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 10px; }
+.question-reponse { background: #f0fdfa; border-left: 3px solid #0a9396; padding: 10px 14px; border-radius: 0 8px 8px 0; font-size: 13px; color: #444; line-height: 1.6; }
+.question-reponse.pending { background: #fff8e1; border-color: #ffc107; color: #888; font-style: italic; }
+.btn-delete-question { background: none; border: none; color: #e53935; font-size: 12px; cursor: pointer; margin-top: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 600; }
+.btn-delete-question:hover { background: #ffebee; }
+
+/* FORM ELEMENTS */
+.form-select { width: 100%; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; background: white; transition: border-color 0.2s; }
+.form-select:focus { border-color: #0a9396; }
+.form-textarea { width: 100%; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 14px; outline: none; background: white; resize: vertical; font-family: inherit; transition: border-color 0.2s; box-sizing: border-box; }
+.form-textarea:focus { border-color: #0a9396; }
+
+/* LISTE D'ATTENTE */
+.badge-en-attente { background: #fff3e0; color: #e65100; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.btn-attente { background: #fff3e0; color: #e65100; border: 1px solid #ffcc80; padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; white-space: nowrap; }
+.btn-attente:hover { background: #ffcc80; }
+.btn-quitter-attente { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+.btn-quitter-attente:hover { background: #ef9a9a; color: white; }
+
 @media (max-width: 768px) {
   .dashboard-wrapper { flex-direction: column; }
   .sidebar { width: 100%; height: auto; position: relative; }
@@ -279,10 +455,13 @@
   .main-content { padding: 16px; }
   .profile-grid { grid-template-columns: 1fr; }
   .inscription-card { flex-direction: column; align-items: flex-start; }
-  .inscription-right { flex-direction: row; width: 100%; justify-content: space-between; }
+  .inscription-right { flex-direction: row; width: 100%; justify-content: space-between; flex-wrap: wrap; }
   .quick-actions { grid-template-columns: 1fr; }
   .chat-container { flex-direction: column; height: auto; }
   .contacts-panel { width: 100%; min-width: unset; border-right: none; border-bottom: 1px solid #e8edf2; max-height: 200px; }
   .conversation-panel { min-height: 400px; }
   .modal-programme { width: 96%; }
+  .attestation-certificate { padding: 30px 20px; }
+  .cert-title { font-size: 20px; }
+  .cert-name { font-size: 20px; }
 }

@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Formation {
   titre: string;
   description: string;
-  date_debut: string;
-  date_fin?: string;
   duree?: number;
   specialite?: string;
   nb_places?: number;
   status?: 'draft' | 'pending_approval' | 'accepted' | 'published';
   formateur_id: number;
+  photo?: string;
+  module_count?: number;
 }
 
 @Injectable({
@@ -19,7 +20,7 @@ export interface Formation {
 })
 export class FormateurService {
 
-  private api = 'http://localhost:3000/api/formateur';
+  private api = `${environment.apiUrl}/formateur`;
 
   constructor(private http: HttpClient) {}
 
@@ -44,13 +45,13 @@ export class FormateurService {
   }
 
   // 🔹 Créer une formation
-  creerFormation(formation: Formation): Observable<any> {
-    return this.http.post(`${this.api}/creer-formation`, formation);
+  creerFormation(data: FormData): Observable<any> {
+    return this.http.post(`${this.api}/creer-formation`, data);
   }
 
   // 🔹 Mettre à jour une formation
-  modifierFormation(formationId: number, formation: Partial<Formation>): Observable<any> {
-    return this.http.put(`${this.api}/formations/${formationId}`, formation);
+  modifierFormation(formationId: number, data: FormData): Observable<any> {
+    return this.http.put(`${this.api}/formations/${formationId}`, data);
   }
 
   // 🔹 Soumettre une formation à l'admin pour approbation
@@ -70,9 +71,9 @@ export class FormateurService {
     return this.http.get<any>(`${this.api}/stats/${formateurId}`);
   }
 
-  // 🔹 Valider la présence d'un étudiant
-  mettreAJourStatutInscription(inscriptionId: number, statut: string): Observable<any> {
-    return this.http.put(`${this.api}/inscriptions/${inscriptionId}/status`, { statut });
+  // 🔹 Valider la présence d'un participant (étudiant ou externe)
+  mettreAJourStatutInscription(inscriptionId: number, statut: string, typeParticipant: string = 'étudiant'): Observable<any> {
+    return this.http.put(`${this.api}/inscriptions/${inscriptionId}/status`, { statut, type_participant: typeParticipant });
   }
 
   // 🔹 Ajouter un support à une formation
@@ -143,5 +144,22 @@ export class FormateurService {
   }
   traiterJustificatif(justifId: number, statut: 'accepté' | 'refusé'): Observable<any> {
     return this.http.put(`${this.api}/justificatifs/${justifId}`, { statut });
+  }
+
+  // Programme et modules
+  getProgramme(formationId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/formations/${formationId}/programme`);
+  }
+  saveProgramme(formationId: number, data: { description_globale?: string; objectifs?: string; prerequis?: string }): Observable<any> {
+    return this.http.put(`${this.api}/formations/${formationId}/programme`, data);
+  }
+  addModule(formationId: number, data: { titre: string; description?: string | null; duree_heures?: number | null; ordre?: number | null }): Observable<any> {
+    return this.http.post(`${this.api}/formations/${formationId}/modules`, data);
+  }
+  updateModule(formationId: number, moduleId: number, data: { titre: string; description?: string | null; duree_heures?: number | null; ordre?: number | null }): Observable<any> {
+    return this.http.put(`${this.api}/formations/${formationId}/modules/${moduleId}`, data);
+  }
+  deleteModule(formationId: number, moduleId: number): Observable<any> {
+    return this.http.delete(`${this.api}/formations/${formationId}/modules/${moduleId}`);
   }
 }

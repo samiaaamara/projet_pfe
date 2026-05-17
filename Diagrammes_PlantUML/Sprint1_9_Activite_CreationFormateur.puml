@@ -1,0 +1,49 @@
+@startuml Sprint1_Activite_CreationFormateur
+title Diagramme d'Activité — Création de Compte Formateur (Admin)
+
+start
+:Admin accède à la section Formateurs;
+
+:Clique sur "Ajouter un Formateur";
+
+:Système affiche formulaire;
+
+:Admin remplit les champs\n(nom, email, pwd, spécialité);
+
+:Admin clique "Créer";
+
+:Validation frontend;
+
+if (Tous champs remplis?) then (non)
+    :Affiche erreurs de validation;
+    :Admin corrige;
+    goto continue
+else (oui)
+    label continue
+    :Envoie requête au backend;
+    
+    :Vérification email unique;
+    
+    if (Email déjà utilisé?) then (oui)
+        :Affiche erreur "Email existe";
+        :Admin essaie autre email;
+        goto continue
+    else (non)
+        :Hachage du mot de passe (bcrypt);
+        
+        :Création compte dans users;
+        
+        :Création profil dans formateurs;
+        
+        :Affiche message succès;
+        
+        :Recharge liste formateurs;
+        
+        :Nouveau formateur visible;
+        end
+    endif
+endif
+
+stop
+
+@enduml

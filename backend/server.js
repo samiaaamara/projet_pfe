@@ -3,6 +3,57 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+const db = require('./db');
+(async () => {
+  try {
+    await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_profil VARCHAR(255) DEFAULT NULL');
+
+    // Quiz tables
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS quiz (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        formation_id   INT NOT NULL UNIQUE,
+        titre          VARCHAR(200) NOT NULL DEFAULT 'Quiz de validation',
+        seuil_reussite INT NOT NULL DEFAULT 70,
+        nb_tentatives  INT NOT NULL DEFAULT 3,
+        FOREIGN KEY (formation_id) REFERENCES formations(id) ON DELETE CASCADE
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS questions_quiz (
+        id       INT AUTO_INCREMENT PRIMARY KEY,
+        quiz_id  INT NOT NULL,
+        question TEXT NOT NULL,
+        ordre    INT DEFAULT 0,
+        FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS reponses_quiz (
+        id           INT AUTO_INCREMENT PRIMARY KEY,
+        question_id  INT NOT NULL,
+        reponse      TEXT NOT NULL,
+        est_correcte BOOLEAN NOT NULL DEFAULT FALSE,
+        FOREIGN KEY (question_id) REFERENCES questions_quiz(id) ON DELETE CASCADE
+      )
+    `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS tentatives_quiz (
+        id             INT AUTO_INCREMENT PRIMARY KEY,
+        candidat_id    INT DEFAULT NULL,
+        externe_id     INT DEFAULT NULL,
+        quiz_id        INT NOT NULL,
+        score          INT NOT NULL,
+        reussi         BOOLEAN NOT NULL DEFAULT FALSE,
+        date_tentative DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
+      )
+    `);
+  } catch (err) {
+    console.error('Erreur init DB:', err.message);
+  }
+})();
+
 const app = express();
 
 const loginLimiter = rateLimit({
@@ -24,13 +75,13 @@ app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 app.use('/api/auth/login', loginLimiter);
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/formations', require('./routes/formation.routes'));
-app.use('/api/etudiant', require('./routes/etudiant.routes'));
+app.use('/api/candidat', require('./routes/candidat.routes'));
 app.use('/api/formateur', require('./routes/formateur.routes'));
 app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/messages', require('./routes/messages.routes'));
-app.use('/api/questions', require('./routes/questions.routes'));
 app.use('/api/externe', require('./routes/externe.routes'));
+app.use('/api/etudiant', require('./routes/candidat.routes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));

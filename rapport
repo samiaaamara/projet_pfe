@@ -1,0 +1,689 @@
+Introduction Générale
+
+Aujourd'hui, l’informatique occupe une place essentielle dans tous les domaines, notamment dans celui de la formation professionnelle, où la transformation numérique devient une nécessité pour améliorer la gestion administrative et pédagogique.
+Les solutions informatiques permettent de proposer des outils fiables, rapides et efficaces afin d’automatiser plusieurs tâches liées à la gestion des formations. Dans ce contexte, j’ai développé la plateforme « FormaPro », conçue pour faciliter et améliorer la gestion des formations au sein de l’Institut Supérieur des Études Technologiques de Tozeur.
+Ce rapport présente les différentes étapes suivies pour la réalisation de cette application au cours de ce projet de fin d’études. Il est organisé en plusieurs chapitres :
+•	Le premier chapitre intitulé « Présentation du projet » présente le cadre général du projet, l’étude de l’existant, la problématique, la solution proposée ainsi que la méthodologie SCRUM adoptée. 
+•	Le deuxième chapitre intitulé « Sprint 0 » décrit les besoins fonctionnels et non fonctionnels, le backlog produit ainsi que l’architecture technique et les technologies utilisées. 
+•	Le troisième chapitre intitulé « Sprint 1 » présente le backlog du sprint, la phase de conception à travers les différents diagrammes UML ainsi que la réalisation des premières fonctionnalités. 
+•	Le quatrième chapitre intitulé « Sprint 2 » présente les fonctionnalités développées durant ce sprint ainsi que leur conception et leur implémentation. 
+•	Le cinquième chapitre intitulé « Sprint 3 » décrit les nouvelles fonctionnalités réalisées ainsi que les différentes étapes de conception et de développement. 
+•	Le sixième chapitre intitulé « Sprint 4 » présente les dernières fonctionnalités développées ainsi que les améliorations apportées à la plateforme. 
+Enfin, ce rapport se termine par une conclusion générale résumant les travaux réalisés ainsi que les perspectives d’amélioration et les évolutions futures du projet.
+
+
+
+Chapitre 
+1	   Présentation du projet
+
+Introduction
+Ce premier chapitre présente le cadre général de mon projet de fin d'études intitulé « Plateforme de Gestion des Formations ». Je commencerai par une présentation de l'organisme d'accueil afin de situer le contexte général du projet. Ensuite, j'étudierai les solutions existantes afin d'identifier leurs limites et de justifier la mise en place d'une nouvelle solution adaptée aux besoins des centres de formation professionnelle. Par la suite, je présenterai la solution proposée, la méthodologie adoptée, les outils et technologies utilisés ainsi que le pilotage du projet avec la méthode SCRUM.
+I.	Présentation de l’organisme d’accueil
+Dans le cadre de mon projet de fin d'études, j'ai effectué mon stage au sein de l'Institut Supérieur des Études Technologiques de Tozeur (ISET Tozeur). L'ISET Tozeur est un établissement universitaire public appartenant au réseau des Instituts Supérieurs des Études Technologiques en Tunisie. Il assure des formations académiques et professionnelles dans plusieurs domaines technologiques et informatiques afin de préparer les étudiants à intégrer le marché du travail. L'établissement propose plusieurs spécialités liées au développement informatique, aux réseaux, au multimédia, à la gestion et aux technologies de l'information. Grâce à son environnement pédagogique moderne, l'institut encourage également l'innovation, la recherche scientifique et la transformation numérique. Cette structure représente un environnement favorable pour la réalisation de projets innovants, notamment ma plateforme intelligente de gestion des formations..
+ 
+Figure 1:Logo de l'ISET Tozeur
+1.	Les activités de l’ISET Tozeur
+L’ISET Tozeur assure plusieurs activités académiques et administratives, parmi lesquelles :
+•	Formation académique
+L’établissement propose des formations universitaires dans plusieurs spécialités technologiques et professionnelles.
+•	Encadrement pédagogique
+L’institut accompagne les étudiants à travers des projets, stages et travaux pratiques afin de développer leurs compétences techniques et professionnelles.
+•	Innovation et recherche
+L’ISET encourage les projets innovants et les activités de recherche scientifique dans différents domaines technologiques.
+•	Transformation numérique
+L’établissement participe à la digitalisation des processus administratifs et pédagogiques.
+•	Gestion des stages
+L’institut assure le suivi des stages académiques et professionnels des étudiants.
+2.	Organigramme
+L’organisation administrative et pédagogique de l’ISET Tozeur repose sur plusieurs services et départements :
+•	Direction générale ; 
+•	Secrétariat général ; 
+•	Départements académiques ; 
+•	Service informatique ; 
+•	Service administratif ; 
+•	Service des stages ; 
+•	Enseignants ; 
+•	Étudiants. 
+II.	Contexte et Présentation du Projet
+1.	Présentation du projet
+Ce travail s'inscrit dans le cadre de mon projet de fin d'études pour l'obtention de la Licence en Développement des Systèmes d'Information à l'Institut Supérieur des Études Technologiques de Tozeur. Dans ce contexte, j'ai développé une plateforme web intelligente nommée « FormaPro », dédiée à la gestion des formations professionnelles. Cette plateforme vise à digitaliser et automatiser les différentes opérations liées à la gestion des formations, des inscriptions, des paiements ainsi qu'au suivi pédagogique des apprenants Cette plateforme vise à digitaliser et automatiser les différentes opérations liées à la gestion des formations, des inscriptions, des paiements ainsi qu’au suivi pédagogique des apprenants.
+
+2.	Étude et critique de l’existant
+Avant de développer cette plateforme, j’ai étudié plusieurs solutions existantes utilisées dans le domaine de la gestion des formations et de l’apprentissage en ligne :
+• Moodle
+Plateforme open source de gestion des cours et des évaluations. 
+ 
+Figure 2: Logo MOODLE
+
+• Google Classroom
+Plateforme éducative permettant le partage de documents et la gestion des cours.
+ 
+Figure 3: Logo Google Classroom
+• Coursera
+Plateforme internationale proposant des formations et certifications en ligne.
+ 
+Figure 4: Logo Coursera
+
+	Critique de l’existant :
+Les solutions existantes présentent plusieurs limites :
+•	absence de centralisation complète ; 
+•	manque de personnalisation selon le profil de l'utilisateur ;
+•	 absence de gestion avancée des paiements ; 
+•	communication limitée entre les acteurs ; 
+•	absence d'assistant intelligent intégré ; 
+•	suivi pédagogique insuffisant ;
+•	 absence de workflow de validation et d'approbation des formations ; 
+•	impossibilité d'upload de supports pédagogiques multiformat directement intégrée à la plateforme.
+Ces limites justifient la nécessité de développer une nouvelle solution plus adaptée aux besoins des centres de formation professionnelle.
+
+3.	Problématique
+Le processus actuel de gestion des formations présente plusieurs difficultés pour les différents acteurs.
+Pour les administrateurs
+•	gestion manuelle des inscriptions ;
+•	 difficulté de suivi des formations et de leur cycle de vie ;
+•	 absence de statistiques centralisées et de tableau de bord ;
+•	 difficulté de gestion des paiements ;
+•	 absence de processus structuré d'approbation des formations soumises par les formateurs.
+Pour les formateurs
+•	difficulté de suivi pédagogique des étudiants ; 
+•	absence d'outils modernes de communication ; 
+•	gestion complexe des séances, modules et supports de cours ;
+•	 absence d'un circuit de soumission et de validation des formations.
+Pour les étudiants
+•	difficulté d'accès aux informations et supports pédagogiques ;
+•	 suivi limité des inscriptions ; absence de communication centralisée ;
+•	 pas d'assistant intelligent pour répondre aux questions fréquentes.
+Pour les utilisateurs externes
+•	difficulté d'inscription aux formations ; 
+•	absence de paiement en ligne sécurisé ;
+•	 manque d'informations sur les formations disponibles.
+Solution proposée :
+Notre solution consiste à développer une plateforme web intelligente permettant :
+•	la gestion complète des formations; 
+•	la gestion des utilisateurs ; 
+•	la gestion des modules et des séances ;
+•	la gestion du programme de formation
+•	les inscriptions en ligne avec vérification de la disponibilité des places et filtrage par spécialité ;
+•	le paiement sécurisé via Stripe pour les utilisateurs externes souhaitant s'inscrire à des formations payantes  ; 
+•	le suivi pédagogique des étudiants par les formateurs; 
+•	la messagerie interne entre les acteurs de la plateforme ;
+•	l’intégration d’un assistant intelligent basé sur l’intelligence artificielle ;
+•	un tableau de bord statistique pour l'administrateur.
+ 
+
+III.	Méthodologie adoptée :
+La méthodologie utilisée pour la réalisation d’un projet représente une étape importante afin d’assurer une bonne organisation du travail et de faciliter le développement des fonctionnalités d’un système logiciel. Il existe plusieurs méthodologies de développement, chacune présentant des avantages et des limites. Le choix de la méthode dépend principalement des besoins du projet ainsi que de l’organisation de l’équipe.
+1.	Méthodologie de travail (Méthode Agile) :
+Afin de répondre aux exigences de notre application, j’ai choisi d’adopter la méthodologie Agile. Cette approche permet une meilleure flexibilité, une adaptation rapide aux changements ainsi qu’une amélioration continue du projet.
+Après avoir adopté le développement Agile, j’ai réalisé une comparaison entre plusieurs méthodes agiles afin de sélectionner la stratégie la plus adaptée à mon projet.
+
+Méthode	Description	Points forts	Limitations
+XP	Une méthode agile qui met l'accent sur la qualité du code et la livraison rapide.	- Code de qualité (tests automatisés).
+- Bonne collaboration.	- Difficile  à  appliquer
+- Nécessite une équipe expérimentée
+Kanban	Une méthode agile qui optimise le flux de travail à l’aide de tableaux visuels.	- Visualisation claire.
+- Flexibilité continue.	- Moins adapté aux équipes distantes.
+- Mise en œuvre complexe.
+Scrum	Un espace de travail qui utilise des sprints pour livrer des fonctionnalités de manière itérative.	- Bonne communication.
+- Livraison rapide.	- Nécessite une gestion de projet rigoureuse
+- Nécessite des rôles bien définis.
+Tableau 1:Une comparaison de méthodes agiles
+
+Après comparaison, j’ai choisi la méthode SCRUM car elle offre une meilleure organisation du travail, une gestion efficace des tâches ainsi qu’un suivi continu et structuré de l’avancement du projet.
+2.	SCRUM :
+Scrum c’est un espace de travail comprend les éléments suivants : les 3 piliers, définit les trois rôles et les quatres évènements : 
+Les 3 Piliers de Scrum : 
+
+•	Transparence : Toutes les informations importantes sont visibles par tous les membres et parties prenantes.
+•	Inspection : Le travail est régulièrement contrôlé pour éviter les erreurs et assurer la qualité dès le départ. 
+•	Adaptation : L’équipe ajuste un travail continu grâce à l’expérience et au contexte du projet.
+ Les rôles Scrum : 
+•	Product Owner : Porte la vision du produit, priorise les besoins (backlog) et représente le client
+•	Scrum Master : est le garant de la méthodologie SCRUM. Un pédagogue et diplomate qui assure les équipes en charge des projets adoptent les principes et les valeurs de SCRUM. 
+•	Equipe de développement : se compose idéalement mois de dix employés et responsable de la production des produits demandés par les clients.  
+	Les Evènements SCRUM : 
+•	Le Sprint : Selon le projet, cela peut varier quatre semaines maximum. Il s’agit d’un intervalle de temps appelé itération, pendant lequel l’équipe de développement conçoit, construit et teste de nouvelles fonctionnalités. 
+•	Le Sprint Planning : Planification du travail à réaliser pendant le sprint, en accord avec le Product Owner. 
+•	Le Daily Scrum ou Mêlée : Réunion quotidienne (15 min) pour suivre l’avancement et ajuster si besoin
+•	La Sprint review : Mener à la fin du sprint, elle comprend la présentation des fonctionnalités développées au cours du sprint aux parties prenantes, la collecte de leurs commentaires et l'évaluation de l'avancement global du projet. 
+•	La Sprint Rétrospective : il a pour but d'échanger sur les problématiques méthodologiques ou organisationnelles rencontrées tout au long du sprint, d'en tirer des enseignements et d'en tirer profit pour une amélioration continue collective. 
+ 
+Figure 5:Cycle de vie de SCRUM
+
+
+
+IV.	Langage de modélisation (UML) :
+UML se définit comme un langage de modélisation graphique et textuel destiné à comprendre et décrire les besoins, spécifier et documenter les systèmes, concevoir des solutions logicielles et représenter les différents aspects d’un système informatique.
+UML contient plusieurs types de diagrammes permettant de modéliser le fonctionnement et la structure d’une application. Dans le cadre de ce projet, j’ai choisi d’utiliser les diagrammes suivants afin d’expliquer le fonctionnement de la plateforme :
+•	Le diagramme de cas d’utilisation : représente les interactions entre les acteurs et le système ainsi que les différentes fonctionnalités offertes. 
+•	Le diagramme de séquence : illustre les échanges de messages entre les objets dans une séquence temporelle. 
+•	Le diagramme d’activité : modélise le flux des actions et des processus sous forme d’étapes et de transitions. 
+•	Le diagramme de classes : décrit la structure statique du système à travers les classes, les attributs, les méthodes et les relations entre les différentes entités.
+ 
+Figure 6:Logo UML
+
+V.	Pilotage de projet avec SCRUM :
+1.	Rôles et équipes
+Rôles Scrum	Personnes affectées
+Product Owner	Moi-même
+Scrum Master	Mme. HEDFI Souhir
+Team	Moi-même
+Tableau 2: Rôles et équipes
+2.	Identification des acteurs :
+La plateforme de gestion des formations est composée de plusieurs acteurs principaux :
+•	Étudiant
+Utilisateur inscrit sur la plateforme qui peut consulter les formations filtrées par sa spécialité, s'inscrire, suivre sa progression et accéder aux supports pédagogiques.
+•	Formateur
+Responsable de la création et de la gestion des formations. Il soumet les formations à l'approbation de l'administrateur, publie les supports de cours, gère les modules et les séances, et suit les étudiants. 
+•	Administrateur
+Gestionnaire principal de la plateforme. Il supervise les utilisateurs, valide et publie les formations selon le workflow d'approbation, gère les catégories, consulte les statistiques et assure le bon fonctionnement global du système. 
+•	Utilisateur externe
+Personne extérieure à l'ISET (professionnel, entreprise, particulier) qui doit d'abord créer un compte et s'authentifier sur la plateforme, puis peut consulter le catalogue et s'inscrire à une formation payante avec paiement sécurisé via Stripe.
+3.	Le Backlog du projet
+Le backlog produit regroupe l’ensemble des fonctionnalités de la plateforme, organisées par acteur et par priorité. Il permet de planifier le développement du système de manière structurée et progressive.
+
+
+En tant que	Je veux	PBI	Priorité
+Étudiant	S’inscrire à la plateforme	PBI 1	Élevée
+Étudiant	S’authentifier	PBI 2	Élevée
+Étudiant	Consulter les formations disponibles (filtrées par spécialité)	PBI 3	Élevée
+Étudiant	S’inscrire à une formation	PBI 4	Élevée
+Étudiant	Suivre mes formations inscrites	PBI 5	Moyenne
+Étudiant	Accéder aux supports de cours	PBI 6	Moyenne
+Étudiant	Recevoir des notifications	PBI 7	Moyenne
+Étudiant	Utiliser l'assistant IA pour des questions sur mes formations	PBI 8	Moyenne
+Étudiant	Envoyer et recevoir des messages internes	PBI 9	Faible
+Formateur	S’inscrire à la plateforme	PBI 10	Élevée
+Formateur	S’authentifier	PBI 11	Élevée
+Formateur	Créer des formations	PBI 12	Élevée
+Formateur	Gérer les modules et le programme d'une formation	PBI 13	Élevée
+Formateur	Soumettre une formation à l'approbation de l'administrateur	PBI 14	Élevée
+Formateur	Uploader des supports pédagogiques (PDF, vidéos, documents)	PBI 15	Élevée
+Formateur	Gérer les séances d'une formation	PBI 16	Élevée
+Formateur	Suivre les étudiants inscrits	PBI 17	Élevée
+Formateur	Évaluer et noter les étudiants	PBI 18	Moyenne
+Formateur	Envoyer et recevoir des messages internes	PBI 19	Faible
+Administrateur	S'authentifier	PBI 20	Élevée
+Administrateur	Gérer les utilisateurs (CRUD)	PBI 21	Élevée
+Administrateur	Gérer les formations (CRUD)	PBI 22	Élevée
+Administrateur	Approuver ou rejeter les formations en attente	PBI 23	Élevée
+Administrateur	Publier les formations acceptées dans le catalogue	PBI 24	Élevée
+Administrateur	Gérer les modules de formation	PBI 25	Élevée
+Administrateur	Consulter les statistiques du tableau de bord	PBI 26	Moyenne
+Administrateur	Gérer les formateurs (CRUD)	PBI 27	Élevée
+Utilisateur externe	S’inscrire à la plateforme	PBI 28
+	Élevée
+Utilisateur externe	S’authentifier	PBI 29	Élevée
+Utilisateur externe	Consulter le catalogue de formations	PBI 30	Élevée
+Utilisateur externe	S'inscrire à une formation payante	PBI 31	Élevée
+Utilisateur externe	Effectuer un paiement Stripe	PBI 32	Élevée
+Tableau 3:Backlog du projet
+
+Conclusion :
+Dans ce chapitre, j'ai présenté le contexte général de mon projet, étudié les solutions existantes et leurs limites, défini la problématique et la solution proposée, puis décrit. Cette présentation sera complétée dans le chapitre suivant intitulé « Sprint 0 », qui détaillera la conception et l'analyse du système à travers les diagrammes UML.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chapitre 
+2	   Sprint 0
+
+Introduction
+Dans ce chapitre, je vais me concentrer sur la spécification des besoins de la plateforme web « FormaPro ». J’expliquerai les besoins fonctionnels et non fonctionnels à travers des User Stories, je présenterai la planification des sprints, ainsi que l’environnement de travail utilisé pour le développement de l’application.
+
+I.	Spécification des besoins
+1.	Les besoins fonctionnels (User Stories)
+Le tableau ci-dessous présente en détail l'ensemble des exigences fonctionnelles de notre plateforme.
+Acteur	PBI	User Story ID	User Stories
+Étudiant	PBI 1	US1	S'inscrire à la plateforme
+	PBI 2	US2	S'authentifier
+	PBI 3	US3	Consulter le catalogue des formations disponibles
+		US4	Filtrer les formations par spécialité
+	PBI 4	US5	S'inscrire à une formation
+	PBI 5	US6	Consulter mes formations inscrites
+		US7	Consulter mon statut de présence
+	PBI 6	US8	Accéder aux supports pédagogiques
+	PBI 7	US9	Recevoir des notifications
+	PBI 8	US10	Utiliser l'assistant intelligent pour des questions
+	PBI 9	US11	Envoyer et recevoir des messages internes
+Formateur	PBI 10	US12	S'inscrire à la plateforme
+	PBI 11	US13	S'authentifier
+	PBI 12	US14	Créer une formation (brouillon)
+	PBI 13	US15	Ajouter des modules à une formation
+		US16	Définir le programme et les objectifs
+	PBI 14	US17	Soumettre une formation à l'approbation de l'administrateur
+	PBI 15	US18	Uploader des supports pédagogiques (PDF, vidéo, document)
+		US19	Supprimer un support pédagogique
+	PBI 16	US20	Gérer les séances d'une formation
+	PBI 17	US21	Consulter la liste des étudiants inscrits
+		US22	Valider la présence des étudiants
+	PBI 18	US23	Évaluer et noter les étudiants
+	PBI 19	US24	Envoyer et recevoir des messages internes
+Administrateur	PBI 20	US25	S'authentifier
+	PBI 21	US26	Consulter la liste des utilisateurs
+		US27	Filtrer les utilisateurs par rôle et spécialité
+		US28	Supprimer un utilisateur
+	PBI 22	US29	Consulter toutes les formations
+		US30	Créer une formation directement
+		US31	Modifier une formation
+		US32	Supprimer une formation
+	PBI 23	US33	Accepter une formation en attente
+		US34	Rejeter une formation en attente
+	PBI 24	US35	Publier une formation acceptée dans le catalogue
+	PBI 25	US36	Gérer les modules de formation
+	PBI 26	US37	Consulter les statistiques du tableau de bord
+	PBI 27	US38	Créer un compte formateur
+		US39	Modifier un compte formateur
+		US40	Supprimer un compte formateur
+Utilisateur externe	PBI 28	US41	S'inscrire à la plateforme
+	PBI 29	US42	S'authentifier
+	PBI 30	US43	Consulter le catalogue des formations disponibles
+	PBI 31	US44	S'inscrire à une formation payante
+	PBI 32	US45	Effectuer un paiement sécurisé via Stripe
+		US46	Accéder aux supports pédagogiques après paiement
+Tableau 4:Besoins fonctionnels (User Stories)
+
+2.	Les besoins non fonctionnels
+Les besoins non fonctionnels influencent de manière indirecte la qualité, la fiabilité et la performance de la plateforme. Les exigences suivantes ont été prises en compte :
+•	Sécurité : Les mots de passe sont hachés via bcrypt. L'accès aux ressources est contrôlé par des tokens JWT. Un système de rate limiting protège contre les attaques par force brute.
+•	Performance : Les listes sont paginées côté backend pour réduire les temps de chargement. Les requêtes SQL sont optimisées avec des index et des jointures maîtrisées.
+•	Simplicité d'utilisation : L'interface est intuitive, responsive et adaptée aux utilisateurs non expérimentés grâce à Bootstrap 5 et des messages d'erreur clairs par champ.
+•	Extensibilité : L'architecture est modulaire (routes Express séparées, composants Angular standalone) pour permettre l'ajout de nouvelles fonctionnalités sans altérer les performances.
+•	Compatibilité : La plateforme est compatible avec les principaux navigateurs web (Chrome, Firefox, Edge) et accessible sur mobile et tablette.
+•	Disponibilité : L'architecture découplée (frontend/backend indépendants) facilite la maintenance et garantit une meilleure disponibilité du service.
+
+II.	Planification du projet
+Sprint 1	Sprint 2	Sprint 3	Sprint 4
+PBI 1, 2 : Inscription & Authentification	PBI 12 : Créer une formation	PBI 4 : Inscription formation	PBI 9, 19, 24 : Messagerie
+PBI 20 : Auth Administrateur	PBI 13 : Modules & Programme	PBI 28, 29 : Inscription externe	PBI 7 : Notifications
+PBI 21 : Gestion des utilisateurs	PBI 14 : Soumission approbation	PBI 31, 32 : Paiement Stripe	PBI 8 : Assistant IA (Ollama)
+PBI 27 : Gestion des formateurs	PBI 23, 24 : Accepter/Publier	PBI 15 : Supports pédagogiques	PBI 18 : Notation formations
+PBI 26 : Statistiques dashboard	PBI 22 : Gestion formations admin	PBI 17 : Présences étudiants	Questions / Réponses
+Tableau 5:Planification des sprints
+
+
+
+III.	Environnement de travail
+1.	Environnement Matériel
+Le tableau ci-dessous présente les caractéristiques de l'ordinateur utilisé pour le développement de la plateforme FormaPro.
+Caractéristique	Configuration
+Ordinateur	DELL
+RAM	16 Go
+Processeur	Intel Core i5
+Disque dur	512 Go SSD
+Système d'exploitation	Windows 11
+Tableau 6 :Caractéristiques de l'ordinateur
+
+2.	Environnement Logiciel
+Logo	Description
+ 	Plateforme d'hébergement et de gestion de versions basée sur Git. Utilisée pour le suivi des versions et la sauvegarde du code source.
+ 	XAMPP est un environnement de développement local incluant Apache, MySQL, PHP, permettant de tester des applications web en local.
+ 	Éditeur de code open-source développé par Microsoft, supportant Angular, TypeScript et Node.js via des extensions.
+ 	Outil permettant de tester et documenter les routes de l'API REST, facilitant l'intégration entre le frontend et le backend.
+ 	Outil de modélisation UML permettant la conception des diagrammes (cas d'utilisation, classes, séquences, activités).
+ 	Interface graphique web pour administrer la base de données MySQL et visualiser les tables.
+ 	Outil en ligne de commande pour générer, développer et builder le projet Angular.
+Tableau 7:Environnement logiciel
+
+
+
+
+
+
+3.	SGBD
+Logo	Description
+  	Système de gestion de base de données relationnelle utilisé pour stocker les données des utilisateurs, formations, inscriptions, supports et notifications. La base de données est nommée gestion_formations.
+Tableau 8:SGBD
+
+4.	Langages utilisés
+Logo	Description
+ 	Langage de programmation typé basé sur JavaScript, utilisé pour développer le frontend Angular et garantir la robustesse du code.
+ 
+Langage de programmation utilisé côté backend avec Node.js pour la logique métier et les routes API.
+ 	Langage de structuration des pages web, utilisé dans les templates Angular.
+ 	Langage de mise en forme des éléments HTML, complété par Bootstrap 5.
+ 	Langage de requêtes utilisé pour manipuler et interroger la base de données MySQL.
+Tableau 9: Langages utilisés
+
+
+
+5.	Frameworks et bibliothèques
+Logo	Description
+ 	Framework frontend SPA (Single Page Application) basé sur TypeScript, avec des composants standalone et un système de routage protégé par des guards.
+ 	Framework CSS open source permettant un design moderne, responsive et compatible multi-appareils.
+ 	Environnement d'exécution JavaScript côté serveur, performant et adapté aux applications web grâce à son architecture événementielle.
+ 	Framework web pour construire des API RESTful avec Node.js. Utilisé pour définir toutes les routes backend de FormaPro.
+ 	Middleware Node.js pour la gestion de l'upload de fichiers (PDF, vidéos, documents) avec contrôle du type et de la taille.
+ 
+Bibliothèque de paiement en ligne sécurisé utilisée pour la gestion des transactions des utilisateurs externes.
+ 
+Outil d'exécution locale de modèles de langage (LLM) utilisé pour intégrer l'assistant intelligent de la plateforme.
+Tableau 10: Frameworks et bibliothèques
+
+Conclusion
+Durant ce chapitre, j’ai mis l’accent sur les besoins fonctionnels et non fonctionnels du projet à travers les différentes User Stories et les PBIs définis pour la plateforme FormaPro. J’ai également présenté la planification des différents sprints ainsi que l’environnement matériel et logiciel utilisé pour le développement de l’application.
+
+Chapitre 
+3	  Sprint 1
+Introduction
+
+Dans ce chapitre, je vais détailler les différentes étapes nécessaires à la réalisation du premier incrément de la plateforme FormaPro. Ce sprint constitue la base du système en mettant en place les fonctionnalités d’inscription, d’authentification ainsi que la gestion des utilisateurs pour les différents acteurs de la plateforme.
+
+I.	Objectif du Sprint
+
+Les objectifs de ce sprint sont :
+
+•	Inscription des utilisateurs (étudiant, formateur, utilisateur externe).
+•	Authentification sécurisée avec JWT.
+•	Gestion du profil utilisateur.
+•	Gestion des utilisateurs par l'administrateur (CRUD).
+•	Gestion des formateurs par l'administrateur (CRUD).
+•	Consultation du tableau de bord statistique.
+
+II.	Backlog du Sprint
+
+Le tableau suivant décrit en détail les tâches qui seront effectuées pendant ce sprint :
+
+
+
+
+
+Thème	User Stories
+Inscription étudiant	En tant qu'étudiant, je veux créer un compte avec mes informations personnelles (nom, email, mot de passe, spécialité, niveau, CIN, téléphone).
+Inscription formateur	En tant que formateur, je veux créer un compte avec mes informations (nom, email, mot de passe, spécialité, téléphone).
+Inscription externe	En tant qu'utilisateur externe, je veux créer un compte pour pouvoir accéder au catalogue et m'inscrire à des formations payantes.
+Authentification	En tant qu'utilisateur (étudiant, formateur, externe), je veux m'authentifier avec mon email et mot de passe afin d'accéder à mon espace personnel.
+Authentification admin	En tant qu'administrateur, je veux m'authentifier via une page dédiée afin d'accéder au tableau de bord d'administration.
+Gérer mon profil	En tant qu'utilisateur connecté, je veux consulter et modifier mes informations personnelles (nom, email, téléphone, spécialité).
+Changer mot de passe	En tant qu'utilisateur connecté, je veux modifier mon mot de passe en fournissant l'ancien et le nouveau.
+Tableau de bord statistique	En tant qu'administrateur, je veux consulter un tableau de bord affichant les statistiques globales (nombre d'étudiants, formateurs, formations publiées, formations en attente).
+Consulter les utilisateurs	En tant qu'administrateur, je veux consulter la liste des utilisateurs avec filtres par rôle et spécialité.
+Supprimer un utilisateur	En tant qu'administrateur, je veux supprimer un compte utilisateur de la plateforme.
+Créer un formateur	En tant qu'administrateur, je veux créer directement un compte formateur avec ses informations (nom, email, mot de passe, spécialité).
+Modifier un formateur	En tant qu'administrateur, je veux modifier les informations d'un compte formateur existant.
+Supprimer un formateur	En tant qu'administrateur, je veux supprimer un compte formateur de la plateforme.
+Consulter les formateurs	En tant qu'administrateur, je veux consulter la liste des formateurs avec tri et filtrage par spécialité.
+
+Tableau 11: Backlog du Sprint 1
+
+
+Ces fonctionnalités constitueront la base des prochains incréments de développement et permettront d'automatiser et d'optimiser le processus de gestion des formations au sein de l'ISET Tozeur.
+
+III.	Conception
+
+Dans cette section, je vais réaliser les diagrammes de cas d’utilisation, les diagrammes de séquence, les diagrammes d’activité ainsi que le diagramme de classes du Sprint 1.
+
+1.	Diagrammes de cas d'utilisation
+
+Je commencerai par présenter le diagramme de cas d’utilisation global du Sprint 1, avant de détailler les différentes fonctionnalités attendues pour chaque acteur lors du raffinement.
+
+Figure 8 : Diagramme de cas d'utilisation global — Sprint 1
+________________________________________
+1.1	Raffinement de cas d'utilisation — Utilisateur (Étudiant / Formateur / Externe)
+
+Ce diagramme détaille les cas d'utilisation liés à l'inscription, la connexion et la gestion du profil pour les utilisateurs non-admin.
+
+Figure 9 : Raffinement de cas d'utilisation — Utilisateur
+________________________________________
+1.2	Raffinement de cas d'utilisation — Administrateur
+
+Ce diagramme illustre les fonctionnalités accessibles à l'administrateur dans ce sprint : gestion des utilisateurs, gestion des formateurs et consultation des statistiques.
+
+Figure 10 : Raffinement de cas d'utilisation — Administrateur
+________________________________________
+	Scénario du cas d'utilisation « S'inscrire » :
+Titre	S'inscrire à la plateforme
+Acteur	Étudiant / Formateur / Utilisateur externe
+Objectif	Créer un nouveau compte utilisateur selon son rôle.
+Préconditions	L'utilisateur n'est pas encore inscrit. Il dispose d'une adresse email valide.
+Scénario nominal	1. L'utilisateur accède à la page d'inscription. 
+2. Il sélectionne son rôle (étudiant, formateur, externe). 
+3. Le système affiche le formulaire adapté au rôle.
+ 4. L'utilisateur remplit ses informations. 
+5. Le système vérifie la validité des données. 
+6. Le système hache le mot de passe avec bcrypt.
+ 7. Le système enregistre l'utilisateur et son profil dans la base de données. 
+8. Le système redirige l'utilisateur vers la page de connexion.
+Scénario alternatif	5a. Si l'email est déjà utilisé, le système affiche un message d'erreur. 
+5b. Si un champ obligatoire est vide, le système affiche le message d'erreur correspondant.
+Post-condition	Le compte est créé. L'utilisateur peut se connecter à son espace.
+
+Tableau 12: Scénario du cas d'utilisation « S'inscrire »
+
+
+	Scénario du cas d'utilisation « Gérer les formateurs » :
+
+Titre	Créer un compte formateur
+Acteur	Administrateur
+Objectif	Ajouter un nouveau formateur directement depuis le dashboard admin.
+Préconditions	L'administrateur est authentifié.
+Scénario nominal	1. L'administrateur accède à la section « Formateurs ». 
+2. Il clique sur « Ajouter un formateur ». 
+3. Le système affiche un formulaire (nom, email, mot de passe, spécialité).
+ 4. L'administrateur remplit et soumet le formulaire.
+ 5. Le système valide les données.
+ 6. Le système crée le compte dans users et le profil dans formateurs. 
+7. Un message de confirmation s'affiche.
+Scénario alternatif	5a. Si l'email existe déjà, le système affiche un message d'erreur.
+Post-condition	Le formateur peut se connecter et créer des formations.
+
+Tableau 13: Scénario du cas d'utilisation « S'inscrire »
+
+
+2.	Diagrammes de séquence
+Dans cette partie, je vais présenter les diagrammes de séquence illustrant les interactions entre les acteurs et le système pour les principales fonctionnalités du Sprint 1, notamment l’authentification et l’inscription des utilisateurs.
+
+2.1	Diagramme de séquence « S'authentifier »
+
+Ce diagramme illustre le processus d'authentification d'un utilisateur dans le système.
+Utilisateur     Page Login     Backend Express     Base de données
+    │               │                │                   │
+    │─Email+Mdp────►│                │                   │
+    │               │─POST /auth/login──────────────────►│
+    │               │                │─SELECT user WHERE─►│
+    │               │                │   email=?          │
+    │               │                │◄──user────────────│
+    │               │                │─bcrypt.compare()   │
+    │               │                │─jwt.sign(payload)  │
+    │               │◄──{token,user}─│                   │
+    │◄──Redirection─│                │                   │
+    │   Dashboard   │                │                   │
+Figure 11 : Diagramme de séquence « S'authentifier »
+
+2.2	Diagramme de séquence « S'inscrire »
+
+Ce diagramme décrit le processus d'inscription d'un nouveau utilisateur selon son rôle.
+
+Utilisateur     Page Inscription   Backend Express     Base de données
+    │               │                    │                   │
+    │─Choix rôle───►│                    │                   │
+    │─Formulaire────►│                    │                   │
+    │               │─POST /auth/register────────────────────►│
+    │               │                    │─bcrypt.hash(mdp)   │
+    │               │                    │─INSERT INTO users  ├─►│
+    │               │                    │─INSERT INTO        │
+    │               │                    │  [etudiants/       │
+    │               │                    │   formateurs/      │
+    │               │                    │   externes]────────►│
+    │               │◄──{token, user}────│                   │
+    │◄──Redirection─│                    │                   │
+Figure 12 : Diagramme de séquence « S'inscrire »
+
+3.	Diagramme d'activité
+
+	Diagramme d'activité « Authentification et redirection »
+
+[Utilisateur saisit email + mot de passe]
+              │
+    [Vérification email en BDD]
+         ┌────┴────┐
+      [Trouvé]  [Non trouvé]
+         │           │
+  [bcrypt.compare]  [Erreur: email incorrect]
+     ┌───┴───┐
+  [Valide] [Invalide]
+     │           │
+  [JWT signé] [Erreur: mot de passe incorrect]
+     │
+  [Vérification rôle]
+  ┌────┬────┬────┬────┐
+[admin][formateur][étudiant][externe]
+  │       │          │         │
+[Dashboard Admin][Dashboard Formateur]...
+
+Figure 13 : Diagramme d'activité « Authentification et redirection »
+
+1.	Diagramme de classes — Sprint 1
+2.	
+Le diagramme de classe de notre premier sprint est présenté par la figure ci-dessous :
+@startuml Sprint1_Classes
+class User {
+  +id: int
+  +nom: string
+  +email: string
+  +mot_de_passe: string
+  +role: enum
+  +login(): Token
+  +register(): void
+  +updateProfile(): void
+  +changePassword(): void
+}
+class Etudiant {
+  +id: int
+  +user_id: int
+  +specialite: string
+  +niveau: string
+  +cin: string
+  +telephone: string
+}
+class Formateur {
+  +id: int
+  +user_id: int
+  +specialite: string
+  +telephone: string
+}
+class Externe {
+  +id: int
+  +user_id: int
+  +specialite: string
+  +telephone: string
+}
+class Admin {
+  +id: int
+  +user_id: int
+  +manageUsers(): void
+  +manageFormateurs(): void
+  +getStats(): Stats
+}
+User "1" -- "1" Etudiant
+User "1" -- "1" Formateur
+User "1" -- "1" Externe
+User "1" -- "1" Admin
+@enduml
+Figure 14 : Diagramme de classes — Sprint 1
+
+IV.	Réalisation
+Dans cette section, à l’aide des captures d’écran ci-dessous, nous allons montrer les résultats de notre premier sprint de notre projet.
+
+1.	Interface d'accueil (Home)
+
+La page d'accueil publique de FormaPro présente la plateforme, ses fonctionnalités principales, les domaines de formation disponibles et les appels à l'action pour s'inscrire ou se connecter.
+
+Figure 15 : Interface d'accueil FormaPro
+
+2.	Interface d'inscription
+Cette page permet à l'utilisateur de créer un compte en sélectionnant son rôle. Le formulaire s'adapte dynamiquement selon le rôle choisi (étudiant, formateur ou utilisateur externe) et inclut une validation en temps réel des champs obligatoires.
+
+Figure 16 : Interface d'inscription
+
+3.	Interface de connexion
+
+Cette page de connexion permet à tous les utilisateurs de s'authentifier avec leur email et mot de passe. Après validation, le système génère un token JWT et redirige automatiquement l'utilisateur vers le dashboard correspondant à son rôle.
+
+Figure 17 : Interface de connexion
+
+4.	Interface connexion administrateur
+
+L'administrateur dispose d'une page de connexion dédiée (/admin-login) avec vérification du rôle côté backend via le middleware verifyAdmin.
+
+Figure 18 : Interface connexion administrateur
+
+5.	Interface Dashboard administrateur
+
+Lorsque l'administrateur se connecte, cette interface affiche un aperçu global du système : nombre total d'utilisateurs, de formateurs, de formations publiées et de formations en attente d'approbation. Des boutons d'actions rapides permettent de naviguer directement vers les sections clés.
+
+Figure 19 : Dashboard administrateur
+
+6.	Interface gestion des utilisateurs
+Cette interface permet à l'administrateur de consulter la liste complète des utilisateurs avec filtres par rôle (étudiant, formateur, externe, admin) et par spécialité. La spécialité est récupérée dynamiquement via une requête SQL avec JOIN sur les tables de profils.
+
+Figure 20 : Gestion des utilisateurs
+
+7.	Interface gestion des formateurs
+
+Cette interface permet à l'administrateur de créer, modifier et supprimer des comptes formateurs. Elle inclut un système de tri (par nom, email ou spécialité) et de pagination.
+
+Figure 21 : Gestion des formateurs
+
+8.	Interface profil utilisateur
+
+Chaque utilisateur peut consulter et modifier ses informations personnelles depuis son espace profil, et changer son mot de passe en fournissant l'ancien mot de passe pour validation.
+
+Figure 22 : Interface profil utilisateur
+
+
+V.	Tests
+
+1.	Test — Connexion avec des identifiants incorrects
+
+Lorsque l'utilisateur saisit un email inexistant ou un mot de passe incorrect, le système affiche un message d'erreur précis sans révéler si c'est l'email ou le mot de passe qui est incorrect, pour des raisons de sécurité.
+
+Figure 23 : Test connexion — identifiants incorrects
+
+
+2.	Test — Inscription avec email déjà utilisé
+
+Si l'utilisateur tente de créer un compte avec un email déjà enregistré, le système retourne une erreur 400 avec le message approprié et l'affiche clairement sur le formulaire.
+
+Figure 24 : Test inscription — email déjà existant
+
+3.	Test — Validation des champs du formulaire
+
+Chaque champ obligatoire du formulaire est validé côté frontend (avec messages d'erreur inline) et côté backend (réponse 400 avec message précis). Les champs date et numériques (durée, places) sont aussi contraints via des attributs HTML (min, type).
+
+Figure 25 : Test — validation formulaire
+
+Conclusion
+
+Ce chapitre a permis de mettre en lumière le travail accompli lors du premier sprint de FormaPro, en détaillant les tâches réalisées pour l'inscription, l'authentification et la gestion des utilisateurs. Ce sprint constitue le socle fondateur de la plateforme, sur lequel s'appuieront les fonctionnalités métiers des sprints suivants
+
+
+
+
+ 
+

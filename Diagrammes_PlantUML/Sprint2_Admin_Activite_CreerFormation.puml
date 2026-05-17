@@ -1,0 +1,51 @@
+@startuml Admin_CreerFormation_Activite
+title Diagramme d'Activité — Admin Crée Formation et Assigne Formateur
+
+start
+:Admin accède au Dashboard;
+
+:Clique "Créer une nouvelle formation";
+
+:Système affiche formulaire;
+
+:Admin remplit les champs obligatoires\n(titre, description, spécialité, prix, places disponibles);
+
+:Admin sélectionne un formateur\nparmi la liste disponible;
+
+:Admin clique "Créer";
+
+:Validation des champs côté frontend;
+
+if (Tous les champs remplis?) then (non)
+    :Affiche erreur de validation;
+    :Admin corrige les erreurs;
+    goto remplir
+else (oui)
+    label remplir
+    :Envoie requête au backend;
+    
+    :Vérification que le formateur existe;
+    
+    if (Formateur valide?) then (non)
+        :Erreur: Formateur introuvable;
+        :Affiche erreur à l'admin;
+        end
+    else (oui)
+        :Création de la formation\navec status = "brouillon";
+        
+        :Assignation du formateur\nà la formation créée;
+        
+        :Création programme de formation;
+        
+        :Affiche message succès;
+        
+        :Formation apparaît\ndans la liste des formations;
+        
+        :Admin peut maintenant\najouter des modules;
+        end
+    endif
+endif
+
+stop
+
+@enduml

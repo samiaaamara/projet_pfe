@@ -1,0 +1,34 @@
+@startuml Sprint1_Sequence_Authentification
+title Diagramme de Séquence — Authentification
+
+actor Utilisateur as User
+participant "Page Login\nFrontend" as Frontend
+participant "Backend\nExpress" as Backend
+database "Base de Données\nMySQL" as DB
+
+User -> Frontend: Email + Mot de passe
+activate Frontend
+
+Frontend -> Backend: POST /api/auth/login\n{email, mot_de_passe}
+activate Backend
+
+Backend -> DB: SELECT user WHERE email = ?
+activate DB
+DB --> Backend: user_object
+deactivate DB
+
+Backend -> Backend: bcrypt.compare(\nmot_de_passe,\nhashed_password)
+alt Mot de passe valide
+    Backend -> Backend: jwt.sign(payload)
+    Backend --> Frontend: {success, token, user}
+    deactivate Backend
+    Frontend --> User: Redirection Dashboard\navec token stocké
+else Mot de passe invalide
+    Backend --> Frontend: {error: "Identifiants incorrects"}
+    deactivate Backend
+    Frontend --> User: Message d'erreur
+end
+
+deactivate Frontend
+
+@enduml

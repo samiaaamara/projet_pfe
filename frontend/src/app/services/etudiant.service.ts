@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EtudiantService {
 
-  private apiUrl = 'http://localhost:3000/api/etudiant';
+  private apiUrl = `${environment.apiUrl}/etudiant`;
 
   constructor(private http: HttpClient) {}
 
@@ -102,5 +103,18 @@ export class EtudiantService {
   // Vérification d'éligibilité à l'attestation
   getEligibiliteAttestation(etudiantId: number, formationId: number) {
     return this.http.get<any>(`${this.apiUrl}/eligibilite-attestation/${etudiantId}/${formationId}`);
+  }
+
+  // Quiz
+  getQuiz(formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz/${formationId}`);
+  }
+
+  getQuizScore(candidatId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz-score/${candidatId}/${formationId}`);
+  }
+
+  soumettreQuiz(data: { candidat_id: number; quiz_id: number; reponses: { question_id: number; reponse_id: number }[] }) {
+    return this.http.post<any>(`${this.apiUrl}/quiz/soumettre`, data);
   }
 }

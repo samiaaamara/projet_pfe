@@ -13,7 +13,13 @@
       "Bash(git gc *)",
       "Bash(git push *)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Force)",
-      "Bash(Select-Object Name, FullName)"
+      "Bash(Select-Object Name, FullName)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Recurse -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Format-Table FullName)",
+      "PowerShell(if \\(!\\(Test-Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\\\\backend\\\\uploads\"\\)\\) { New-Item -ItemType Directory -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\\\\backend\\\\uploads\" | Out-Null; Write-Host \"Dossier uploads créé\" } else { Write-Host \"Dossier uploads existe déjà\" })",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Directory)",
+      "Bash(Select-Object Name)"
     ]
   }
 }

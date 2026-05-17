@@ -1,0 +1,35 @@
+@startuml Sprint1_CasUtilisation_Global
+title Diagramme de Cas d'Utilisation Global — Sprint 1 FormaPro
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor Utilisateur
+actor Admin
+
+rectangle FormaPro {
+    usecase "S'inscrire" as UC1
+    usecase "S'authentifier" as UC2
+    usecase "Gérer profil" as UC3
+    usecase "Changer mot de passe" as UC4
+    usecase "Consulter tableau de bord" as UC5
+    usecase "Gérer utilisateurs" as UC6
+    usecase "Gérer formateurs" as UC7
+    usecase "Consulter statistiques" as UC8
+}
+
+Utilisateur --> UC1
+Utilisateur --> UC2
+Utilisateur --> UC3
+Utilisateur --> UC4
+Admin --> UC2
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Admin --> UC8
+
+UC1 .> UC2 : <<include>>
+UC6 .> UC1 : <<extend>>
+UC7 .> UC1 : <<extend>>
+
+@enduml

@@ -3,7 +3,8 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-profile">
-      <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+      <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="avatar avatar-img" alt="Photo de profil">
+      <div *ngIf="!profilePhotoUrl" class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
       <div class="sidebar-role">Formateur</div>
       <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
@@ -33,9 +34,6 @@
             <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
         <span class="nav-icon">💬</span> Messagerie
         <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
-      </a>
-      <a class="nav-item" [class.active]="activeSection === 'questions'" (click)="openQuestions()">
-        <span class="nav-icon">❓</span> Questions
       </a>
     </nav>
 
@@ -73,7 +71,7 @@
         <div class="stat-card green">
           <div class="stat-icon">👥</div>
           <div class="stat-value">{{ stats.etudiants }}</div>
-          <div class="stat-label">Étudiants inscrits</div>
+          <div class="stat-label">Participants inscrits</div>
         </div>
         <div class="stat-card teal" (click)="setSection('mesFormations')">
           <div class="stat-icon">📅</div>
@@ -114,7 +112,8 @@
             <div class="recent-icon">📘</div>
             <div class="recent-info">
               <div class="recent-title">{{ f.titre }}</div>
-              <div class="recent-date">{{ f.date_debut | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date" *ngIf="f.date_debut">{{ f.date_debut | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date" *ngIf="!f.date_debut">Date à définir</div>
             </div>
             <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-accepted': f.status==='accepted', 'status-published': f.status==='published'}">
               {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : f.status === 'accepted' ? 'Acceptée' : 'Publié' }}
@@ -142,6 +141,7 @@
           <option value="pending_approval">En attente</option>
           <option value="accepted">Acceptée</option>
           <option value="published">Publié</option>
+          <option value="archivée">📦 Archivée</option>
         </select>
       </div>
  
@@ -153,10 +153,21 @@
  
        <div class="formations-list">
         <div class="formation-item" *ngFor="let f of filteredFormations">
+          <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="formation-item-photo" [alt]="f.titre">
           <div class="formation-item-header">
             <div>
-              <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-published': f.status==='published'}">
-                {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : 'Publié' }}
+              <span class="status-badge" [ngClass]="{
+                'status-draft':     f.status==='draft',
+                'status-pending':   f.status==='pending_approval',
+                'status-accepted':  f.status==='accepted',
+                'status-published': f.status==='published',
+                'status-archived':  f.status==='archivée'
+              }">
+                {{ f.status === 'draft' ? 'Brouillon'
+                 : f.status === 'pending_approval' ? 'En attente'
+                 : f.status === 'accepted' ? 'Acceptée'
+                 : f.status === 'published' ? 'Publié'
+                 : '📦 Archivée' }}
               </span>
             </div>
           </div>
@@ -165,17 +176,30 @@
           <p class="formation-item-desc">{{ f.description }}</p>
           <div class="formation-item-meta">
             <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="f.duree">⏱ {{ f.duree }}h</span>
             <span *ngIf="f.nb_places">👥 {{ f.nb_places }} places</span>
           </div>
+          <div class="formation-item-meta" *ngIf="f.module_count !== undefined">
+            <span [class.text-success]="f.module_count > 0" [class.text-warning]="f.module_count === 0">
+              📦 {{ f.module_count }} module(s)
+            </span>
+          </div>
           <div class="formation-item-actions">
-            <button class="btn-action blue" (click)="voirInscriptions(f.id)">👥 Inscrits</button>
-            <button class="btn-action teal" (click)="ouvrirSeances(f)">📅 Séances</button>
-            <button class="btn-action orange" *ngIf="f.status !== 'published'" (click)="ouvrirEditionFormation(f)" [disabled]="f.status === 'pending_approval' || f.status === 'accepted'">✏️ Modifier</button>
-            <button class="btn-action purple" (click)="ajouterSupportDirect(f.id)">📎 Supports</button>
-            <button class="btn-action green" *ngIf="f.status === 'draft'" (click)="soumettreFormationPourApprobation(f.id)">✉️ Soumettre</button>
-            <button class="btn-action red" *ngIf="f.status !== 'published'" (click)="supprimerFormation(f.id)" [disabled]="f.status === 'pending_approval' || f.status === 'accepted'">🗑️ Supprimer</button>
-            <span class="published-lock-badge" *ngIf="f.status === 'published'" title="Formation publiée — gérée par l'administrateur">🔒 Géré par l'admin</span>
+            <ng-container *ngIf="f.status !== 'archivée'">
+              <button class="btn-action blue" (click)="voirInscriptions(f.id)">👥 Inscrits</button>
+              <button class="btn-action teal" (click)="ouvrirSeances(f)">📅 Séances</button>
+              <button class="btn-action orange" *ngIf="f.status !== 'published'" (click)="ouvrirEditionFormation(f)" [disabled]="f.status === 'pending_approval' || f.status === 'accepted'">✏️ Modifier</button>
+              <button class="btn-action indigo" *ngIf="f.status === 'draft'" (click)="ouvrirProgramme(f)">📋 Programme</button>
+              <button class="btn-action purple" (click)="ajouterSupportDirect(f.id)">📎 Supports</button>
+              <button class="btn-action green" *ngIf="f.status === 'draft'"
+                      (click)="soumettreFormationPourApprobation(f.id)"
+                      [disabled]="!f.module_count || f.module_count < 1"
+                      [title]="(!f.module_count || f.module_count < 1) ? 'Ajoutez au moins 1 module avant de soumettre' : 'Soumettre à l\'admin'">
+                ✉️ Soumettre
+              </button>
+              <button class="btn-action red" *ngIf="f.status !== 'published'" (click)="supprimerFormation(f.id)" [disabled]="f.status === 'pending_approval' || f.status === 'accepted'">🗑️ Supprimer</button>
+              <span class="published-lock-badge" *ngIf="f.status === 'published'" title="Formation publiée — gérée par l'administrateur">🔒 Géré par l'admin</span>
+            </ng-container>
+            <span *ngIf="f.status === 'archivée'" class="archived-lock-badge">📦 Formation terminée</span>
           </div>
         </div>
       </div>
@@ -309,11 +333,17 @@
         <!-- Informations personnelles -->
         <div class="form-card">
           <div class="profile-avatar-row">
-            <div class="avatar-lg">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+            <div class="profile-photo-wrapper" (click)="photoInputForm.click()" title="Changer la photo de profil">
+              <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="profile-photo-img" alt="Photo de profil">
+              <div *ngIf="!profilePhotoUrl" class="profile-photo-placeholder">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
+              <div class="profile-photo-overlay">📷</div>
+            </div>
+            <input #photoInputForm type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden (change)="onProfilePhotoSelected($event)">
             <div>
               <div class="profile-name">{{ user?.nom }}</div>
               <div class="profile-role-badge">Formateur</div>
               <div class="profile-specialite-chip" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
+              <div class="profile-photo-hint">Cliquez sur la photo pour la modifier</div>
             </div>
           </div>
           <h5 class="section-title" style="margin-top:20px">Informations personnelles</h5>
@@ -474,66 +504,6 @@
       </div>
     </section>
 
-    <!-- ===== QUESTIONS ===== -->
-    <section *ngIf="activeSection === 'questions'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>❓ Questions des Étudiants</h2>
-        <p>Répondez aux questions posées sur vos formations</p>
-      </div>
-       <div class="card-form mb-4">
-        <div class="form-group" style="margin-bottom:0">
-          <label>Sélectionner une formation</label>
-          <select [(ngModel)]="formationQuestionsId" class="form-control"
-                  (ngModelChange)="loadQuestionsFormation($event)">
-            <option [ngValue]="null">Choisir une formation...</option>
-            <option *ngFor="let f of formations" [ngValue]="f.id">{{ f.titre }}</option>
-          </select>
-        </div>
-      </div>
-      <div *ngIf="formationQuestionsId">
-        <div class="questions-list">
-          <div class="question-card" *ngFor="let q of questionsFormation">
-            <div class="q-header">
-              <span class="q-student-name">👤 {{ q.etudiant_nom }}</span>
-              <span class="q-date">{{ q.date_question | date:'dd/MM/yyyy' }}</span>
-            </div>
-            <div class="q-content">❓ {{ q.question }}</div>
-<div *ngIf="q.reponse && !q.isEditing" class="q-answer-given">
-              <span class="answer-icon">💡</span>
-              <div class="answer-content">
-                <span class="answer-label">Votre réponse :</span>
-                {{ q.reponse }}
-              </div>
-              <button class="btn-edit-ans" (click)="modifierReponse(q)">✏️ Modifier</button>
-            </div>
-
-            <div *ngIf="!q.reponse || q.isEditing" class="q-reply-form">
-              <textarea [(ngModel)]="q.reponseTemp" rows="2" class="form-control"
-                        placeholder="Entrez votre réponse..."></textarea>
-              <div class="q-reply-actions">
-                <button class="btn-primary btn-sm" (click)="repondreQuestion(q)"
-                        [disabled]="!q.reponseTemp?.trim()">
-                  Répondre ✅
-                </button>
-                <button *ngIf="q.isEditing" class="btn-secondary btn-sm"
-                        (click)="q.isEditing = false">Annuler</button>
-              </div>
-            </div>
-          </div>
-          <div *ngIf="questionsFormation.length === 0" class="empty-state">
-            <div>❓</div>
-            <p>Aucune question pour cette formation.</p>
-          </div>
-        </div>
-
-</div>
-
-      <div *ngIf="!formationQuestionsId" class="empty-state">
-        <div>📚</div>
-        <p>Sélectionnez une formation pour voir les questions des étudiants.</p>
-      </div>
-    </section>
 
   </main>
 
@@ -541,29 +511,36 @@
   <div class="modal-overlay" *ngIf="showInscriptionsModal" (click)="fermerInscriptionsModal()">
     <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h4 class="modal-title">👥 Étudiants inscrits — {{ formationSelectionnee?.titre }}</h4>
+        <h4 class="modal-title">👥 Participants inscrits — {{ formationSelectionnee?.titre }}</h4>
         <button class="modal-close" (click)="fermerInscriptionsModal()">✕</button>
       </div>
 
       <div *ngIf="inscriptions.length === 0" class="modal-empty">
-        <span>📭</span><p>Aucun étudiant inscrit à cette formation.</p>
+        <span>📭</span><p>Aucun participant inscrit à cette formation.</p>
       </div>
 
       <div class="table-responsive" *ngIf="inscriptions.length > 0 && !progressionEtudiant">
         <table class="data-table">
           <thead>
-            <tr><th>Nom</th><th>Email</th><th>Statut</th><th>Date</th><th>Actions</th></tr>
+            <tr><th>Nom</th><th>Email</th><th>Type</th><th>Statut</th><th>Date</th><th>Actions</th></tr>
           </thead>
           <tbody>
             <tr *ngFor="let e of inscriptions">
               <td>{{ e.nom }}</td>
               <td>{{ e.email }}</td>
+              <td>
+                <span class="badge-type-participant"
+                      [class.badge-etudiant]="e.type_participant === 'étudiant'"
+                      [class.badge-externe]="e.type_participant === 'externe'">
+                  {{ e.type_participant === 'étudiant' ? '🎓 Étudiant' : '🌐 Externe' }}
+                </span>
+              </td>
               <td><span class="status-badge" [ngClass]="{'status-published': e.statut==='présent', 'status-pending': e.statut==='en attente', 'status-draft': e.statut==='absent'}">{{ e.statut }}</span></td>
               <td>{{ e.date_inscription | date:'dd/MM/yyyy' }}</td>
               <td class="action-cell">
                 <button class="btn-action green" *ngIf="e.statut !== 'présent'" (click)="validerPresence(e, 'présent')">✅ Présent</button>
                 <button class="btn-action red" *ngIf="e.statut !== 'absent'" (click)="validerPresence(e, 'absent')">❌ Absent</button>
-                <button class="btn-action teal" (click)="ouvrirProgression(e)" title="Voir la progression">📈 Progression</button>
+                <button class="btn-action teal" *ngIf="e.candidat_id" (click)="ouvrirProgression(e)" title="Voir la progression">📈 Progression</button>
               </td>
             </tr>
           </tbody>
@@ -594,7 +571,7 @@
         <div class="prog-modules-table" *ngIf="progressionModules.length > 0">
           <div class="prog-mod-row" *ngFor="let m of progressionModules; let i = index">
             <div class="prog-mod-num">{{ i + 1 }}</div>
-            <div class="prog-mod-title">{{ m.titre }}<span class="prog-mod-duree" *ngIf="m.duree_heures">⏱ {{ m.duree_heures }}h</span></div>
+            <div class="prog-mod-title">{{ m.titre }}</div>
             <div class="prog-mod-actions">
               <button class="btn-statut" [class.active]="m.statut === 'non_commence'" (click)="changerStatutModule(m, 'non_commence')">⬜</button>
               <button class="btn-statut en-cours" [class.active]="m.statut === 'en_cours'" (click)="changerStatutModule(m, 'en_cours')">🔄</button>
@@ -726,59 +703,237 @@
     </div>
   </div>
 
-  <!-- ===== MODAL CRÉATION / MODIFICATION FORMATION ===== -->
+  <!-- ===== MODAL PROGRAMME ===== -->
+  <div class="modal-overlay" *ngIf="showProgrammeModal" (click)="fermerProgramme()">
+    <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h4 class="modal-title">📋 Programme — {{ programmeFormation?.titre }}</h4>
+        <button class="modal-close" (click)="fermerProgramme()">✕</button>
+      </div>
+
+      <!-- Description globale / Objectifs / Prérequis -->
+      <div class="programme-section">
+        <h6 class="programme-section-title">Description globale</h6>
+        <textarea class="form-input" [(ngModel)]="programmeData.description_globale" rows="3" placeholder="Décrivez la formation de manière globale..."></textarea>
+        <h6 class="programme-section-title" style="margin-top:14px">Objectifs</h6>
+        <textarea class="form-input" [(ngModel)]="programmeData.objectifs" rows="3" placeholder="Quels sont les objectifs pédagogiques ?"></textarea>
+        <h6 class="programme-section-title" style="margin-top:14px">Prérequis</h6>
+        <textarea class="form-input" [(ngModel)]="programmeData.prerequis" rows="2" placeholder="Quels sont les prérequis pour suivre cette formation ?"></textarea>
+        <button class="btn-save" style="margin-top:12px" (click)="sauvegarderProgramme()">💾 Sauvegarder le programme</button>
+      </div>
+
+      <hr class="modal-divider">
+
+      <!-- Modules -->
+      <div class="programme-section">
+        <h6 class="programme-section-title">Modules ({{ programmeModules.length }})</h6>
+
+        <!-- Formulaire module -->
+        <div class="module-form-grid">
+          <input class="form-input" type="text" [(ngModel)]="moduleForm.titre" placeholder="Titre du module *">
+          <input class="form-input" type="text" [(ngModel)]="moduleForm.description" placeholder="Description (optionnel)">
+          <input class="form-input" type="number" [(ngModel)]="moduleForm.ordre" placeholder="Ordre" min="1" style="max-width:100px">
+          <button class="btn-save" (click)="soumettreModule()">{{ editModuleMode ? '💾 Modifier' : '➕ Ajouter' }}</button>
+          <button class="btn-cancel" *ngIf="editModuleMode" (click)="annulerEditModule()">Annuler</button>
+        </div>
+
+        <!-- Liste modules -->
+        <div *ngIf="programmeModules.length === 0" class="module-empty">
+          <span>⚠️</span><p>Aucun module défini. Ajoutez au moins 1 module pour pouvoir soumettre la formation.</p>
+        </div>
+        <div class="module-list" *ngIf="programmeModules.length > 0">
+          <div class="module-row" *ngFor="let m of programmeModules; let i = index">
+            <div class="module-num">{{ m.ordre || (i + 1) }}</div>
+            <div class="module-info">
+              <div class="module-titre">{{ m.titre }}</div>
+              <div class="module-desc" *ngIf="m.description">{{ m.description }}</div>
+            </div>
+            <div class="module-actions">
+              <button class="btn-action orange" (click)="editerModule(m)">✏️</button>
+              <button class="btn-action red" (click)="supprimerModule(m.id)">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="fermerProgramme()">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CRÉATION (stepper 3 étapes) / MODIFICATION FORMATION ===== -->
   <div class="modal-overlay" *ngIf="showFormationModal" (click)="closeFormationModal()">
-    <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
+
+      <!-- Header -->
       <div class="modal-header">
         <h4 class="modal-title">{{ editMode ? '✏️ Modifier la formation' : '➕ Créer une formation' }}</h4>
         <button class="modal-close" (click)="closeFormationModal()">✕</button>
       </div>
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>Titre *</label>
-          <input class="form-input" type="text" [(ngModel)]="titre" placeholder="Titre de la formation">
-          <small class="error-msg" *ngIf="formErrors.titre">{{ formErrors.titre }}</small>
+
+      <!-- Stepper indicator (création uniquement) -->
+      <div class="stepper" *ngIf="!editMode">
+        <div class="step" [class.active]="creationStep === 1" [class.done]="creationStep > 1">
+          <div class="step-circle">{{ creationStep > 1 ? '✓' : '1' }}</div>
+          <div class="step-label">Informations</div>
         </div>
-        <div class="form-group full">
-          <label>Description *</label>
-          <textarea class="form-input" [(ngModel)]="description" placeholder="Description détaillée..." rows="3"></textarea>
-          <small class="error-msg" *ngIf="formErrors.description">{{ formErrors.description }}</small>
+        <div class="step-line" [class.done]="creationStep > 1"></div>
+        <div class="step" [class.active]="creationStep === 2" [class.done]="creationStep > 2">
+          <div class="step-circle">{{ creationStep > 2 ? '✓' : '2' }}</div>
+          <div class="step-label">Programme & Modules</div>
         </div>
-        <div class="form-group">
-          <label>Date de début *</label>
-          <input class="form-input" type="date" [(ngModel)]="date_debut" [min]="today">
-          <small class="error-msg" *ngIf="formErrors.date_debut">{{ formErrors.date_debut }}</small>
-        </div>
-        <div class="form-group">
-          <label>Date de fin</label>
-          <input class="form-input" type="date" [(ngModel)]="date_fin" [min]="date_debut || today">
-          <small class="error-msg" *ngIf="formErrors.date_fin">{{ formErrors.date_fin }}</small>
-        </div>
-        <div class="form-group">
-          <label>Durée (heures)</label>
-          <input class="form-input" type="number" [(ngModel)]="duree" placeholder="Ex: 20" min="1">
-          <small class="error-msg" *ngIf="formErrors.duree">{{ formErrors.duree }}</small>
-        </div>
-        <div class="form-group">
-          <label>Nombre de places</label>
-          <input class="form-input" type="number" [(ngModel)]="nb_places" placeholder="Ex: 30" min="1">
-          <small class="error-msg" *ngIf="formErrors.nb_places">{{ formErrors.nb_places }}</small>
-        </div>
-        <div class="form-group">
-          <label>Spécialité *</label>
-          <select class="form-input" [(ngModel)]="specialite">
-            <option value="">-- Spécialité --</option>
-            <option *ngFor="let s of specialites" [value]="s">{{ s }}</option>
-          </select>
-          <small class="error-msg" *ngIf="formErrors.specialite">{{ formErrors.specialite }}</small>
+        <div class="step-line" [class.done]="creationStep > 2"></div>
+        <div class="step" [class.active]="creationStep === 3">
+          <div class="step-circle">3</div>
+          <div class="step-label">Supports</div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeFormationModal()">Annuler</button>
-        <button class="btn-save" (click)="editMode ? modifierFormation() : creerFormation()">
-          💾 {{ editMode ? 'Enregistrer les modifications' : 'Créer la formation' }}
-        </button>
+
+      <!-- ===== ÉTAPE 1 : Informations de base (création) OU formulaire modification ===== -->
+      <div *ngIf="editMode || creationStep === 1">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Titre *</label>
+            <input class="form-input" type="text" [(ngModel)]="titre" placeholder="Titre de la formation">
+            <small class="error-msg" *ngIf="formErrors.titre">{{ formErrors.titre }}</small>
+          </div>
+          <div class="form-group full">
+            <label>Description *</label>
+            <textarea class="form-input" [(ngModel)]="description" placeholder="Description détaillée..." rows="3"></textarea>
+            <small class="error-msg" *ngIf="formErrors.description">{{ formErrors.description }}</small>
+          </div>
+          <div class="form-group form-info-note">
+            <p>📅 Les dates de début et de fin seront fixées par l'administrateur après approbation.</p>
+          </div>
+          <div class="form-group">
+            <label>Nombre de places</label>
+            <input class="form-input" type="number" [(ngModel)]="nb_places" placeholder="Ex: 30" min="1">
+            <small class="error-msg" *ngIf="formErrors.nb_places">{{ formErrors.nb_places }}</small>
+          </div>
+          <div class="form-group">
+            <label>Spécialité</label>
+            <div class="specialite-auto-badge">
+              <span class="specialite-icon">🎓</span>
+              {{ profileSpecialite || 'Non définie' }}
+            </div>
+            <small class="help-text">Spécialité de votre profil — attribuée automatiquement</small>
+          </div>
+          <div class="form-group full">
+            <label>Photo de la formation</label>
+            <div class="photo-upload-area">
+              <div *ngIf="photoPreview" class="photo-preview-container">
+                <img [src]="photoPreview" class="photo-preview-img" alt="Aperçu photo">
+                <button type="button" class="btn-remove-photo" (click)="supprimerPhoto()">✕ Supprimer</button>
+              </div>
+              <div *ngIf="!photoPreview" class="photo-placeholder">
+                <span>🖼️</span><p>Aucune photo sélectionnée</p>
+              </div>
+              <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" (change)="onPhotoSelected($event)" class="form-input photo-input">
+              <small class="help-text">PNG, JPG, GIF, WEBP — max 5 Mo</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeFormationModal()">Annuler</button>
+          <button class="btn-save" (click)="editMode ? modifierFormation() : creerFormation()">
+            {{ editMode ? '💾 Enregistrer' : 'Suivant — Programme ›' }}
+          </button>
+        </div>
       </div>
+
+      <!-- ===== ÉTAPE 2 : Programme & Modules ===== -->
+      <div *ngIf="!editMode && creationStep === 2">
+        <div class="programme-section">
+          <h6 class="programme-section-title">Description globale</h6>
+          <textarea class="form-input" [(ngModel)]="programmeData.description_globale" rows="3" placeholder="Décrivez la formation de manière globale..."></textarea>
+          <h6 class="programme-section-title" style="margin-top:14px">Objectifs pédagogiques</h6>
+          <textarea class="form-input" [(ngModel)]="programmeData.objectifs" rows="3" placeholder="Quels sont les objectifs pédagogiques ?"></textarea>
+          <h6 class="programme-section-title" style="margin-top:14px">Prérequis</h6>
+          <textarea class="form-input" [(ngModel)]="programmeData.prerequis" rows="2" placeholder="Quels sont les prérequis pour suivre cette formation ?"></textarea>
+        </div>
+
+        <hr class="modal-divider">
+
+        <div class="programme-section">
+          <h6 class="programme-section-title">Modules <span class="module-count-chip">{{ programmeModules.length }}</span></h6>
+          <div class="module-form-grid">
+            <input class="form-input" type="text" [(ngModel)]="moduleForm.titre" placeholder="Titre du module *">
+            <input class="form-input" type="text" [(ngModel)]="moduleForm.description" placeholder="Description (optionnel)">
+            <input class="form-input" type="number" [(ngModel)]="moduleForm.ordre" placeholder="Ordre" min="1" style="max-width:90px">
+            <button class="btn-save" (click)="soumettreModule()">{{ editModuleMode ? '💾 Modifier' : '➕ Ajouter' }}</button>
+            <button class="btn-cancel" *ngIf="editModuleMode" (click)="annulerEditModule()">Annuler</button>
+          </div>
+          <div *ngIf="programmeModules.length === 0" class="module-empty">
+            ⚠️ Ajoutez au moins 1 module pour pouvoir soumettre la formation à l'admin.
+          </div>
+          <div class="module-list" *ngIf="programmeModules.length > 0">
+            <div class="module-row" *ngFor="let m of programmeModules; let i = index">
+              <div class="module-num">{{ m.ordre || (i + 1) }}</div>
+              <div class="module-info">
+                <div class="module-titre">{{ m.titre }}</div>
+                <div class="module-desc" *ngIf="m.description">{{ m.description }}</div>
+                </div>
+              <div class="module-actions">
+                <button class="btn-action orange" (click)="editerModule(m)">✏️</button>
+                <button class="btn-action red" (click)="supprimerModule(m.id)">🗑️</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="creationStep = 1">‹ Retour</button>
+          <button class="btn-save" (click)="passerEtape3()">Suivant — Supports ›</button>
+        </div>
+      </div>
+
+      <!-- ===== ÉTAPE 3 : Supports pédagogiques ===== -->
+      <div *ngIf="!editMode && creationStep === 3">
+        <div class="programme-section">
+          <h6 class="programme-section-title">Ajouter des supports pédagogiques</h6>
+          <div class="support-form-row">
+            <select class="filter-select" [(ngModel)]="supportType">
+              <option value="">Type de support</option>
+              <option value="PDF">📄 PDF</option>
+              <option value="Vidéo">🎬 Vidéo</option>
+              <option value="Présentation">📊 Présentation</option>
+              <option value="Exercice">✏️ Exercice</option>
+              <option value="Lien">🔗 Lien externe</option>
+              <option value="Autre">📎 Autre</option>
+            </select>
+            <div class="support-mode-toggle">
+              <button class="mode-btn" [class.active]="supportMode==='file'" (click)="supportMode='file'">📁 Fichier</button>
+              <button class="mode-btn" [class.active]="supportMode==='url'" (click)="supportMode='url'">🔗 URL</button>
+            </div>
+            <input *ngIf="supportMode==='url'" class="search-input" type="text" [(ngModel)]="supportFichier" placeholder="URL du fichier">
+            <input *ngIf="supportMode==='file'" class="search-input" type="file" (change)="onSupportFileChange($event)">
+            <button class="btn-save" style="white-space:nowrap" (click)="ajouterSupport()">Ajouter</button>
+          </div>
+
+          <div class="supports-list" *ngIf="supports.length > 0" style="margin-top:14px">
+            <div class="support-item" *ngFor="let s of supports">
+              <div class="support-icon">
+                {{ s.type === 'PDF' ? '📄' : s.type === 'Vidéo' ? '🎬' : s.type === 'Présentation' ? '📊' : '📎' }}
+              </div>
+              <div class="support-info">
+                <div class="support-type">{{ s.type }}</div>
+                <div class="support-name">{{ s.fichier }}</div>
+              </div>
+              <button class="btn-action red" (click)="supprimerSupport(s.id)">🗑️</button>
+            </div>
+          </div>
+          <div *ngIf="supports.length === 0" class="module-empty" style="margin-top:14px">
+            Aucun support ajouté — vous pouvez en ajouter plus tard depuis la section Supports.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="creationStep = 2">‹ Retour</button>
+          <button class="btn-save btn-finish" (click)="terminerCreation()">✅ Terminer la création</button>
+        </div>
+      </div>
+
     </div>
   </div>
 

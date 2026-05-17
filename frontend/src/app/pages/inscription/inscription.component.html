@@ -64,11 +64,11 @@
             <div class="input-wrapper" [class.is-invalid]="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)">
               <span class="input-icon">&#128273;</span>
               <input type="password" [(ngModel)]="password" name="password" #passwordRef="ngModel"
-                     placeholder="Au moins 6 caracteres" required minlength="6">
+                     placeholder="Au moins 8 caracteres" required minlength="8">
             </div>
             <div *ngIf="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)" class="field-error">
               <span *ngIf="passwordRef.errors?.['required']">Le mot de passe est obligatoire.</span>
-              <span *ngIf="passwordRef.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caracteres.</span>
+              <span *ngIf="passwordRef.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caracteres.</span>
             </div>
           </div>
 
@@ -77,18 +77,17 @@
             <div class="input-wrapper select-wrapper">
               <span class="input-icon">&#127917;</span>
               <select [(ngModel)]="role" name="role" required>
-                <option value="etudiant">Etudiant</option>
-                <option value="formateur">Formateur</option>
+                <option value="candidat">Candidat</option>
                 <option value="externe">Utilisateur Externe</option>
               </select>
             </div>
           </div>
         </div>
 
-        <!-- CHAMPS ETUDIANT -->
-        <div *ngIf="role === 'etudiant'" class="role-fields">
+        <!-- CHAMPS CANDIDAT -->
+        <div *ngIf="role === 'candidat'" class="role-fields">
           <div class="role-fields-title">
-            <span class="role-chip blue">Etudiant</span>
+            <span class="role-chip blue">Candidat</span>
             <span>Informations supplementaires</span>
           </div>
 
@@ -108,13 +107,13 @@
 
             <div class="form-group">
               <label>Telephone</label>
-              <div class="input-wrapper" [class.is-invalid]="telEtudRef.invalid && (telEtudRef.dirty || telEtudRef.touched)">
+              <div class="input-wrapper" [class.is-invalid]="telCandRef.invalid && (telCandRef.dirty || telCandRef.touched)">
                 <span class="input-icon">&#128222;</span>
-                <input type="text" [(ngModel)]="telephone" name="telephone_etudiant" #telEtudRef="ngModel"
+                <input type="text" [(ngModel)]="telephone" name="telephone_candidat" #telCandRef="ngModel"
                        placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
               </div>
-              <div *ngIf="telEtudRef.invalid && (telEtudRef.dirty || telEtudRef.touched)" class="field-error">
-                <span *ngIf="telEtudRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
+              <div *ngIf="telCandRef.invalid && (telCandRef.dirty || telCandRef.touched)" class="field-error">
+                <span *ngIf="telCandRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
               </div>
             </div>
           </div>
@@ -137,14 +136,14 @@
 
             <div class="form-group">
               <label>Spécialité *</label>
-              <div class="input-wrapper select-wrapper" [class.is-invalid]="specEtudRef.invalid && (specEtudRef.dirty || specEtudRef.touched)">
+              <div class="input-wrapper select-wrapper" [class.is-invalid]="specCandRef.invalid && (specCandRef.dirty || specCandRef.touched)">
                 <span class="input-icon">&#128161;</span>
-                <select [(ngModel)]="specialite" name="specialite" #specEtudRef="ngModel" required>
+                <select [(ngModel)]="specialite" name="specialite" #specCandRef="ngModel" required>
                   <option value="">-- Sélectionnez une spécialité --</option>
                   <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
                 </select>
               </div>
-              <div *ngIf="specEtudRef.invalid && (specEtudRef.dirty || specEtudRef.touched)" class="field-error">
+              <div *ngIf="specCandRef.invalid && (specCandRef.dirty || specCandRef.touched)" class="field-error">
                 <span>La spécialité est obligatoire.</span>
               </div>
             </div>
@@ -152,58 +151,19 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Date de naissance</label>
-              <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
-                <span class="input-icon">&#128197;</span>
-                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_etudiant"
-                       [attr.max]="today" (change)="validateDateNaissance()">
-              </div>
-              <div *ngIf="dateNaissanceError" class="field-error">
-                <span>La date de naissance doit etre dans le passe.</span>
+              <label>Entreprise / Organisation</label>
+              <div class="input-wrapper">
+                <span class="input-icon">&#127970;</span>
+                <input type="text" [(ngModel)]="entreprise" name="entreprise_candidat"
+                       placeholder="Nom de votre entreprise (optionnel)" maxlength="150">
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- CHAMPS FORMATEUR -->
-        <div *ngIf="role === 'formateur'" class="role-fields">
-          <div class="role-fields-title">
-            <span class="role-chip green">Formateur</span>
-            <span>Informations supplementaires</span>
-          </div>
-
-          <div class="form-group">
-            <label>Spécialité *</label>
-            <div class="input-wrapper select-wrapper" [class.is-invalid]="specFormRef.invalid && (specFormRef.dirty || specFormRef.touched)">
-              <span class="input-icon">&#128161;</span>
-              <select [(ngModel)]="specialite" name="specialite_formateur" #specFormRef="ngModel" required>
-                <option value="">-- Sélectionnez une spécialité --</option>
-                <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
-              </select>
-            </div>
-            <div *ngIf="specFormRef.invalid && (specFormRef.dirty || specFormRef.touched)" class="field-error">
-              <span>La spécialité est obligatoire.</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Telephone</label>
-            <div class="input-wrapper" [class.is-invalid]="telFormRef.invalid && (telFormRef.dirty || telFormRef.touched)">
-              <span class="input-icon">&#128222;</span>
-              <input type="text" [(ngModel)]="telephone" name="telephone_formateur" #telFormRef="ngModel"
-                     placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
-            </div>
-            <div *ngIf="telFormRef.invalid && (telFormRef.dirty || telFormRef.touched)" class="field-error">
-              <span *ngIf="telFormRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
-            </div>
-          </div>
-
-          <div class="form-row">
             <div class="form-group">
               <label>Date de naissance</label>
               <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
                 <span class="input-icon">&#128197;</span>
-                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_formateur"
+                <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_candidat"
                        [attr.max]="today" (change)="validateDateNaissance()">
               </div>
               <div *ngIf="dateNaissanceError" class="field-error">

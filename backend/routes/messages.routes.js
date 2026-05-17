@@ -1,15 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const validate = require('../middleware/validate');
+const { messageSchema } = require('../validators/schemas');
 
-// GET contacts with last message preview and unread count
-router.get('/contacts/:userId', (req, res) => {
+router.get('/contacts/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId);
-
-  db.query('SELECT role FROM users WHERE id = ?', [userId], (err, result) => {
-    if (err || !result.length) return res.status(404).json({ error: 'Utilisateur non trouvé' });
-
-    const role = result[0].role;
+  try {
+    const [userRows] = await db.query('SELECT role FROM users WHERE id = ?', [userId]);
+    if (!userRows.length) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    const role = userRows[0].role;
     let sql, params;
 
     if (role === 'etudiant') {
@@ -28,9 +28,7 @@ router.get('/contacts/:userId', (req, res) => {
         WHERE i.etudiant_id = (SELECT id FROM etudiants WHERE user_id = ?)
       `;
       params = [userId, userId, userId, userId];
-
     } else if (role === 'formateur') {
-      /* Formateur voit : étudiants inscrits + externes payés + admins */
       sql = `
         SELECT DISTINCT u.id, u.nom, u.role,
           (SELECT contenu FROM messages
@@ -56,9 +54,7 @@ router.get('/contacts/:userId', (req, res) => {
         )
       `;
       params = [userId, userId, userId, userId, userId];
-
     } else if (role === 'admin') {
-      /* Admin voit tous les formateurs */
       sql = `
         SELECT DISTINCT u.id, u.nom, u.role,
           (SELECT contenu FROM messages
@@ -71,9 +67,7 @@ router.get('/contacts/:userId', (req, res) => {
         JOIN users u ON fo.user_id = u.id
       `;
       params = [userId, userId, userId];
-
     } else if (role === 'externe') {
-      /* Externe voit les formateurs de ses formations payées */
       sql = `
         SELECT DISTINCT u.id, u.nom, u.role,
           (SELECT contenu FROM messages
@@ -90,71 +84,64 @@ router.get('/contacts/:userId', (req, res) => {
         AND ie.statut_paiement = 'payé'
       `;
       params = [userId, userId, userId, userId];
-
     } else {
       return res.json([]);
     }
 
-    db.query(sql, params, (err2, contacts) => {
-      if (err2) return res.status(500).json(err2);
-      res.json(contacts);
-    });
-  });
+    const [contacts] = await db.query(sql, params);
+    res.json(contacts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// GET conversation between two users (auto-marks as read)
-router.get('/conversation/:userId/:otherId', (req, res) => {
+router.get('/conversation/:userId/:otherId', async (req, res) => {
   const userId = parseInt(req.params.userId);
   const otherId = parseInt(req.params.otherId);
+  try {
+    db.query(
+      'UPDATE messages SET lu = 1 WHERE expediteur_id = ? AND destinataire_id = ? AND lu = 0',
+      [otherId, userId]
+    ).catch(() => {});
 
-  db.query(
-    'UPDATE messages SET lu = 1 WHERE expediteur_id = ? AND destinataire_id = ? AND lu = 0',
-    [otherId, userId],
-    () => {}
-  );
-
-  db.query(
-    `SELECT m.id, m.contenu, m.date_envoi, m.expediteur_id, m.lu, u.nom AS expediteur_nom
-     FROM messages m
-     JOIN users u ON m.expediteur_id = u.id
-     WHERE (m.expediteur_id = ? AND m.destinataire_id = ?)
-        OR (m.expediteur_id = ? AND m.destinataire_id = ?)
-     ORDER BY m.date_envoi ASC`,
-    [userId, otherId, otherId, userId],
-    (err, results) => {
-      if (err) return res.status(500).json(err);
-      res.json(results);
-    }
-  );
-});
-
-// POST send a message
-router.post('/send', (req, res) => {
-  const { expediteur_id, destinataire_id, contenu } = req.body;
-  if (!expediteur_id || !destinataire_id || !contenu?.trim()) {
-    return res.status(400).json({ error: 'Données manquantes' });
+    const [results] = await db.query(
+      `SELECT m.id, m.contenu, m.date_envoi, m.expediteur_id, m.lu, u.nom AS expediteur_nom
+       FROM messages m
+       JOIN users u ON m.expediteur_id = u.id
+       WHERE (m.expediteur_id = ? AND m.destinataire_id = ?)
+          OR (m.expediteur_id = ? AND m.destinataire_id = ?)
+       ORDER BY m.date_envoi ASC`,
+      [userId, otherId, otherId, userId]
+    );
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-  db.query(
-    'INSERT INTO messages (expediteur_id, destinataire_id, contenu) VALUES (?, ?, ?)',
-    [expediteur_id, destinataire_id, contenu.trim()],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json({ id: result.insertId, message: 'Message envoyé ✉️' });
-    }
-  );
 });
 
-// GET unread messages count
-router.get('/unread-count/:userId', (req, res) => {
-  const userId = parseInt(req.params.userId);
-  db.query(
-    'SELECT COUNT(*) AS count FROM messages WHERE destinataire_id = ? AND lu = 0',
-    [userId],
-    (err, results) => {
-      if (err) return res.status(500).json(err);
-      res.json({ count: results[0].count });
-    }
-  );
+router.post('/send', validate(messageSchema), async (req, res) => {
+  const { expediteur_id, destinataire_id, contenu } = req.body;
+  try {
+    const [result] = await db.query(
+      'INSERT INTO messages (expediteur_id, destinataire_id, contenu) VALUES (?, ?, ?)',
+      [expediteur_id, destinataire_id, contenu.trim()]
+    );
+    res.json({ id: result.insertId, message: 'Message envoyé ✉️' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/unread-count/:userId', async (req, res) => {
+  try {
+    const [results] = await db.query(
+      'SELECT COUNT(*) AS count FROM messages WHERE destinataire_id = ? AND lu = 0',
+      [parseInt(req.params.userId)]
+    );
+    res.json({ count: results[0].count });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

@@ -1,0 +1,46 @@
+@startuml Sprint1_Sequence_GestionFormateurs
+title Diagramme de Séquence — Créer un Compte Formateur (Admin)
+
+actor Admin
+participant "Dashboard Admin\nFrontend" as Frontend
+participant "Backend\nExpress" as Backend
+database "Base de Données\nMySQL" as DB
+
+Admin -> Frontend: Clique "Ajouter Formateur"
+activate Frontend
+Frontend --> Admin: Affiche formulaire\n(nom, email, pwd, spécialité)
+
+Admin -> Frontend: Remplit et soumet
+activate Frontend
+
+Frontend -> Frontend: Validation frontend
+
+Frontend -> Backend: POST /api/admin/create-formateur\n{nom, email, pwd, spécialité}
+activate Backend
+
+Backend -> Backend: Authentification admin\n(vérifier JWT + rôle)
+
+Backend -> DB: SELECT user WHERE email = ?
+activate DB
+DB --> Backend: null
+deactivate DB
+
+Backend -> Backend: bcrypt.hash(mot_de_passe)
+
+Backend -> DB: INSERT INTO users\n(nom, email, hashed_pwd, role='formateur')
+activate DB
+DB --> Backend: user_id
+deactivate DB
+
+Backend -> DB: INSERT INTO formateurs\n(user_id, specialite)
+activate DB
+DB --> Backend: formateur_id
+deactivate DB
+
+Backend --> Frontend: {success, message, formateur}
+deactivate Backend
+
+Frontend --> Admin: Message confirmation\nRecharge liste formateurs
+deactivate Frontend
+
+@enduml

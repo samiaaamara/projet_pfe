@@ -5,9 +5,9 @@ import { Router } from '@angular/router';
 import { EtudiantService } from '../../services/etudiant.service';
 import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 import { NotificationsService } from '../../services/notifications.service';
 import { MessagesService } from '../../services/messages.service';
-import { QuestionsService } from '../../services/questions.service';
 import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-widget.component';
 
 @Component({
@@ -18,6 +18,7 @@ import { ChatWidgetComponent } from '../../components/navbar/chat-widget/chat-wi
   styleUrl: './etudiant.component.css',
 })
 export class EtudiantComponent implements OnInit, OnDestroy {
+  readonly environment = environment;
 
   user: any = null;
   etudiantId: number | null = null;
@@ -50,6 +51,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   profileSpecialite = '';
   profileCin = '';
   profileNiveau = '';
+  profilePhotoUrl: string | null = null;
   ancienMdp = '';
   nouveauMdp = '';
   confirmMdp = '';
@@ -77,14 +79,13 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     return this.contacts.filter(c => c.nom?.toLowerCase().includes(q));
   }
 
-  // Questions
-  mesQuestions: any[] = [];
-  questionFormationId: number | null = null;
-  questionTexte = '';
-
-  message = '';
+ message = '';
   messageType: 'success' | 'danger' = 'success';
- activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'questions' = 'accueil';
+ activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'quiz' = 'accueil';
+
+  // Quiz section
+  quizStatuts: { [formationId: number]: any } = {};
+  quizSectionLoading = false;
 
   // Programme
   programmeFormation: any = null;
@@ -111,13 +112,21 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   attestationData: any = null;
   attestationLoading = false;
 
+  // Quiz
+  showQuizModal = false;
+  quizFormationId: number | null = null;
+  quizData: any = null;
+  quizReponses: { [questionId: number]: number } = {};
+  quizResultat: any = null;
+  quizLoading = false;
+  quizSubmitting = false;
+
   constructor(
     private etudiantService: EtudiantService,
     private externeService: ExterneService,
     private authService: Auth,
     private notifService: NotificationsService,
     private msgService: MessagesService,
-    private questService: QuestionsService,
     private router: Router
   ) {}
 
@@ -277,7 +286,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   getLienSupport(fichier: string): string {
     if (!fichier) return '#';
-    if (fichier.startsWith('/uploads/')) return `http://localhost:3000${fichier}`;
+    if (fichier.startsWith('/uploads/')) return `${environment.baseUrl}${fichier}`;
     return fichier;
   }
 
@@ -352,6 +361,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
       this.profileSpecialite = data.specialite || '';
       this.profileCin = data.cin || '';
       this.profileNiveau = data.niveau || '';
+      this.profilePhotoUrl = data.photo_profil || null;
     },
     error: () => {}
   });
@@ -374,6 +384,22 @@ sauvegarderProfil() {
     error: (err) => this.showMessage(err?.error?.message || 'Erreur mise à jour du profil', 'danger')
   });
 }
+
+  onPhotoSelected(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('photo', file);
+    this.authService.uploadProfilePhoto(formData).subscribe({
+      next: (res: any) => {
+        this.profilePhotoUrl = res.photo_profil;
+        this.user.photo_profil = res.photo_profil;
+        localStorage.setItem('user', JSON.stringify(this.user));
+        this.showMessage('Photo de profil mise à jour');
+      },
+      error: () => this.showMessage('Erreur lors du téléchargement de la photo', 'danger')
+    });
+  }
 
   changerMotDePasse() {
     if (!this.ancienMdp || !this.nouveauMdp) {
@@ -508,39 +534,6 @@ sauvegarderProfil() {
     });
   }
 
-  // ===== Questions =====
-  openQuestions() {
-    this.activeSection = 'questions';
-    this.message = '';
-    this.loadMesQuestions();
-  }
-
-  loadMesQuestions() {
-    if (!this.user?.id) return;
-    this.questService.getMesQuestions(this.user.id).subscribe({
-      next: data => this.mesQuestions = data,
-      error: () => {}
-    });
-  }
-
-  poserQuestion() {
-    if (!this.questionFormationId || !this.questionTexte.trim() || !this.user?.id) return;
-    this.questService.poserQuestion(this.questionFormationId, this.user.id, this.questionTexte).subscribe({
-      next: () => {
-        this.showMessage('Question envoyée !');
-        this.questionTexte = '';
-        this.loadMesQuestions();
-      },
-      error: () => this.showMessage('Erreur lors de l\'envoi de la question', 'danger')
-    });
-  }
-
-  supprimerQuestion(id: number) {
-    this.questService.supprimer(id).subscribe({
-      next: () => this.mesQuestions = this.mesQuestions.filter(q => q.id !== id),
-      error: () => {}
-    });
-  }
 
   // ===== Progression modulaire =====
   voirProgressionFormation(f: any) {
@@ -681,6 +674,119 @@ sauvegarderProfil() {
       },
       error: () => this.showMessage('Erreur lors de l\'envoi', 'danger')
     });
+  }
+
+  allerAuxAttestations() {
+    this.formationAttestation = null;
+    this.activeSection = 'attestation';
+    this.message = '';
+  }
+
+  // ===== Section Quiz =====
+  ouvrirSectionQuiz() {
+    this.activeSection = 'quiz';
+    this.message = '';
+    this.quizSectionLoading = true;
+    this.quizStatuts = {};
+    let loaded = 0;
+    if (!this.mesFormations.length) { this.quizSectionLoading = false; return; }
+    this.mesFormations.forEach(f => {
+      this.etudiantService.getQuizScore(this.etudiantId!, f.formation_id).subscribe({
+        next: data => {
+          this.quizStatuts[f.formation_id] = data;
+          loaded++;
+          if (loaded === this.mesFormations.length) this.quizSectionLoading = false;
+        },
+        error: () => {
+          loaded++;
+          if (loaded === this.mesFormations.length) this.quizSectionLoading = false;
+        }
+      });
+    });
+  }
+
+  quizDisponible(formationId: number): boolean {
+    const s = this.quizStatuts[formationId];
+    if (!s || !s.has_quiz) return false;
+    return !s.reussi && (s.tentatives || 0) < (s.nb_tentatives_max || 3);
+  }
+
+  nbQuizDisponibles(): number {
+    return this.mesFormations.filter(f => {
+      const e = this.eligibiliteMap[f.formation_id];
+      return e?.has_quiz && !e?.quiz_ok && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
+    }).length;
+  }
+
+  // ===== Quiz =====
+  ouvrirQuiz(f: any) {
+    this.quizFormationId = f.formation_id;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizLoading = true;
+    this.showQuizModal = true;
+    this.etudiantService.getQuiz(f.formation_id).subscribe({
+      next: data => { this.quizData = data; this.quizLoading = false; },
+      error: () => { this.quizLoading = false; this.showMessage('Erreur chargement du quiz', 'danger'); }
+    });
+  }
+
+  fermerQuiz() {
+    this.showQuizModal = false;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizFormationId = null;
+    if (this.quizResultat?.reussi) this.loadMesFormations();
+  }
+
+  soumettreQuiz() {
+    if (!this.etudiantId || !this.quizData) return;
+    const reponses = Object.entries(this.quizReponses).map(([question_id, reponse_id]) => ({
+      question_id: Number(question_id), reponse_id: Number(reponse_id)
+    }));
+    if (reponses.length < this.quizData.questions.length) {
+      this.showMessage('Veuillez répondre à toutes les questions', 'danger'); return;
+    }
+    this.quizSubmitting = true;
+    this.etudiantService.soumettreQuiz({
+      candidat_id: this.etudiantId,
+      quiz_id: this.quizData.id,
+      reponses
+    }).subscribe({
+      next: res => {
+        this.quizResultat = res;
+        this.quizSubmitting = false;
+        if (this.quizFormationId) {
+          this.etudiantService.getEligibiliteAttestation(this.etudiantId!, this.quizFormationId).subscribe({
+            next: data => this.eligibiliteMap = { ...this.eligibiliteMap, [this.quizFormationId!]: data },
+            error: () => {}
+          });
+        }
+      },
+      error: (err) => {
+        this.quizSubmitting = false;
+        this.showMessage(err?.error?.error || 'Erreur lors de la soumission', 'danger');
+      }
+    });
+  }
+
+  fermerQuizApresResultat() {
+    const wasSuccessful = this.quizResultat?.reussi;
+    const fid = this.quizFormationId;
+    this.showQuizModal = false;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizFormationId = null;
+    if (wasSuccessful) this.loadMesFormations();
+    if (fid) {
+      this.etudiantService.getQuizScore(this.etudiantId!, fid).subscribe({
+        next: data => this.quizStatuts[fid] = data,
+        error: () => {}
+      });
+    }
   }
 
   // ===== Attestation enrichie =====

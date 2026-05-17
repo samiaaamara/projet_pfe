@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../services/admin.service';
 import { MessagesService } from '../../services/messages.service';
 import { Auth } from '../../services/auth';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -38,7 +39,6 @@ export class AdminComponent implements OnInit, OnDestroy {
   formationsPending: any[] = [];
   formationsAccepted: any[] = [];
   stats: any = {};
-  prixPublication: { [id: number]: number } = {};
 
   userSearch: string = '';
   userRoleFilter: string = '';
@@ -53,6 +53,15 @@ export class AdminComponent implements OnInit, OnDestroy {
   formateurSort: 'nom' | 'email' | 'specialite' = 'nom';
   formateurSpecialiteOptions: string[] = [];
 
+  get formateursFiltresParSpecialite(): any[] {
+    if (!this.formData.specialite) return [];
+    return this.formateurs.filter(f => f.specialite === this.formData.specialite);
+  }
+
+  onSpecialiteFormChange() {
+    this.formData.formateur_id = null;
+  }
+
   message: string = '';
   messageType: 'success' | 'warning' | 'danger' | 'info' = 'info';
 
@@ -64,18 +73,69 @@ export class AdminComponent implements OnInit, OnDestroy {
   formData: any = this.getEmptyForm();
   formateurForm: any = this.getEmptyFormateur();
   formDataErrors: any = {};
+
+  photoFile: File | null = null;
+  photoPreview: string | null = null;
+  photoExistante: string = '';
   formateurErrors: any = {};
 
   loading = false;
+
+  // Modal configuration avant publication
+  showConfigModal = false;
+  configFormation: any = null;
+  configDateDebut = '';
+  configDateFin = '';
+  configPrix: number | null = null;
+  configSeances: any[] = [];
+  configModules: any[] = [];
+  configSeanceForm: any = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+  configEditSeanceMode = false;
+  configEditSeanceId: number | null = null;
+  configLoading = false;
+  configPublishing = false;
+
+  get configToday(): string { return new Date().toISOString().split('T')[0]; }
+
+  // Détails formation (modal lecture)
+  showDetailsModal = false;
+  formationDetails: any = null;
+  detailsModules: any[] = [];
+  detailsSupports: any[] = [];
+  detailsProgramme: any = null;
+  detailsLoading = false;
 
   // Programme de formation
   showProgrammeEditor = false;
   programmeFormation: any = null;
   programmeData = { description_globale: '', objectifs: '', prerequis: '' };
   programmeModules: any[] = [];
-  moduleForm = { titre: '', description: '', duree_heures: '' as string | number, ordre: 0 };
+  moduleForm = { titre: '', description: '', ordre: 0 };
   editModuleMode = false;
   editModuleId: number | null = null;
+
+  // Stepper création formation (admin)
+  adminStep: 1 | 2 | 3 = 1;
+  adminStepFormationId: number | null = null;
+
+  // Supports (stepper étape 3)
+  adminSupports: any[] = [];
+  adminSupportFile: File | null = null;
+  adminSupportType = 'pdf';
+  adminSupportUrl = '';
+  adminSupportNom = '';
+  adminSupportLoading = false;
+
+  // Séances (stepper étape 3)
+  adminStepSeances: any[] = [];
+  adminStepSeanceForm: any = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+  adminStepEditSeanceMode = false;
+  adminStepEditSeanceId: number | null = null;
+
+  getSupportIcon(type: string): string {
+    const icons: any = { pdf: '📄', video: '🎥', lien: '🔗', image: '🖼️', autre: '📎' };
+    return icons[type] || '📎';
+  }
 
   constructor(
     private adminService: AdminService,
@@ -161,7 +221,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   getRoleLabel(role: string): string {
-    const labels: any = { formateur: 'Formateur', etudiant: 'Étudiant', externe: 'Externe', admin: 'Admin' };
+    const labels: any = { formateur: 'Formateur', candidat: 'Candidat', externe: 'Externe', admin: 'Admin' };
     return labels[role] || role;
   }
 
@@ -172,7 +232,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       description: '',
       date_debut: '',
       date_fin: '',
-      duree: '',
+
       formateur_id: null,
       specialite: '',
       nb_places: null,
@@ -310,10 +370,6 @@ get filteredUsers() {
     if (this.formData.date_fin && new Date(this.formData.date_fin) < new Date(this.formData.date_debut)) {
       this.formDataErrors.date_fin = 'Date fin doit être après date début'; valid = false;
     }
-    if (!this.formData.duree || Number(this.formData.duree) <= 0) {
-      this.formDataErrors.duree = 'Durée positive requise'; valid = false;
-    }
-  
     if (!this.formData.specialite) {
       this.formDataErrors.specialite = 'Spécialité obligatoire'; valid = false;
     }
@@ -358,6 +414,26 @@ get filteredUsers() {
     this.editFormationMode = false;
     this.formData = this.getEmptyForm();
     this.resetFormationErrors();
+    this.photoFile = null;
+    this.photoPreview = null;
+    this.photoExistante = '';
+    this.adminStep = 1;
+    this.adminStepFormationId = null;
+    this.programmeFormation = null;
+    this.programmeData = { description_globale: '', objectifs: '', prerequis: '' };
+    this.programmeModules = [];
+    this.moduleForm = { titre: '', description: '', ordre: 0 };
+    this.editModuleMode = false;
+    this.editModuleId = null;
+    this.adminSupports = [];
+    this.adminSupportFile = null;
+    this.adminSupportType = 'pdf';
+    this.adminSupportUrl = '';
+    this.adminSupportNom = '';
+    this.adminStepSeances = [];
+    this.adminStepSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+    this.adminStepEditSeanceMode = false;
+    this.adminStepEditSeanceId = null;
   }
 
   editFormation(f: any) {
@@ -370,13 +446,32 @@ get filteredUsers() {
       description: f.description || '',
       date_debut: f.date_debut || '',
       date_fin: f.date_fin || '',
-      duree: f.duree || '',
+
       formateur_id: f.formateur_id || null,
       specialite: f.specialite || '',
       nb_places: f.nb_places || 0,
       prix: f.prix || 0,
       status: f.status || 'draft'
     };
+    this.photoFile = null;
+    this.photoExistante = f.photo || '';
+    this.photoPreview = f.photo ? `${environment.baseUrl}${f.photo}` : null;
+  }
+
+  onAdminPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.photoFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => { this.photoPreview = e.target?.result as string; };
+      reader.readAsDataURL(this.photoFile);
+    }
+  }
+
+  supprimerAdminPhoto() {
+    this.photoFile = null;
+    this.photoPreview = null;
+    this.photoExistante = '';
   }
 
   openAddFormateur() {
@@ -399,7 +494,15 @@ get filteredUsers() {
     };
   }
 
-  closeForm() { this.showFormationForm = false; this.resetFormationErrors(); }
+  closeForm() {
+    this.showFormationForm = false;
+    this.resetFormationErrors();
+    this.photoFile = null;
+    this.photoPreview = null;
+    this.photoExistante = '';
+    this.adminStep = 1;
+    this.adminStepFormationId = null;
+  }
   closeFormateurForm() { this.showFormateurForm = false; this.resetFormateurErrors(); }
 
   saveFormation() {
@@ -408,17 +511,247 @@ get filteredUsers() {
       return;
     }
     this.loading = true;
+
+    const fd = new FormData();
+    fd.append('titre', this.formData.titre);
+    fd.append('description', this.formData.description || '');
+    fd.append('date_debut', this.formData.date_debut);
+    if (this.formData.date_fin) fd.append('date_fin', this.formData.date_fin);
+    fd.append('specialite', this.formData.specialite);
+    fd.append('nb_places', this.formData.nb_places);
+    fd.append('prix', this.formData.prix || 0);
+    fd.append('formateur_id', this.formData.formateur_id);
+    if (this.formData.status) fd.append('status', this.formData.status);
+    if (this.photoFile) fd.append('photo', this.photoFile);
+    else if (this.photoExistante) fd.append('photo_existante', this.photoExistante);
+
     if (this.editFormationMode) {
-      this.adminService.updateFormation(this.formData.id, this.formData).subscribe({
+      this.adminService.updateFormation(this.formData.id, fd).subscribe({
         next: () => { this.showMessage('Formation modifiée ✅', 'success'); this.afterSave(); },
         error: () => { this.showMessage('❌ Erreur modification', 'danger'); this.loading = false; }
       });
     } else {
-      this.adminService.addFormation(this.formData).subscribe({
-        next: () => { this.showMessage('Formation ajoutée ✅', 'success'); this.afterSave(); },
+      this.adminService.addFormation(fd).subscribe({
+        next: (res: any) => {
+          this.loading = false;
+          this.adminStepFormationId = res.id;
+          this.programmeFormation = { id: res.id, titre: this.formData.titre };
+          this.programmeModules = [];
+          this.adminStep = 2;
+        },
         error: () => { this.showMessage('❌ Erreur ajout', 'danger'); this.loading = false; }
       });
     }
+  }
+
+  passerStep3Admin() {
+    if (!this.adminStepFormationId) return;
+    if (this.programmeData.description_globale || this.programmeData.objectifs || this.programmeData.prerequis) {
+      this.adminService.saveProgramme(this.adminStepFormationId, this.programmeData).subscribe({ error: () => {} });
+    }
+    this.adminStepSeances = [];
+    this.adminStepSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+    this.adminStep = 3;
+  }
+
+  onAdminSupportFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.[0]) {
+      this.adminSupportFile = input.files[0];
+      if (!this.adminSupportNom) this.adminSupportNom = input.files[0].name;
+    }
+  }
+
+  ajouterSupportAdmin() {
+    if (!this.adminStepFormationId) return;
+    if (this.adminSupportType === 'lien') {
+      if (!this.adminSupportUrl.trim()) { this.showMessage('URL obligatoire pour un lien.', 'danger'); return; }
+      const fd = new FormData();
+      fd.append('type', this.adminSupportType);
+      fd.append('fichier', this.adminSupportUrl.trim());
+      fd.append('nom', this.adminSupportNom || this.adminSupportUrl.trim());
+      this.adminSupportLoading = true;
+      this.adminService.addFormationSupport(this.adminStepFormationId, fd).subscribe({
+        next: (res: any) => {
+          this.adminSupports.push(res);
+          this.adminSupportUrl = '';
+          this.adminSupportNom = '';
+          this.adminSupportLoading = false;
+        },
+        error: () => { this.showMessage('Erreur ajout support', 'danger'); this.adminSupportLoading = false; }
+      });
+    } else {
+      if (!this.adminSupportFile) { this.showMessage('Sélectionnez un fichier.', 'danger'); return; }
+      const fd = new FormData();
+      fd.append('type', this.adminSupportType);
+      fd.append('fichier', this.adminSupportFile);
+      fd.append('nom', this.adminSupportNom || this.adminSupportFile.name);
+      this.adminSupportLoading = true;
+      this.adminService.addFormationSupport(this.adminStepFormationId, fd).subscribe({
+        next: (res: any) => {
+          this.adminSupports.push(res);
+          this.adminSupportFile = null;
+          this.adminSupportNom = '';
+          this.adminSupportLoading = false;
+        },
+        error: () => { this.showMessage('Erreur upload support', 'danger'); this.adminSupportLoading = false; }
+      });
+    }
+  }
+
+  supprimerSupportAdmin(supportId: number) {
+    this.adminService.deleteFormationSupport(supportId).subscribe({
+      next: () => { this.adminSupports = this.adminSupports.filter(s => s.id !== supportId); },
+      error: () => this.showMessage('Erreur suppression support', 'danger')
+    });
+  }
+
+  ajouterSeanceAdmin() {
+    if (!this.adminStepFormationId) return;
+    const f = this.adminStepSeanceForm;
+    if (!f.date_seance || !f.heure_debut || !f.heure_fin) {
+      this.showMessage('Date, heure début et heure fin sont obligatoires.', 'danger'); return;
+    }
+    if (this.adminStepEditSeanceMode && this.adminStepEditSeanceId) {
+      this.adminService.deleteFormationSeance(this.adminStepEditSeanceId).subscribe({
+        next: () => {
+          this.adminStepSeances = this.adminStepSeances.filter(s => s.id !== this.adminStepEditSeanceId);
+          this._creerSeanceAdmin();
+        },
+        error: () => this.showMessage('Erreur modification séance', 'danger')
+      });
+    } else {
+      this._creerSeanceAdmin();
+    }
+  }
+
+  private _creerSeanceAdmin() {
+    const module = this.programmeModules.find(m => m.id === this.adminStepSeanceForm.module_id);
+    this.adminService.addFormationSeance(this.adminStepFormationId!, {
+      ...this.adminStepSeanceForm, formation_id: this.adminStepFormationId
+    }).subscribe({
+      next: (res: any) => {
+        this.adminStepSeances.push({ id: res.id, ...this.adminStepSeanceForm, module_titre: module?.titre || null });
+        this.adminStepSeances = [...this.adminStepSeances].sort((a, b) => a.date_seance > b.date_seance ? 1 : -1);
+        this.adminStepSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+        this.adminStepEditSeanceMode = false;
+        this.adminStepEditSeanceId = null;
+      },
+      error: (err: any) => this.showMessage(err?.error?.error || 'Erreur ajout séance', 'danger')
+    });
+  }
+
+  editerSeanceAdmin(s: any) {
+    this.adminStepEditSeanceMode = true;
+    this.adminStepEditSeanceId = s.id;
+    this.adminStepSeanceForm = { date_seance: s.date_seance?.substring(0, 10), heure_debut: s.heure_debut, heure_fin: s.heure_fin, salle: s.salle || '', module_id: s.module_id || null };
+  }
+
+  annulerEditSeanceAdmin() {
+    this.adminStepEditSeanceMode = false;
+    this.adminStepEditSeanceId = null;
+    this.adminStepSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+  }
+
+  supprimerSeanceAdmin(id: number) {
+    this.adminService.deleteFormationSeance(id).subscribe({
+      next: () => { this.adminStepSeances = this.adminStepSeances.filter(s => s.id !== id); },
+      error: () => this.showMessage('Erreur suppression séance', 'danger')
+    });
+  }
+
+  terminerCreationAdmin() {
+    this.showMessage('Formation créée avec succès ✅', 'success');
+    this.closeForm();
+    this.loadFormations();
+    this.loadStats();
+  }
+
+  // ===== QUIZ MANAGEMENT =====
+  showQuizModal = false;
+  quizManagFormationId: number | null = null;
+  quizManagFormationTitre = '';
+  quizManagLoading = false;
+  quizManagForm = { titre: 'Quiz de validation', seuil_reussite: 70, nb_tentatives: 3 };
+  quizManagQuestions: any[] = [];
+  quizManagHasExisting = false;
+
+  ouvrirGererQuiz(f: any) {
+    this.quizManagFormationId = f.id;
+    this.quizManagFormationTitre = f.titre;
+    this.quizManagLoading = true;
+    this.showQuizModal = true;
+    this.adminService.getFormationQuiz(f.id).subscribe({
+      next: (data: any) => {
+        this.quizManagLoading = false;
+        if (data) {
+          this.quizManagHasExisting = true;
+          this.quizManagForm = { titre: data.titre, seuil_reussite: data.seuil_reussite, nb_tentatives: data.nb_tentatives };
+          this.quizManagQuestions = data.questions.map((q: any) => ({
+            question: q.question,
+            reponses: q.reponses.map((r: any) => ({ reponse: r.reponse, est_correcte: !!r.est_correcte }))
+          }));
+        } else {
+          this.quizManagHasExisting = false;
+          this.quizManagForm = { titre: 'Quiz de validation', seuil_reussite: 70, nb_tentatives: 3 };
+          this.quizManagQuestions = [
+            { question: '', reponses: [{ reponse: '', est_correcte: true }, { reponse: '', est_correcte: false }] }
+          ];
+        }
+      },
+      error: () => { this.quizManagLoading = false; }
+    });
+  }
+
+  fermerQuizModal() {
+    this.showQuizModal = false;
+    this.quizManagFormationId = null;
+    this.quizManagQuestions = [];
+  }
+
+  ajouterQuestionAdmin() {
+    this.quizManagQuestions.push({
+      question: '',
+      reponses: [{ reponse: '', est_correcte: true }, { reponse: '', est_correcte: false }]
+    });
+  }
+
+  supprimerQuestionAdmin(i: number) { this.quizManagQuestions.splice(i, 1); }
+
+  ajouterReponseAdmin(qi: number) {
+    this.quizManagQuestions[qi].reponses.push({ reponse: '', est_correcte: false });
+  }
+
+  supprimerReponseAdmin(qi: number, ri: number) {
+    this.quizManagQuestions[qi].reponses.splice(ri, 1);
+  }
+
+  setCorrectAnswer(qi: number, ri: number) {
+    this.quizManagQuestions[qi].reponses.forEach((r: any, idx: number) => {
+      r.est_correcte = idx === ri;
+    });
+  }
+
+  sauvegarderQuiz() {
+    if (!this.quizManagFormationId) return;
+    if (!this.quizManagQuestions.length) { this.showMessage('Ajoutez au moins une question.', 'danger'); return; }
+    for (const q of this.quizManagQuestions) {
+      if (!q.question.trim()) { this.showMessage('Toutes les questions doivent avoir un texte.', 'danger'); return; }
+      if (!q.reponses.some((r: any) => r.est_correcte)) { this.showMessage('Chaque question doit avoir une bonne réponse.', 'danger'); return; }
+    }
+    const payload = { ...this.quizManagForm, questions: this.quizManagQuestions };
+    this.adminService.saveFormationQuiz(this.quizManagFormationId, payload).subscribe({
+      next: () => { this.showMessage('Quiz sauvegardé ✅', 'success'); this.fermerQuizModal(); },
+      error: (err: any) => this.showMessage(err?.error?.error || '❌ Erreur sauvegarde quiz', 'danger')
+    });
+  }
+
+  supprimerQuizAdmin() {
+    if (!this.quizManagFormationId || !confirm('Supprimer le quiz de cette formation ?')) return;
+    this.adminService.deleteFormationQuiz(this.quizManagFormationId).subscribe({
+      next: () => { this.showMessage('Quiz supprimé ✅', 'success'); this.fermerQuizModal(); },
+      error: () => this.showMessage('Erreur suppression quiz', 'danger')
+    });
   }
 
   saveFormateur() {
@@ -514,19 +847,133 @@ acceptFormation(formationId: number) {
   });
 }
 
-publishAcceptedFormation(formationId: number) {
-  if (!confirm('Publier cette formation dans le catalogue ?')) return;
-  const prix = this.prixPublication[formationId] ?? undefined;
 
-  this.adminService.publishAcceptedFormation(formationId, prix).subscribe({
+// ===== Configuration avant publication =====
+ouvrirConfig(f: any) {
+  this.configFormation = f;
+  this.configDateDebut = f.date_debut ? f.date_debut.substring(0, 10) : '';
+  this.configDateFin = f.date_fin ? f.date_fin.substring(0, 10) : '';
+  this.configPrix = f.prix ?? null;
+  this.configSeances = [];
+  this.configModules = [];
+  this.configSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+  this.configEditSeanceMode = false;
+  this.configEditSeanceId = null;
+  this.configLoading = true;
+  this.showConfigModal = true;
+
+  this.adminService.getFormationDetails(f.id).subscribe({
+    next: (res: any) => {
+      this.configModules = res.modules || [];
+      this.configLoading = false;
+    },
+    error: () => { this.configLoading = false; }
+  });
+
+  this.adminService.getFormationSeances(f.id).subscribe({
+    next: (data) => this.configSeances = data,
+    error: () => {}
+  });
+}
+
+fermerConfig() {
+  this.showConfigModal = false;
+  this.configFormation = null;
+}
+
+ajouterSeanceConfig() {
+  if (!this.configFormation) return;
+  if (!this.configSeanceForm.date_seance || !this.configSeanceForm.heure_debut || !this.configSeanceForm.heure_fin) {
+    this.showMessage('Date, heure début et heure fin sont obligatoires.', 'danger'); return;
+  }
+  if (this.configEditSeanceMode && this.configEditSeanceId) {
+    // Pas de route PUT admin — supprimer et recréer
+    this.adminService.deleteFormationSeance(this.configEditSeanceId).subscribe({
+      next: () => {
+        this.configSeances = this.configSeances.filter(s => s.id !== this.configEditSeanceId);
+        this._creerSeanceConfig();
+      },
+      error: () => this.showMessage('Erreur modification séance', 'danger')
+    });
+  } else {
+    this._creerSeanceConfig();
+  }
+}
+
+private _creerSeanceConfig() {
+  this.adminService.addFormationSeance(this.configFormation.id, {
+    ...this.configSeanceForm,
+    formation_id: this.configFormation.id
+  }).subscribe({
+    next: (res: any) => {
+      const module = this.configModules.find(m => m.id === this.configSeanceForm.module_id);
+      this.configSeances.push({
+        id: res.id,
+        ...this.configSeanceForm,
+        module_titre: module?.titre || null,
+        module_ordre: module?.ordre || null
+      });
+      this.configSeances = [...this.configSeances].sort((a, b) => a.date_seance > b.date_seance ? 1 : -1);
+      this.configSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+      this.configEditSeanceMode = false;
+      this.configEditSeanceId = null;
+    },
+    error: (err: any) => this.showMessage(err?.error?.error || 'Erreur ajout séance', 'danger')
+  });
+}
+
+editerSeanceConfig(s: any) {
+  this.configEditSeanceMode = true;
+  this.configEditSeanceId = s.id;
+  this.configSeanceForm = {
+    date_seance: s.date_seance?.substring(0, 10),
+    heure_debut: s.heure_debut,
+    heure_fin: s.heure_fin,
+    salle: s.salle || '',
+    module_id: s.module_id || null
+  };
+}
+
+annulerEditSeanceConfig() {
+  this.configEditSeanceMode = false;
+  this.configEditSeanceId = null;
+  this.configSeanceForm = { date_seance: '', heure_debut: '', heure_fin: '', salle: '', module_id: null };
+}
+
+supprimerSeanceConfig(seanceId: number) {
+  this.adminService.deleteFormationSeance(seanceId).subscribe({
     next: () => {
-      const label = (!prix || prix === 0) ? 'gratuite' : `payante (${prix} EUR)`;
-      this.showMessage(`Formation publiée dans le catalogue 🚀 — Formation ${label}. Le formateur a été notifié.`, 'success');
-      delete this.prixPublication[formationId];
+      this.configSeances = this.configSeances.filter(s => s.id !== seanceId);
+    },
+    error: () => this.showMessage('Erreur suppression séance', 'danger')
+  });
+}
+
+publierFormation() {
+  if (!this.configFormation || !this.configDateDebut) {
+    this.showMessage('La date de début est obligatoire.', 'danger'); return;
+  }
+  if (!this.configPrix || this.configPrix <= 0) {
+    this.showMessage('Le prix est obligatoire pour publier la formation.', 'danger'); return;
+  }
+  if (this.configDateFin && this.configDateFin < this.configDateDebut) {
+    this.showMessage('La date de fin doit être après la date de début.', 'danger'); return;
+  }
+  this.configPublishing = true;
+  this.adminService.publishAcceptedFormation(this.configFormation.id, {
+    date_debut: this.configDateDebut,
+    date_fin: this.configDateFin || undefined,
+    prix: this.configPrix
+  }).subscribe({
+    next: () => {
+      this.showMessage(`Formation publiée dans le catalogue 🚀 — ${this.configPrix} EUR. Le formateur a été notifié.`, 'success');
+      this.configPublishing = false;
+      this.fermerConfig();
       this.loadFormationsAccepted();
       this.loadFormations();
     },
-    error: (err) => {
+    error: (err: any) => {
+      this.configPublishing = false;
       this.showMessage(err?.error?.error || '❌ Erreur lors de la publication', 'danger');
     }
   });
@@ -543,13 +990,58 @@ publishAcceptedFormation(formationId: number) {
     });
   }
 
+  // ===== Détails formation =====
+  voirDetails(f: any) {
+    this.showDetailsModal = true;
+    this.formationDetails = f;
+    this.detailsLoading = true;
+    this.detailsModules = [];
+    this.detailsSupports = [];
+    this.detailsProgramme = null;
+    this.adminService.getFormationDetails(f.id).subscribe({
+      next: (res: any) => {
+        this.formationDetails = res.formation;
+        this.detailsProgramme = res.programme;
+        this.detailsModules = res.modules || [];
+        this.detailsSupports = res.supports || [];
+        this.detailsLoading = false;
+      },
+      error: () => {
+        this.detailsLoading = false;
+        this.showMessage('Erreur lors du chargement des détails', 'danger');
+      }
+    });
+  }
+
+  fermerDetails() {
+    this.showDetailsModal = false;
+    this.formationDetails = null;
+    this.detailsModules = [];
+    this.detailsSupports = [];
+    this.detailsProgramme = null;
+  }
+
+  accepterDepuisDetails() {
+    if (!this.formationDetails) return;
+    this.fermerDetails();
+    this.acceptFormation(this.formationDetails.id);
+  }
+
+  rejeterDepuisDetails() {
+    if (!this.formationDetails) return;
+    const id = this.formationDetails.id;
+    this.fermerDetails();
+    this.rejectFormation(id);
+  }
+
+
   // ===== Programme =====
   ouvrirProgramme(f: any) {
     this.programmeFormation = f;
     this.showProgrammeEditor = true;
     this.editModuleMode = false;
     this.editModuleId = null;
-    this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: 0 };
+    this.moduleForm = { titre: '', description: '', ordre: 0 };
     this.adminService.getProgramme(f.id).subscribe({
       next: (res: any) => {
         const p = res.programme;
@@ -593,7 +1085,7 @@ publishAcceptedFormation(formationId: number) {
       this.adminService.addModule(this.programmeFormation.id, this.moduleForm).subscribe({
         next: (res: any) => {
           this.programmeModules.push({ id: res.id, ...this.moduleForm, formation_id: this.programmeFormation.id });
-          this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: this.programmeModules.length };
+          this.moduleForm = { titre: '', description: '', ordre: this.programmeModules.length };
           this.showMessage('Module ajouté ✅', 'success');
         },
         error: () => this.showMessage('Erreur ajout module', 'danger')
@@ -604,13 +1096,13 @@ publishAcceptedFormation(formationId: number) {
   editerModule(m: any) {
     this.editModuleMode = true;
     this.editModuleId = m.id;
-    this.moduleForm = { titre: m.titre, description: m.description || '', duree_heures: m.duree_heures || '', ordre: m.ordre };
+    this.moduleForm = { titre: m.titre, description: m.description || '', ordre: m.ordre };
   }
 
   annulerEditModule() {
     this.editModuleMode = false;
     this.editModuleId = null;
-    this.moduleForm = { titre: '', description: '', duree_heures: '', ordre: this.programmeModules.length };
+    this.moduleForm = { titre: '', description: '', ordre: this.programmeModules.length };
   }
 
   supprimerModule(moduleId: number) {

@@ -1,0 +1,111 @@
+@startuml Sprint1_Classes
+title Diagramme de Classes — Sprint 1
+
+class User {
+    - id: int
+    - nom: string
+    - email: string
+    - mot_de_passe: string (hashed)
+    - role: enum {admin, formateur, etudiant, externe}
+    - date_creation: datetime
+    - date_modification: datetime
+    --
+    + login(email, mdp): Token
+    + register(data): User
+    + updateProfile(data): void
+    + changePassword(ancien_mdp, nouveau_mdp): void
+    + delete(): void
+}
+
+class Etudiant {
+    - id: int
+    - user_id: int (FK)
+    - specialite: string
+    - niveau: string
+    - cin: string
+    - telephone: string
+    - date_inscription: datetime
+    --
+    + getFormations(): Formation[]
+    + s_inscrire(formation_id): Inscription
+}
+
+class Formateur {
+    - id: int
+    - user_id: int (FK)
+    - specialite: string
+    - telephone: string
+    - statut: enum {actif, inactif}
+    - date_inscription: datetime
+    --
+    + creerFormation(data): Formation
+    + consulterFormations(): Formation[]
+    + consulterEtudiants(): Etudiant[]
+}
+
+class Externe {
+    - id: int
+    - user_id: int (FK)
+    - specialite: string
+    - telephone: string
+    - organisation: string
+    - date_inscription: datetime
+    --
+    + consulterFormations(): Formation[]
+    + s_inscrire(formation_id): InscriptionExterne
+}
+
+class Admin {
+    - id: int
+    - user_id: int (FK)
+    - date_nomination: datetime
+    --
+    + manageUsers(): User[]
+    + deleteUser(user_id): void
+    + createFormateur(data): Formateur
+    + updateFormateur(formateur_id, data): void
+    + deleteFormateur(formateur_id): void
+    + getStatistics(): Statistics
+}
+
+class Formation {
+    - id: int
+    - titre: string
+    - description: string
+    - formateur_id: int (FK)
+    --
+    + creer(): void
+    + modifier(data): void
+}
+
+class Statistics {
+    - nombre_etudiants: int
+    - nombre_formateurs: int
+    - nombre_formations_publiees: int
+    - nombre_formations_en_attente: int
+    --
+    + getGlobalStats(): void
+}
+
+User <|-- Etudiant : héritage
+User <|-- Formateur : héritage
+User <|-- Externe : héritage
+User <|-- Admin : héritage
+
+User "1" -- "*" User : manages (Admin)
+Formateur "1" -- "*" Formation : crée
+Admin "1" -- "1" Statistics : consulte
+
+note right of User
+    Entité principale du système
+    Stockage sécurisé du mot de passe (bcrypt)
+    Rôle détermine les permissions
+end note
+
+note right of Admin
+    Accès complet au système
+    Gestion des utilisateurs et formateurs
+    Consultation des statistiques
+end note
+
+@enduml
