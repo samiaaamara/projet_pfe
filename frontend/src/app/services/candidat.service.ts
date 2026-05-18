@@ -92,4 +92,16 @@ export class CandidatService {
   getEligibiliteAttestation(candidatId: number, formationId: number) {
     return this.http.get<any>(`${this.apiUrl}/eligibilite-attestation/${candidatId}/${formationId}`);
   }
+
+  getQuiz(formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz/${formationId}`);
+  }
+
+  getQuizScore(candidatId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz-score/${candidatId}/${formationId}`);
+  }
+
+  soumettreQuiz(data: { candidat_id: number; quiz_id: number; reponses: { question_id: number; reponse_id: number }[] }) {
+    return this.http.post<any>(`${this.apiUrl}/quiz/soumettre`, data);
+  }
 }

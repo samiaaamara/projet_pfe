@@ -56,6 +56,15 @@ router.post('/inscription', validate(inscriptionEtudiantSchema), async (req, res
     if (existing.length > 0)
       return res.status(400).json({ message: 'Vous êtes déjà inscrit à cette formation' });
 
+    const [activeInscription] = await db.query(
+      `SELECT i.id FROM inscriptions i
+       JOIN formations f ON i.formation_id = f.id
+       WHERE i.etudiant_id = ? AND (f.date_fin IS NULL OR f.date_fin >= CURDATE())`,
+      [etudiant_id]
+    );
+    if (activeInscription.length > 0)
+      return res.status(400).json({ message: 'Vous êtes déjà inscrit à une formation en cours. Attendez sa fin pour vous inscrire à une autre.' });
+
     const [results] = await db.query(
       `SELECT nb_places, (SELECT COUNT(*) FROM inscriptions WHERE formation_id = ?) AS inscrits
        FROM formations WHERE id = ? AND status = 'published'`,
@@ -69,28 +78,10 @@ router.post('/inscription', validate(inscriptionEtudiantSchema), async (req, res
       return res.status(400).json({ message: 'Cette formation est complète' });
 
     await db.query(
-      "INSERT INTO inscriptions (etudiant_id, formation_id, statut, date_inscription) VALUES (?, ?, 'Inscrit', NOW())",
+      "INSERT INTO inscriptions (etudiant_id, formation_id, statut, date_inscription) VALUES (?, ?, 'en_attente', NOW())",
       [etudiant_id, formation_id]
     );
-    res.json({ message: 'Inscription réussie' });
-
-    // Notifier le formateur (fire and forget)
-    db.query(
-      `SELECT f.titre, fo.user_id AS formateur_user_id, u.nom AS etudiant_nom
-       FROM formations f
-       JOIN formateurs fo ON f.formateur_id = fo.id
-       JOIN etudiants e ON e.id = ?
-       JOIN users u ON e.user_id = u.id
-       WHERE f.id = ?`,
-      [etudiant_id, formation_id]
-    ).then(([nr]) => {
-      if (nr.length > 0) {
-        db.query(
-          'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-          [nr[0].formateur_user_id, `📚 ${nr[0].etudiant_nom} s'est inscrit à votre formation « ${nr[0].titre} »`, 'inscription']
-        ).catch(() => {});
-      }
-    }).catch(() => {});
+    res.json({ message: "Demande d'inscription envoyée. En attente d'approbation par l'administrateur." });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

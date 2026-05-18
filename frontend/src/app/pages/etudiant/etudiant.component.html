@@ -56,36 +56,88 @@
 
     <!-- ACCUEIL -->
     <section *ngIf="activeSection === 'accueil'">
-      <div class="page-title">
-        <h2>Bonjour, {{ user?.nom }} 👋</h2>
-        <p>Bienvenue dans votre espace de formation</p>
+
+      <!-- Bannière de bienvenue -->
+      <div class="welcome-banner">
+        <div class="welcome-left">
+          <div class="welcome-role-tag">🎓 Étudiant · ISET Tozeur</div>
+          <div class="welcome-greeting">Bonjour, {{ user?.nom }} 👋</div>
+          <div class="welcome-sub">Suivez vos formations et progressez à votre rythme</div>
+          <button class="btn-action-banner" (click)="setSection('formations')">Explorer les formations →</button>
+        </div>
+        <div class="welcome-stats-mini">
+          <div class="wsm-item">
+            <span class="wsm-val">{{ mesFormations.length }}</span>
+            <span class="wsm-lbl">Inscriptions</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ progression }}%</span>
+            <span class="wsm-lbl">Progression</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ formationsTerminees }}</span>
+            <span class="wsm-lbl">Terminées</span>
+          </div>
+        </div>
       </div>
 
+      <!-- Statistiques -->
       <div class="stats-grid">
         <div class="stat-card blue" (click)="setSection('formations')">
-          <div class="stat-icon">📚</div>
+          <div class="stat-icon">🎓</div>
           <div class="stat-value">{{ totalFormations }}</div>
           <div class="stat-label">Formations disponibles</div>
         </div>
         <div class="stat-card green" (click)="setSection('mesFormations')">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon">📖</div>
           <div class="stat-value">{{ mesFormations.length }}</div>
           <div class="stat-label">Mes inscriptions</div>
         </div>
         <div class="stat-card orange" (click)="setSection('progression')">
-          <div class="stat-icon">📈</div>
+          <div class="stat-icon">📊</div>
           <div class="stat-value">{{ progression }}%</div>
           <div class="stat-label">Progression globale</div>
         </div>
-        <div class="stat-card purple">
-          <div class="stat-icon">🏆</div>
+        <div class="stat-card purple" (click)="setSection('attestation')">
+          <div class="stat-icon">🏅</div>
           <div class="stat-value">{{ formationsTerminees }}</div>
           <div class="stat-label">Formations terminées</div>
         </div>
       </div>
 
+      <!-- Accès rapide aux fonctionnalités -->
+      <div class="feature-cards-row">
+        <div class="feature-card-quick" (click)="setSection('mesFormations')">
+          <div class="fcq-icon">📖</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Mes formations</div>
+            <div class="fcq-desc">Accédez aux contenus et supports de vos cours</div>
+          </div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="ouvrirSectionQuiz()">
+          <div class="fcq-icon">📝</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Mes Quiz</div>
+            <div class="fcq-desc">Testez vos connaissances et validez vos acquis</div>
+          </div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="setSection('attestation')">
+          <div class="fcq-icon">🏆</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Attestations</div>
+            <div class="fcq-desc">Téléchargez vos certificats de réussite officiels</div>
+          </div>
+          <div class="fcq-arrow">›</div>
+        </div>
+      </div>
+
+      <!-- Dernières inscriptions -->
       <div class="card-section">
-        <h5 class="section-title">Dernières inscriptions</h5>
+        <h5 class="section-title">📋 Dernières inscriptions</h5>
         <div *ngIf="mesFormations.length === 0" class="empty-state">
           <span>📭</span>
           <p>Aucune inscription pour le moment.</p>
@@ -96,7 +148,7 @@
             <div class="recent-icon">📘</div>
             <div class="recent-info">
               <div class="recent-title">{{ f.titre }}</div>
-              <div class="recent-date">Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date">📅 Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</div>
             </div>
             <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
           </div>
@@ -154,21 +206,32 @@
 
           <div class="formation-footer">
             <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
-            <!-- Déjà inscrit -->
-            <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Inscrit</span>
-            <!-- Place disponible -->
-            <button *ngIf="!estDejaInscrit(f.id) && !estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
-              S'inscrire
-            </button>
-            <!-- Formation complète : liste d'attente -->
-            <ng-container *ngIf="!estDejaInscrit(f.id) && estComplet(f)">
-              <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
-                ⏳ Liste d'attente
-              </button>
-              <span *ngIf="estEnAttente(f.id)" class="badge-attente">
-                ⏳ En attente #{{ positionAttente(f.id) }}
-                <button class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste">✕</button>
+            <!-- Déjà inscrit ou en attente -->
+            <ng-container *ngIf="estDejaInscrit(f.id)">
+              <span *ngIf="getStatutInscription(f.id) === 'en_attente'" class="badge-attente-admin" title="Votre demande est en cours d'examen par l'administrateur.">⏳ En attente d'approbation</span>
+              <span *ngIf="getStatutInscription(f.id) !== 'en_attente'" class="badge-inscrit">✓ Inscrit</span>
+            </ng-container>
+            <ng-container *ngIf="!estDejaInscrit(f.id)">
+              <!-- Formation active en cours : blocage -->
+              <span *ngIf="aFormationActive" class="badge-formation-bloquee" title="Terminez votre formation en cours avant de vous inscrire à une autre.">
+                🔒 Formation en cours
               </span>
+              <ng-container *ngIf="!aFormationActive">
+                <!-- Place disponible -->
+                <button *ngIf="!estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
+                  S'inscrire
+                </button>
+                <!-- Formation complète : liste d'attente -->
+                <ng-container *ngIf="estComplet(f)">
+                  <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
+                    ⏳ Liste d'attente
+                  </button>
+                  <span *ngIf="estEnAttente(f.id)" class="badge-attente">
+                    ⏳ En attente #{{ positionAttente(f.id) }}
+                    <button class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste">✕</button>
+                  </span>
+                </ng-container>
+              </ng-container>
             </ng-container>
           </div>
         </div>
@@ -640,30 +703,56 @@
   <div *ngIf="attestationLoading" class="attest-loading">Chargement...</div>
 
   <div class="attestation-doc" *ngIf="!attestationLoading">
-    <div class="attest-header">
-      <div class="attest-header-text">
-        <div class="attest-institute">Institut Supérieur des Études Technologiques</div>
-        <div class="attest-title-doc">ATTESTATION DE FORMATION</div>
-      </div>
+
+    <!-- République -->
+    <div class="attest-republic-bar">
+      <span>الجمهورية التونسية</span>
+      <span class="attest-sep">⬥</span>
+      <span>République Tunisienne</span>
+      <span class="attest-sep">⬥</span>
+      <span>وزارة التعليم العالي والبحث العلمي</span>
+      <span class="attest-sep">⬥</span>
+      <span>Ministère de l'Enseignement Supérieur et de la Recherche Scientifique</span>
     </div>
 
+    <!-- En-tête Institut -->
+    <div class="attest-header">
+      <img class="attest-logo"
+           src="https://isett.rnu.tn/images/social-networks-integrations/twitter_image_default.jpg"
+           alt="ISET Tozeur"
+           onerror="this.style.display='none'">
+      <div class="attest-header-center">
+        <div class="attest-institute-ar">المعهد العالي للدراسات التكنولوجية بتوزر</div>
+        <div class="attest-institute">Institut Supérieur des Études Technologiques de Tozeur</div>
+      </div>
+      <div class="attest-header-spacer"></div>
+    </div>
+
+    <!-- Bandeau titre -->
+    <div class="attest-title-band">
+      <span class="attest-star">✦</span>
+      <span class="attest-title-doc">ATTESTATION DE FORMATION</span>
+      <span class="attest-star">✦</span>
+    </div>
+
+    <!-- Corps -->
     <div class="attest-body">
-      <p class="attest-intro">L'établissement soussigné atteste que :</p>
+      <p class="attest-intro">Le Directeur de l'ISET de Tozeur certifie que :</p>
 
       <div class="attest-participant">
+        <div class="attest-participant-label">Monsieur / Madame</div>
         <div class="attest-name">{{ attestationData?.etudiant_nom || user?.nom }}</div>
         <div class="attest-email">{{ attestationData?.etudiant_email || user?.email }}</div>
       </div>
 
-      <p class="attest-intro">a participé à la formation :</p>
+      <p class="attest-intro">a suivi et validé avec succès la formation intitulée :</p>
 
-      <div class="attest-formation-title">{{ attestationData?.titre || formationAttestation?.titre }}</div>
+      <div class="attest-formation-block">
+        <div class="attest-formation-title">{{ attestationData?.titre || formationAttestation?.titre }}</div>
+        <div class="attest-formation-spec" *ngIf="attestationData?.specialite">{{ attestationData.specialite }}</div>
+      </div>
 
       <div class="attest-details-grid">
-        <div class="attest-detail" *ngIf="attestationData?.specialite">
-          <span class="attest-detail-label">Spécialité</span>
-          <span class="attest-detail-val">{{ attestationData.specialite }}</span>
-        </div>
         <div class="attest-detail" *ngIf="attestationData?.date_debut">
           <span class="attest-detail-label">Période</span>
           <span class="attest-detail-val">
@@ -688,18 +777,31 @@
           </span>
         </div>
       </div>
+
+      <div class="attest-closing">
+        La présente attestation est délivrée pour servir et valoir ce que de droit.
+      </div>
     </div>
 
+    <!-- Pied de page -->
     <div class="attest-footer">
-      <div class="attest-footer-left">
-        <div class="attest-footer-label">Formateur</div>
+      <div class="attest-footer-col">
+        <div class="attest-footer-label">Le Formateur</div>
+        <div class="attest-footer-sig-area"></div>
         <div class="attest-footer-sig">{{ attestationData?.formateur_nom || '_______________' }}</div>
       </div>
-      <div class="attest-footer-right">
-        <div class="attest-footer-label">Délivré le</div>
-        <div class="attest-footer-sig">{{ getTodayStr() }}</div>
+      <div class="attest-footer-col attest-footer-col-mid">
+        <div class="attest-stamp-circle">
+          <div class="attest-stamp-inner">CACHET<br>OFFICIEL</div>
+        </div>
+      </div>
+      <div class="attest-footer-col attest-footer-col-right">
+        <div class="attest-footer-label">Tozeur, le {{ getTodayStr() }}</div>
+        <div class="attest-footer-sig-area"></div>
+        <div class="attest-footer-label">Le Directeur</div>
       </div>
     </div>
+
   </div>
 </section>
 

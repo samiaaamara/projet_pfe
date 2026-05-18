@@ -38,6 +38,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   formateurs: any[] = [];
   formationsPending: any[] = [];
   formationsAccepted: any[] = [];
+  inscriptionsPending: any[] = [];
   stats: any = {};
 
   userSearch: string = '';
@@ -155,6 +156,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     this.loadFormateurs();
     this.loadFormationsPending();
     this.loadFormationsAccepted();
+    this.loadInscriptionsPending();
     this.loadStats();
     this.loadUnreadMessages();
     this.msgPollingInterval = setInterval(() => this.loadUnreadMessages(), 30000);
@@ -169,6 +171,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     if (section === 'approvals') {
       this.loadFormationsPending();
       this.loadFormationsAccepted();
+      this.loadInscriptionsPending();
     }
     if (section === 'messages') this.loadContacts();
   }
@@ -829,6 +832,34 @@ get filteredUsers() {
   this.adminService.getFormationsAccepted().subscribe({
     next: res => this.formationsAccepted = res,
     error: err => console.error(err)
+  });
+}
+
+loadInscriptionsPending() {
+  this.adminService.getInscriptionsPending().subscribe({
+    next: res => { this.inscriptionsPending = res; this.loadStats(); },
+    error: err => console.error(err)
+  });
+}
+
+approuverInscription(id: number) {
+  this.adminService.approuverInscription(id).subscribe({
+    next: () => {
+      this.showMessage('Inscription approuvée ✅ — L\'utilisateur a été notifié.', 'success');
+      this.loadInscriptionsPending();
+    },
+    error: (err) => this.showMessage(err?.error?.error || '❌ Erreur lors de l\'approbation', 'danger')
+  });
+}
+
+rejeterInscription(id: number) {
+  if (!confirm('Refuser cette demande d\'inscription ?')) return;
+  this.adminService.rejeterInscription(id).subscribe({
+    next: () => {
+      this.showMessage('Inscription refusée — L\'utilisateur a été notifié.', 'success');
+      this.loadInscriptionsPending();
+    },
+    error: (err) => this.showMessage(err?.error?.error || '❌ Erreur lors du refus', 'danger')
   });
 }
 

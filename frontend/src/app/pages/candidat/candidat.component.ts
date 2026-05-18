@@ -82,7 +82,18 @@ export class CandidatComponent implements OnInit, OnDestroy {
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
-  activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' = 'accueil';
+  activeSection: 'accueil' | 'formations' | 'mesFormations' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'quiz' = 'accueil';
+
+  // Quiz
+  quizStatuts: { [formationId: number]: any } = {};
+  quizSectionLoading = false;
+  showQuizModal = false;
+  quizFormationId: number | null = null;
+  quizData: any = null;
+  quizReponses: { [questionId: number]: number } = {};
+  quizResultat: any = null;
+  quizLoading = false;
+  quizSubmitting = false;
 
   // Programme
   programmeFormation: any = null;
@@ -210,7 +221,7 @@ export class CandidatComponent implements OnInit, OnDestroy {
     if (!this.candidatId) return;
     this.candidatService.inscrire(this.candidatId, formationId).subscribe({
       next: () => {
-        this.showMessage('Inscription réussie !');
+        this.showMessage("Demande envoyée ! En attente d'approbation par l'administrateur.");
         this.loadMesFormations();
         this.loadFormations();
       },
@@ -220,6 +231,19 @@ export class CandidatComponent implements OnInit, OnDestroy {
 
   estDejaInscrit(formationId: number): boolean {
     return this.mesFormations.some(f => f.formation_id === formationId);
+  }
+
+  getStatutInscription(formationId: number): string | null {
+    return this.mesFormations.find(f => f.formation_id === formationId)?.statut || null;
+  }
+
+  get aFormationActive(): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.mesFormations.some(f => {
+      if (!f.date_fin) return true;
+      return new Date(f.date_fin) >= today;
+    });
   }
 
   // ===== Mes formations =====
@@ -246,7 +270,7 @@ export class CandidatComponent implements OnInit, OnDestroy {
   }
 
   getStatutBadge(statut: string): string {
-    const map: any = { 'Inscrit': 'bg-primary', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
+    const map: any = { 'Inscrit': 'bg-primary', 'en_attente': 'bg-warning', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
     return map[statut] || 'bg-secondary';
   }
 
@@ -667,6 +691,97 @@ export class CandidatComponent implements OnInit, OnDestroy {
     this.formationAttestation = null;
     this.activeSection = 'attestation';
     this.message = '';
+  }
+
+  // ===== Section Quiz =====
+  ouvrirSectionQuiz() {
+    this.activeSection = 'quiz';
+    this.message = '';
+    this.quizSectionLoading = true;
+    this.quizStatuts = {};
+    let loaded = 0;
+    if (!this.mesFormations.length) { this.quizSectionLoading = false; return; }
+    this.mesFormations.forEach(f => {
+      this.candidatService.getQuizScore(this.candidatId!, f.formation_id).subscribe({
+        next: data => {
+          this.quizStatuts[f.formation_id] = data;
+          loaded++;
+          if (loaded === this.mesFormations.length) this.quizSectionLoading = false;
+        },
+        error: () => {
+          loaded++;
+          if (loaded === this.mesFormations.length) this.quizSectionLoading = false;
+        }
+      });
+    });
+  }
+
+  nbQuizDisponibles(): number {
+    return this.mesFormations.filter(f => {
+      const e = this.eligibiliteMap[f.formation_id];
+      return e?.has_quiz && !e?.quiz_ok && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
+    }).length;
+  }
+
+  ouvrirQuiz(f: any) {
+    this.quizFormationId = f.formation_id;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizLoading = true;
+    this.showQuizModal = true;
+    this.candidatService.getQuiz(f.formation_id).subscribe({
+      next: data => { this.quizData = data; this.quizLoading = false; },
+      error: () => { this.quizLoading = false; this.showMessage('Erreur chargement du quiz', 'danger'); }
+    });
+  }
+
+  fermerQuizApresResultat() {
+    const wasSuccessful = this.quizResultat?.reussi;
+    const fid = this.quizFormationId;
+    this.showQuizModal = false;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizFormationId = null;
+    if (wasSuccessful) this.loadMesFormations();
+    if (fid) {
+      this.candidatService.getQuizScore(this.candidatId!, fid).subscribe({
+        next: data => this.quizStatuts[fid] = data,
+        error: () => {}
+      });
+    }
+  }
+
+  soumettreQuiz() {
+    if (!this.candidatId || !this.quizData) return;
+    const reponses = Object.entries(this.quizReponses).map(([question_id, reponse_id]) => ({
+      question_id: Number(question_id), reponse_id: Number(reponse_id)
+    }));
+    if (reponses.length < this.quizData.questions.length) {
+      this.showMessage('Veuillez répondre à toutes les questions', 'danger'); return;
+    }
+    this.quizSubmitting = true;
+    this.candidatService.soumettreQuiz({
+      candidat_id: this.candidatId,
+      quiz_id: this.quizData.id,
+      reponses
+    }).subscribe({
+      next: res => {
+        this.quizResultat = res;
+        this.quizSubmitting = false;
+        if (this.quizFormationId) {
+          this.candidatService.getEligibiliteAttestation(this.candidatId!, this.quizFormationId).subscribe({
+            next: data => this.eligibiliteMap = { ...this.eligibiliteMap, [this.quizFormationId!]: data },
+            error: () => {}
+          });
+        }
+      },
+      error: (err) => {
+        this.quizSubmitting = false;
+        this.showMessage(err?.error?.error || 'Erreur lors de la soumission', 'danger');
+      }
+    });
   }
 
   // ===== Attestation enrichie =====

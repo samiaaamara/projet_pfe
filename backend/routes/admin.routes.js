@@ -302,11 +302,119 @@ router.get('/stats', async (req, res) => {
       (SELECT COUNT(*) FROM users WHERE role='candidat') AS candidats,
       (SELECT COUNT(*) FROM formateurs) AS formateurs,
       (SELECT COUNT(*) FROM formations) AS formations,
-      (SELECT COUNT(*) FROM formations WHERE status='published') AS published
+      (SELECT COUNT(*) FROM formations WHERE status='published') AS published,
+      (SELECT COUNT(*) FROM inscriptions WHERE statut='en_attente') AS inscriptions_pending
   `;
   try {
     const [results] = await db.query(sql);
     res.json(results[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ========================= INSCRIPTIONS EN ATTENTE ========================= */
+router.get('/inscriptions-pending', async (req, res) => {
+  const sql = `
+    SELECT i.id, i.formation_id, i.statut, i.date_inscription,
+           f.titre AS formation_titre, f.date_debut, f.nb_places,
+           (SELECT COUNT(*) FROM inscriptions WHERE formation_id = f.id AND statut = 'Inscrit') AS inscrits_actifs,
+           COALESCE(uc.nom, ue.nom) AS user_nom,
+           COALESCE(uc.email, ue.email) AS user_email,
+           CASE WHEN i.candidat_id IS NOT NULL THEN 'candidat' ELSE 'etudiant' END AS type_utilisateur
+    FROM inscriptions i
+    JOIN formations f ON i.formation_id = f.id
+    LEFT JOIN candidats c ON i.candidat_id = c.id
+    LEFT JOIN users uc ON c.user_id = uc.id
+    LEFT JOIN etudiants e ON i.etudiant_id = e.id
+    LEFT JOIN users ue ON e.user_id = ue.id
+    WHERE i.statut = 'en_attente'
+    ORDER BY i.date_inscription ASC
+  `;
+  try {
+    const [results] = await db.query(sql);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/inscriptions/:id/approve', async (req, res) => {
+  const inscriptionId = parseInt(req.params.id);
+  if (isNaN(inscriptionId)) return res.status(400).json({ error: 'ID invalide' });
+  try {
+    const [[insc]] = await db.query(
+      `SELECT i.id, i.formation_id,
+              f.titre AS formation_titre,
+              COALESCE(uc.id, ue.id) AS user_id,
+              COALESCE(uc.nom, ue.nom) AS user_nom,
+              fo.user_id AS formateur_user_id,
+              COALESCE(uc.nom, ue.nom) AS inscrit_nom
+       FROM inscriptions i
+       JOIN formations f ON i.formation_id = f.id
+       JOIN formateurs fo ON f.formateur_id = fo.id
+       LEFT JOIN candidats c ON i.candidat_id = c.id
+       LEFT JOIN users uc ON c.user_id = uc.id
+       LEFT JOIN etudiants e ON i.etudiant_id = e.id
+       LEFT JOIN users ue ON e.user_id = ue.id
+       WHERE i.id = ? AND i.statut = 'en_attente'`,
+      [inscriptionId]
+    );
+    if (!insc) return res.status(404).json({ error: 'Inscription introuvable ou déjà traitée' });
+
+    const [[places]] = await db.query(
+      `SELECT f.nb_places,
+              (SELECT COUNT(*) FROM inscriptions WHERE formation_id = f.id AND statut = 'Inscrit') AS inscrits_actifs
+       FROM formations f WHERE f.id = ?`,
+      [insc.formation_id]
+    );
+    if (places.nb_places !== null && places.inscrits_actifs >= places.nb_places) {
+      return res.status(400).json({ error: `La formation est complète (${places.nb_places} place(s) maximum). Impossible d'approuver cette inscription.` });
+    }
+
+    await db.query("UPDATE inscriptions SET statut = 'Inscrit' WHERE id = ?", [inscriptionId]);
+    res.json({ message: 'Inscription approuvée ✅' });
+
+    db.query(
+      'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+      [insc.user_id, `✅ Votre demande d'inscription à la formation « ${insc.formation_titre} » a été approuvée !`, 'inscription']
+    ).catch(() => {});
+
+    db.query(
+      'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+      [insc.formateur_user_id, `📚 ${insc.inscrit_nom} a été inscrit à votre formation « ${insc.formation_titre} »`, 'inscription']
+    ).catch(() => {});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/inscriptions/:id/reject', async (req, res) => {
+  const inscriptionId = parseInt(req.params.id);
+  if (isNaN(inscriptionId)) return res.status(400).json({ error: 'ID invalide' });
+  try {
+    const [[insc]] = await db.query(
+      `SELECT i.id, i.formation_id,
+              f.titre AS formation_titre,
+              COALESCE(uc.id, ue.id) AS user_id
+       FROM inscriptions i
+       JOIN formations f ON i.formation_id = f.id
+       LEFT JOIN candidats c ON i.candidat_id = c.id
+       LEFT JOIN users uc ON c.user_id = uc.id
+       LEFT JOIN etudiants e ON i.etudiant_id = e.id
+       LEFT JOIN users ue ON e.user_id = ue.id
+       WHERE i.id = ? AND i.statut = 'en_attente'`,
+      [inscriptionId]
+    );
+    if (!insc) return res.status(404).json({ error: 'Inscription introuvable ou déjà traitée' });
+
+    await db.query('DELETE FROM inscriptions WHERE id = ?', [inscriptionId]);
+    res.json({ message: 'Inscription rejetée' });
+
+    db.query(
+      'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+      [insc.user_id, `❌ Votre demande d'inscription à la formation « ${insc.formation_titre} » a été refusée.`, 'inscription']
+    ).catch(() => {});
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

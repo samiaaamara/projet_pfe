@@ -41,8 +41,15 @@ export class FormateurComponent implements OnInit, OnDestroy {
   formErrors: { titre?: string; description?: string; nb_places?: string } = {};
 
   // Stepper création
-  creationStep: 1 | 2 | 3 = 1;
+  creationStep: 1 | 2 | 3 | 4 = 1;
   creationFormationId: number | null = null;
+
+  // Quiz création (Step 4)
+  quizTitre = 'Quiz de validation';
+  quizSeuil = 70;
+  quizNbTentatives = 3;
+  quizQuestions: { question: string; reponses: { reponse: string; est_correcte: boolean }[] }[] = [];
+  quizSaving = false;
 
   // Programme editor
   showProgrammeModal = false;
@@ -247,6 +254,11 @@ export class FormateurComponent implements OnInit, OnDestroy {
     this.programmeData = { description_globale: '', objectifs: '', prerequis: '' };
     this.programmeModules = [];
     this.moduleForm = { titre: '', description: '', ordre: null };
+    this.quizTitre = 'Quiz de validation';
+    this.quizSeuil = 70;
+    this.quizNbTentatives = 3;
+    this.quizQuestions = [];
+    this.quizSaving = false;
     this.editModuleMode = false;
     this.editModuleId = null;
     this.supports = [];
@@ -365,6 +377,85 @@ export class FormateurComponent implements OnInit, OnDestroy {
     this.closeFormationModal();
     this.loadFormations();
     this.activeSection = 'mesFormations';
+  }
+
+  passerEtape4() {
+    this.creationStep = 4;
+    if (this.quizQuestions.length === 0) this.ajouterQuestion();
+  }
+
+  ajouterQuestion() {
+    this.quizQuestions.push({
+      question: '',
+      reponses: [
+        { reponse: '', est_correcte: true },
+        { reponse: '', est_correcte: false },
+        { reponse: '', est_correcte: false }
+      ]
+    });
+  }
+
+  supprimerQuestion(i: number) {
+    this.quizQuestions.splice(i, 1);
+  }
+
+  ajouterReponse(qi: number) {
+    if (this.quizQuestions[qi].reponses.length < 4) {
+      this.quizQuestions[qi].reponses.push({ reponse: '', est_correcte: false });
+    }
+  }
+
+  supprimerReponse(qi: number, ri: number) {
+    if (this.quizQuestions[qi].reponses.length > 2) {
+      this.quizQuestions[qi].reponses.splice(ri, 1);
+    }
+  }
+
+  marquerCorrecte(qi: number, ri: number) {
+    this.quizQuestions[qi].reponses.forEach((r, idx) => r.est_correcte = idx === ri);
+  }
+
+  terminerAvecQuiz() {
+    if (this.quizQuestions.length === 0) {
+      this.showMessage('Ajoutez au moins une question au quiz.', 'danger');
+      return;
+    }
+    for (let i = 0; i < this.quizQuestions.length; i++) {
+      const q = this.quizQuestions[i];
+      if (!q.question.trim()) {
+        this.showMessage(`Question ${i + 1} : le texte de la question est vide.`, 'danger');
+        return;
+      }
+      const filled = q.reponses.filter(r => r.reponse.trim());
+      if (filled.length < 2) {
+        this.showMessage(`Question ${i + 1} : remplissez au moins 2 réponses.`, 'danger');
+        return;
+      }
+      if (!q.reponses.some(r => r.est_correcte && r.reponse.trim())) {
+        this.showMessage(`Question ${i + 1} : cochez la bonne réponse.`, 'danger');
+        return;
+      }
+    }
+    if (!this.creationFormationId) return;
+    this.quizSaving = true;
+    this.formateurService.creerQuiz(this.creationFormationId, {
+      titre: this.quizTitre || 'Quiz de validation',
+      seuil_reussite: this.quizSeuil,
+      nb_tentatives: this.quizNbTentatives,
+      questions: this.quizQuestions.map(q => ({
+        question: q.question.trim(),
+        reponses: q.reponses.filter(r => r.reponse.trim())
+      }))
+    }).subscribe({
+      next: () => {
+        this.quizSaving = false;
+        this.terminerCreation();
+      },
+      error: (err) => {
+        this.quizSaving = false;
+        this.showMessage(err?.error?.error || '❌ Erreur lors de la création du quiz', 'danger');
+      }
+    });
   }
 
   openFormationModal(formation?: any) {

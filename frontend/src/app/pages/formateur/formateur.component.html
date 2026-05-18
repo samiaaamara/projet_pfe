@@ -57,11 +57,34 @@
  
     <!-- ===== ACCUEIL ===== -->
     <section *ngIf="activeSection === 'accueil'">
-      <div class="page-title">
-        <h2>Bonjour, {{ user?.nom }} 👨‍🏫</h2>
-        <p>Gérez vos formations et accompagnez vos étudiants</p>
+
+      <!-- Bannière de bienvenue -->
+      <div class="welcome-banner">
+        <div class="welcome-left">
+          <div class="welcome-role-tag">👨‍🏫 Formateur · ISET Tozeur</div>
+          <div class="welcome-greeting">Bonjour, {{ user?.nom }} 👋</div>
+          <div class="welcome-sub">Créez vos formations, gérez vos séances et accompagnez vos apprenants</div>
+          <button class="btn-action-banner" (click)="setSection('creerFormation')">Créer une formation →</button>
+        </div>
+        <div class="welcome-stats-mini">
+          <div class="wsm-item">
+            <span class="wsm-val">{{ stats.formations }}</span>
+            <span class="wsm-lbl">Formations</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ stats.etudiants }}</span>
+            <span class="wsm-lbl">Apprenants</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ stats.seances }}</span>
+            <span class="wsm-lbl">Séances</span>
+          </div>
+        </div>
       </div>
- 
+
+      <!-- Statistiques -->
       <div class="stats-grid">
         <div class="stat-card blue" (click)="setSection('mesFormations')">
           <div class="stat-icon">📚</div>
@@ -69,54 +92,67 @@
           <div class="stat-label">Formations créées</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-icon">👥</div>
+          <div class="stat-icon">👨‍🎓</div>
           <div class="stat-value">{{ stats.etudiants }}</div>
-          <div class="stat-label">Participants inscrits</div>
+          <div class="stat-label">Apprenants inscrits</div>
         </div>
         <div class="stat-card teal" (click)="setSection('mesFormations')">
-          <div class="stat-icon">📅</div>
+          <div class="stat-icon">📆</div>
           <div class="stat-value">{{ stats.seances }}</div>
           <div class="stat-label">Séances planifiées</div>
         </div>
         <div class="stat-card purple">
-          <div class="stat-icon">✅</div>
+          <div class="stat-icon">✔️</div>
           <div class="stat-value">{{ publishedFormationsCount }}</div>
           <div class="stat-label">Publiées</div>
         </div>
         <div class="stat-card orange">
-          <div class="stat-icon">⏳</div>
+          <div class="stat-icon">⏱️</div>
           <div class="stat-value">{{ pendingApprovalFormationsCount }}</div>
           <div class="stat-label">En attente d'approbation</div>
         </div>
       </div>
- 
-      <div class="card-section">
-        <h5 class="section-title">Actions rapides</h5>
-        <div class="actions-grid">
-          <button class="action-btn blue" (click)="setSection('creerFormation')">
-            <span>➕</span> Créer une formation
-          </button>
-          <button class="action-btn green" (click)="setSection('mesFormations')">
-            <span>📚</span> Mes formations
-          </button>
-          <button class="action-btn purple" (click)="setSection('supports')">
-            <span>📎</span> Gérer les supports
-          </button>
+
+      <!-- Accès rapide aux fonctionnalités -->
+      <div class="feature-cards-row">
+        <div class="feature-card-quick" (click)="setSection('creerFormation')">
+          <div class="fcq-icon">✏️</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Créer une formation</div>
+            <div class="fcq-desc">Concevez et publiez un nouveau programme pédagogique</div>
+          </div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="setSection('mesFormations')">
+          <div class="fcq-icon">📚</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Mes formations</div>
+            <div class="fcq-desc">Gérez séances, présences et progression des apprenants</div>
+          </div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="setSection('supports')">
+          <div class="fcq-icon">📤</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Supports pédagogiques</div>
+            <div class="fcq-desc">Partagez vos ressources (PDF, vidéos, documents)</div>
+          </div>
+          <div class="fcq-arrow">›</div>
         </div>
       </div>
- 
+
+      <!-- Dernières formations -->
       <div class="card-section" *ngIf="formations.length > 0">
-        <h5 class="section-title">Dernières formations</h5>
+        <h5 class="section-title">📚 Dernières formations</h5>
         <div class="recent-list">
           <div class="recent-item" *ngFor="let f of formations.slice(0,3)">
             <div class="recent-icon">📘</div>
             <div class="recent-info">
               <div class="recent-title">{{ f.titre }}</div>
-              <div class="recent-date" *ngIf="f.date_debut">{{ f.date_debut | date:'dd/MM/yyyy' }}</div>
-              <div class="recent-date" *ngIf="!f.date_debut">Date à définir</div>
+              <div class="recent-date">📅 {{ f.date_debut ? (f.date_debut | date:'dd/MM/yyyy') : 'Date à définir' }}</div>
             </div>
             <span class="status-badge" [ngClass]="{'status-draft': f.status==='draft', 'status-pending': f.status==='pending_approval', 'status-accepted': f.status==='accepted', 'status-published': f.status==='published'}">
-              {{ f.status === 'draft' ? 'Brouillon' : f.status === 'pending_approval' ? 'En attente' : f.status === 'accepted' ? 'Acceptée' : 'Publié' }}
+              {{ f.status === 'draft' ? '📝 Brouillon' : f.status === 'pending_approval' ? '⏳ En attente' : f.status === 'accepted' ? '✅ Acceptée' : '🟢 Publiée' }}
             </span>
           </div>
         </div>
@@ -781,12 +817,17 @@
         <div class="step-line" [class.done]="creationStep > 1"></div>
         <div class="step" [class.active]="creationStep === 2" [class.done]="creationStep > 2">
           <div class="step-circle">{{ creationStep > 2 ? '✓' : '2' }}</div>
-          <div class="step-label">Programme & Modules</div>
+          <div class="step-label">Programme</div>
         </div>
         <div class="step-line" [class.done]="creationStep > 2"></div>
-        <div class="step" [class.active]="creationStep === 3">
-          <div class="step-circle">3</div>
+        <div class="step" [class.active]="creationStep === 3" [class.done]="creationStep > 3">
+          <div class="step-circle">{{ creationStep > 3 ? '✓' : '3' }}</div>
           <div class="step-label">Supports</div>
+        </div>
+        <div class="step-line" [class.done]="creationStep > 3"></div>
+        <div class="step" [class.active]="creationStep === 4">
+          <div class="step-circle">4</div>
+          <div class="step-label">📝 Quiz</div>
         </div>
       </div>
 
@@ -930,7 +971,83 @@
 
         <div class="modal-footer">
           <button class="btn-cancel" (click)="creationStep = 2">‹ Retour</button>
-          <button class="btn-save btn-finish" (click)="terminerCreation()">✅ Terminer la création</button>
+          <button class="btn-save" (click)="passerEtape4()">Suivant — Quiz 📝 ›</button>
+        </div>
+      </div>
+
+      <!-- ===== ÉTAPE 4 : Quiz ===== -->
+      <div *ngIf="!editMode && creationStep === 4">
+        <div class="programme-section">
+          <p class="quiz-intro-text">
+            📝 Créez le quiz de validation que vos apprenants devront réussir pour obtenir leur attestation.
+          </p>
+
+          <!-- Paramètres du quiz -->
+          <div class="quiz-params-grid">
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Titre du quiz</label>
+              <input class="form-input" type="text" [(ngModel)]="quizTitre" placeholder="Ex : Quiz de validation">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Seuil de réussite (%) <span class="quiz-seuil-val">{{ quizSeuil }}%</span></label>
+              <input class="form-input quiz-range" type="range" [(ngModel)]="quizSeuil" min="50" max="100" step="5">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Nombre de tentatives max</label>
+              <input class="form-input" type="number" [(ngModel)]="quizNbTentatives" min="1" max="10" style="max-width:100px">
+            </div>
+          </div>
+
+          <hr class="modal-divider">
+
+          <!-- Liste des questions -->
+          <div class="quiz-questions-editor">
+            <div class="quiz-q-header">
+              <h6 class="programme-section-title">Questions <span class="module-count-chip">{{ quizQuestions.length }}</span></h6>
+              <button class="btn-add-question" (click)="ajouterQuestion()" [disabled]="quizQuestions.length >= 20">
+                ➕ Ajouter une question
+              </button>
+            </div>
+
+            <div *ngIf="quizQuestions.length === 0" class="module-empty">
+              ⚠️ Ajoutez au moins 1 question pour créer le quiz.
+            </div>
+
+            <div class="quiz-question-block" *ngFor="let q of quizQuestions; let qi = index">
+              <div class="quiz-q-top">
+                <span class="quiz-q-num">Q{{ qi + 1 }}</span>
+                <input class="form-input quiz-q-input" type="text" [(ngModel)]="q.question"
+                       placeholder="Saisir le texte de la question...">
+                <button class="btn-action red" (click)="supprimerQuestion(qi)" title="Supprimer la question">🗑️</button>
+              </div>
+
+              <div class="quiz-reponses-list">
+                <div class="quiz-rep-row" *ngFor="let r of q.reponses; let ri = index">
+                  <label class="quiz-correct-radio" [title]="'Marquer comme bonne réponse'">
+                    <input type="radio" [name]="'correct-' + qi" [checked]="r.est_correcte"
+                           (change)="marquerCorrecte(qi, ri)">
+                    <span class="quiz-radio-dot" [class.correct]="r.est_correcte">✓</span>
+                  </label>
+                  <input class="form-input quiz-rep-input" type="text" [(ngModel)]="r.reponse"
+                         [placeholder]="'Réponse ' + (ri + 1)"
+                         [class.quiz-rep-correct]="r.est_correcte">
+                  <button class="btn-action red btn-xs" (click)="supprimerReponse(qi, ri)"
+                          [disabled]="q.reponses.length <= 2" title="Supprimer cette réponse">✕</button>
+                </div>
+                <button class="btn-add-rep" (click)="ajouterReponse(qi)" [disabled]="q.reponses.length >= 4">
+                  + Ajouter une réponse
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="creationStep = 3">‹ Retour</button>
+          <button class="btn-save btn-finish" (click)="terminerAvecQuiz()" [disabled]="quizSaving">
+            <span *ngIf="quizSaving">⏳ Enregistrement...</span>
+            <span *ngIf="!quizSaving">✅ Terminer et envoyer à l'admin</span>
+          </button>
         </div>
       </div>
 

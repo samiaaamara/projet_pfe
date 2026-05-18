@@ -22,8 +22,8 @@
       </a>
       <a class="nav-item" [class.active]="activeSection==='approvals'" (click)="setSection('approvals')">
         <span class="nav-icon">🔔</span> Approbations
-       <span class="nav-badge alert-badge" *ngIf="formationsPending.length + formationsAccepted.length > 0">
-  {{ formationsPending.length + formationsAccepted.length }}
+       <span class="nav-badge alert-badge" *ngIf="formationsPending.length + formationsAccepted.length + inscriptionsPending.length > 0">
+  {{ formationsPending.length + formationsAccepted.length + inscriptionsPending.length }}
 </span>
      </a>
       <a class="nav-item" [class.active]="activeSection==='formateurs'" (click)="setSection('formateurs')">
@@ -53,55 +53,75 @@
  
     <!-- ===== DASHBOARD ===== -->
     <section *ngIf="activeSection==='accueil'">
-      <div class="page-title">
-        <h2>🏠 Tableau de bord</h2>
-        <p>Vue d'ensemble de la plateforme</p>
-      </div>
- 
-      <div class="stats-grid">
-        <div class="stat-card blue" (click)="setSection('utilisateurs')">
-          <div class="stat-icon">👥</div>
-          <div class="stat-value">{{ (stats.candidats || 0) + (stats.formateurs || 0) }}</div>
-          <div class="stat-label">Utilisateurs</div>
-        </div>
-        <div class="stat-card green" (click)="setSection('formateurs')">
-          <div class="stat-icon">👨‍🏫</div>
-          <div class="stat-value">{{ stats.formateurs || 0 }}</div>
-          <div class="stat-label">Formateurs</div>
-        </div>
-        <div class="stat-card purple" (click)="setSection('formations')">
-          <div class="stat-icon">📚</div>
-          <div class="stat-value">{{ stats.formations || 0 }}</div>
-          <div class="stat-label">Formations</div>
-        </div>
-        <div class="stat-card orange" (click)="setSection('approvals')">
-          <div class="stat-icon">🔔</div>
-          <div class="stat-value">{{ formationsPending.length }}</div>
-          <div class="stat-label">En attente</div>
-        </div>
-      </div>
- 
-     <div class="two-col-grid">
-        <div class="card-section">
-          <h5 class="section-title">Formations publiées vs total</h5>
-          <div class="progress-track">
-            <div class="progress-fill green"
-                 [style.width.%]="stats.formations ? (stats.published / stats.formations * 100) : 0">
-              {{ stats.published || 0 }} / {{ stats.formations || 0 }}
-            </div>
-          </div>
 
-        <div class="progress-legend">{{ stats.published || 0 }} publiée(s) sur {{ stats.formations || 0 }}</div>
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-left">
+          <div class="welcome-role-tag">⚙️ Administrateur · ISET Tozeur</div>
+          <div class="welcome-greeting">Tableau de bord 👋</div>
+          <div class="welcome-sub">Vue d'ensemble de la plateforme — gérez les utilisateurs, les formations et les approbations.</div>
+          <a class="btn-action-banner" (click)="setSection('approvals')" style="cursor:pointer;">
+            ✅ Voir les approbations →
+          </a>
         </div>
-        <div class="card-section">
-          <h5 class="section-title">Actions rapides</h5>
-          <div class="quick-actions">
-            <button class="action-btn blue" (click)="setSection('formations'); openAddForm()">➕ Nouvelle formation</button>
-            <button class="action-btn green" (click)="setSection('formateurs'); openAddFormateur()">➕ Nouveau formateur</button>
-            <button class="action-btn orange" (click)="setSection('approvals')">🔔 Voir approbations</button>
+        <div class="welcome-stats-mini">
+          <div class="wsm-item">
+            <span class="wsm-val">{{ (stats.candidats || 0) + (stats.formateurs || 0) }}</span>
+            <span class="wsm-lbl">👤 Utilisateurs</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ stats.formations || 0 }}</span>
+            <span class="wsm-lbl">📚 Formations</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ formationsPending.length }}</span>
+            <span class="wsm-lbl">⚠️ En attente</span>
           </div>
         </div>
+      </div>
+
+      <!-- Accès rapide -->
+      <div class="feature-cards-row">
+        <a class="feature-card-quick" (click)="setSection('formations'); openAddForm()" style="cursor:pointer;">
+          <div class="fcq-icon">➕</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Nouvelle formation</div>
+            <div class="fcq-desc">Créez et publiez une nouvelle formation sur la plateforme</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
+        <a class="feature-card-quick" (click)="setSection('formateurs'); openAddFormateur()" style="cursor:pointer;">
+          <div class="fcq-icon">👨‍🏫</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Nouveau formateur</div>
+            <div class="fcq-desc">{{ stats.formateurs || 0 }} formateur(s) actif(s) — ajouter un compte</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
+        <a class="feature-card-quick" (click)="setSection('approvals')" style="cursor:pointer;">
+          <div class="fcq-icon">✅</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Approuver formations</div>
+            <div class="fcq-desc">{{ formationsPending.length }} formation(s) en attente d'approbation</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
+      </div>
+
+      <!-- Progression formations publiées -->
+      <div class="card-section">
+        <h5 class="section-title">📊 Formations publiées vs total</h5>
+        <div class="progress-track">
+          <div class="progress-fill green"
+               [style.width.%]="stats.formations ? (stats.published / stats.formations * 100) : 0">
+            {{ stats.published || 0 }} / {{ stats.formations || 0 }}
+          </div>
         </div>
+        <div class="progress-legend">{{ stats.published || 0 }} publiée(s) sur {{ stats.formations || 0 }}</div>
+      </div>
+
     </section>
  
     <!-- ===== UTILISATEURS ===== -->
@@ -303,12 +323,56 @@
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
         <h2>🔔 Approbations</h2>
-        <p>{{ formationsPending.length }} en attente · {{ formationsAccepted.length }} acceptée(s)</p>
+        <p>{{ formationsPending.length }} formation(s) en attente · {{ formationsAccepted.length }} acceptée(s) · {{ inscriptionsPending.length }} inscription(s) à approuver</p>
       </div>
 
+  <!-- DEMANDES D'INSCRIPTION EN ATTENTE -->
+  <div class="approvals-sub-title">
+    <h4>👤 Demandes d'inscription en attente</h4>
+  </div>
+
+  <div *ngIf="inscriptionsPending.length === 0" class="empty-state" style="margin-bottom:24px">
+    <span>✅</span>
+    <p>Aucune demande d'inscription en attente.</p>
+  </div>
+
+  <div class="inscriptions-pending-list" *ngIf="inscriptionsPending.length > 0">
+    <div class="insc-pending-card" *ngFor="let i of inscriptionsPending">
+      <div class="insc-pending-user">
+        <span class="insc-avatar">{{ i.user_nom?.charAt(0)?.toUpperCase() }}</span>
+        <div class="insc-user-info">
+          <strong>{{ i.user_nom }}</strong>
+          <span class="insc-user-email">{{ i.user_email }}</span>
+          <span class="insc-user-type">{{ i.type_utilisateur === 'candidat' ? '🎓 Candidat' : '📘 Étudiant' }}</span>
+        </div>
+      </div>
+      <div class="insc-pending-formation">
+        <span class="insc-formation-titre">📚 {{ i.formation_titre }}</span>
+        <span class="insc-formation-date" *ngIf="i.date_debut">📅 Début : {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+        <ng-container *ngIf="i.nb_places !== null">
+          <span class="insc-formation-places" [class.insc-places-full]="i.inscrits_actifs >= i.nb_places">
+            👥 {{ i.inscrits_actifs }}/{{ i.nb_places }} place(s)
+            <span *ngIf="i.inscrits_actifs >= i.nb_places" class="insc-full-tag">COMPLET</span>
+          </span>
+        </ng-container>
+        <span class="insc-formation-places" *ngIf="i.nb_places === null">👥 Places illimitées</span>
+      </div>
+      <div class="insc-pending-date">
+        Demandé le {{ i.date_inscription | date:'dd/MM/yyyy HH:mm' }}
+      </div>
+      <div class="insc-pending-actions">
+        <button class="btn-approve"
+                [disabled]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places"
+                [title]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places ? 'Formation complète — impossible d\'approuver' : 'Approuver la demande'"
+                (click)="approuverInscription(i.id)">✅ Approuver</button>
+        <button class="btn-reject" (click)="rejeterInscription(i.id)">❌ Refuser</button>
+      </div>
+    </div>
+  </div>
+
    <!-- EN ATTENTE D'ACCEPTATION -->
-      <div class="approvals-sub-title">
-        <h4>📥 En attente d'acceptation</h4>
+      <div class="approvals-sub-title" style="margin-top:32px">
+        <h4>📥 En attente d'acceptation (formations)</h4>
       </div>
 
     <div *ngIf="formationsPending.length === 0" class="empty-state" style="margin-bottom:24px">

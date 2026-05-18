@@ -60,7 +60,7 @@ export class ExterneComponent implements OnInit, OnDestroy {
 
   message = '';
   messageType: 'success' | 'danger' = 'success';
-  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' = 'accueil';
+  activeSection: 'accueil' | 'formations' | 'mesInscriptions' | 'supports' | 'progression' | 'profil' | 'attestation' | 'notifications' | 'messages' | 'quiz' = 'accueil';
 
   // Messagerie
   contacts: any[] = [];
@@ -106,6 +106,17 @@ export class ExterneComponent implements OnInit, OnDestroy {
   // Justificatifs
   justifSeanceId: number | null = null;
   justifMotif = '';
+
+  // Quiz
+  quizStatuts: { [formationId: number]: any } = {};
+  quizSectionLoading = false;
+  showQuizModal = false;
+  quizFormationId: number | null = null;
+  quizData: any = null;
+  quizReponses: { [questionId: number]: number } = {};
+  quizResultat: any = null;
+  quizLoading = false;
+  quizSubmitting = false;
 
 
   constructor(
@@ -684,5 +695,99 @@ export class ExterneComponent implements OnInit, OnDestroy {
     return this.mesInscriptions
       .filter(i => i.statut_paiement === 'payé')
       .reduce((sum, i) => sum + (parseFloat(i.montant) || 0), 0);
+  }
+
+  // ===== Quiz =====
+  nbQuizDisponibles(): number {
+    return this.mesInscriptions
+      .filter(i => i.statut_paiement === 'payé')
+      .filter(f => {
+        const e = this.eligibiliteMap[f.formation_id];
+        return e?.has_quiz && !e?.quiz_ok && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
+      }).length;
+  }
+
+  ouvrirSectionQuiz() {
+    this.activeSection = 'quiz';
+    this.message = '';
+    this.quizSectionLoading = true;
+    this.quizStatuts = {};
+    const inscriptions = this.mesInscriptions.filter(i => i.statut_paiement === 'payé');
+    if (!inscriptions.length) { this.quizSectionLoading = false; return; }
+    let loaded = 0;
+    inscriptions.forEach(f => {
+      this.externeService.getQuizScore(this.externeId!, f.formation_id).subscribe({
+        next: data => {
+          this.quizStatuts[f.formation_id] = data;
+          loaded++;
+          if (loaded === inscriptions.length) this.quizSectionLoading = false;
+        },
+        error: () => {
+          loaded++;
+          if (loaded === inscriptions.length) this.quizSectionLoading = false;
+        }
+      });
+    });
+  }
+
+  ouvrirQuiz(f: any) {
+    this.quizFormationId = f.formation_id;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizLoading = true;
+    this.showQuizModal = true;
+    this.externeService.getQuiz(f.formation_id).subscribe({
+      next: data => { this.quizData = data; this.quizLoading = false; },
+      error: () => { this.quizLoading = false; this.showMessage('Erreur chargement du quiz', 'danger'); }
+    });
+  }
+
+  soumettreQuiz() {
+    if (!this.externeId || !this.quizData) return;
+    const reponses = Object.entries(this.quizReponses).map(([question_id, reponse_id]) => ({
+      question_id: Number(question_id), reponse_id: Number(reponse_id)
+    }));
+    if (reponses.length < this.quizData.questions.length) {
+      this.showMessage('Veuillez répondre à toutes les questions', 'danger'); return;
+    }
+    this.quizSubmitting = true;
+    this.externeService.soumettreQuiz({
+      externe_id: this.externeId,
+      quiz_id: this.quizData.id,
+      reponses
+    }).subscribe({
+      next: res => {
+        this.quizResultat = res;
+        this.quizSubmitting = false;
+        if (this.quizFormationId) {
+          this.externeService.getEligibiliteAttestation(this.externeId!, this.quizFormationId).subscribe({
+            next: data => this.eligibiliteMap = { ...this.eligibiliteMap, [this.quizFormationId!]: data },
+            error: () => {}
+          });
+        }
+      },
+      error: (err) => {
+        this.quizSubmitting = false;
+        this.showMessage(err?.error?.error || 'Erreur lors de la soumission', 'danger');
+      }
+    });
+  }
+
+  fermerQuizApresResultat() {
+    const wasSuccessful = this.quizResultat?.reussi;
+    const fid = this.quizFormationId;
+    this.showQuizModal = false;
+    this.quizData = null;
+    this.quizReponses = {};
+    this.quizResultat = null;
+    this.quizFormationId = null;
+    if (wasSuccessful) this.loadMesInscriptions();
+    if (fid) {
+      this.externeService.getQuizScore(this.externeId!, fid).subscribe({
+        next: data => this.quizStatuts[fid] = data,
+        error: () => {}
+      });
+    }
   }
 }

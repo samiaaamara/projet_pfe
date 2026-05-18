@@ -6,7 +6,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0d1b2a, #3d6aff);
+  background: linear-gradient(135deg, #001d4a, #0056b3);
   color: white;
   border: none;
   cursor: pointer;
@@ -51,7 +51,7 @@
 
 /* ===== HEADER ===== */
 .chat-win-header {
-  background: linear-gradient(135deg, #0d1b2a, #3d6aff);
+  background: linear-gradient(135deg, #001d4a, #0056b3);
   color: white;
   padding: 12px 16px;
   display: flex;
@@ -114,11 +114,11 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 14px;
   font-weight: 700;
-  color: #3d6aff;
+  color: #0056b3;
   flex-shrink: 0;
 }
 .chat-msg-user .chat-msg-avatar {
-  background: linear-gradient(135deg, #0d1b2a, #3d6aff);
+  background: linear-gradient(135deg, #001d4a, #0056b3);
   color: white;
 }
 
@@ -140,7 +140,7 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 .chat-msg-user .chat-msg-bubble {
-  background: linear-gradient(135deg, #0d1b2a, #3d6aff);
+  background: linear-gradient(135deg, #001d4a, #0056b3);
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -164,7 +164,7 @@
 .typing-dots span {
   width: 7px; height: 7px;
   border-radius: 50%;
-  background: #3d6aff;
+  background: #0056b3;
   animation: bounce 1.2s infinite ease-in-out;
 }
 .typing-dots span:nth-child(1) { animation-delay: 0s; }
@@ -202,12 +202,12 @@
   line-height: 1.4;
   transition: border-color 0.2s;
 }
-.chat-input:focus { border-color: #3d6aff; }
+.chat-input:focus { border-color: #0056b3; }
 
 .chat-send-btn {
   width: 38px; height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0d1b2a, #3d6aff);
+  background: linear-gradient(135deg, #001d4a, #0056b3);
   color: white;
   border: none;
   cursor: pointer;

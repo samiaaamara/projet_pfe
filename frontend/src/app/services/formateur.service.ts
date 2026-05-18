@@ -162,4 +162,17 @@ export class FormateurService {
   deleteModule(formationId: number, moduleId: number): Observable<any> {
     return this.http.delete(`${this.api}/formations/${formationId}/modules/${moduleId}`);
   }
+
+  creerQuiz(formationId: number, data: {
+    titre: string;
+    seuil_reussite: number;
+    nb_tentatives: number;
+    questions: { question: string; reponses: { reponse: string; est_correcte: boolean }[] }[];
+  }): Observable<any> {
+    return this.http.post(`${this.api}/formations/${formationId}/quiz`, data);
+  }
+
+  getQuiz(formationId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/formations/${formationId}/quiz`);
+  }
 }

@@ -156,4 +156,20 @@ export class AdminService {
   deleteFormationSupport(supportId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/supports/${supportId}`);
   }
+
+  // ======================
+  // INSCRIPTIONS
+  // ======================
+
+  getInscriptionsPending(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/inscriptions-pending`);
+  }
+
+  approuverInscription(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/inscriptions/${id}/approve`, {});
+  }
+
+  rejeterInscription(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/inscriptions/${id}/reject`, {});
+  }
 }

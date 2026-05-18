@@ -28,6 +28,10 @@
       <a class="nav-item" [class.active]="activeSection === 'attestation'" (click)="setSection('attestation')">
         <span class="nav-icon">🏆</span> Attestations
       </a>
+      <a class="nav-item" [class.active]="activeSection === 'quiz'" (click)="ouvrirSectionQuiz()">
+        <span class="nav-icon">📝</span> Mes Quiz
+        <span class="nav-badge" *ngIf="nbQuizDisponibles() > 0">{{ nbQuizDisponibles() }}</span>
+      </a>
       <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
         <span class="nav-icon">👤</span> Mon profil
       </a>
@@ -55,36 +59,66 @@
 
     <!-- ===== ACCUEIL ===== -->
     <section *ngIf="activeSection === 'accueil'">
-      <div class="page-title">
-        <h2>Bonjour, {{ user?.nom }} 👋</h2>
-        <p>Bienvenue dans votre espace de formation externe</p>
+
+      <!-- Welcome Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-left">
+          <div class="welcome-role-tag">🏢 Externe · ISET Tozeur</div>
+          <div class="welcome-greeting">Bonjour, {{ user?.nom }} 👋</div>
+          <div class="welcome-sub">Bienvenue dans votre espace de formation externe. Explorez, apprenez et progressez à votre rythme.</div>
+          <a class="btn-action-banner" (click)="setSection('formations')" style="cursor:pointer;">
+            🔭 Explorer le catalogue →
+          </a>
+        </div>
+        <div class="welcome-stats-mini">
+          <div class="wsm-item">
+            <span class="wsm-val">{{ totalFormations }}</span>
+            <span class="wsm-lbl">📚 Catalogue</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ inscriptionsPayees }}</span>
+            <span class="wsm-lbl">🛒 Achetées</span>
+          </div>
+          <div class="wsm-divider"></div>
+          <div class="wsm-item">
+            <span class="wsm-val">{{ progression }}%</span>
+            <span class="wsm-lbl">📊 Progression</span>
+          </div>
+        </div>
       </div>
 
-      <div class="stats-grid">
-        <div class="stat-card teal" (click)="setSection('formations')">
-          <div class="stat-icon">📚</div>
-          <div class="stat-value">{{ totalFormations }}</div>
-          <div class="stat-label">Formations disponibles</div>
-        </div>
-        <div class="stat-card blue" (click)="setSection('mesInscriptions')">
-          <div class="stat-icon">🎓</div>
-          <div class="stat-value">{{ inscriptionsPayees }}</div>
-          <div class="stat-label">Formations achetées</div>
-        </div>
-        <div class="stat-card green" (click)="setSection('progression')">
-          <div class="stat-icon">📈</div>
-          <div class="stat-value">{{ progression }}%</div>
-          <div class="stat-label">Progression globale</div>
-        </div>
-        <div class="stat-card orange">
-          <div class="stat-icon">💰</div>
-          <div class="stat-value">{{ totalDepense | number:'1.0-2' }} EUR</div>
-          <div class="stat-label">Total dépensé</div>
-        </div>
+      <!-- Accès rapide -->
+      <div class="feature-cards-row">
+        <a class="feature-card-quick" (click)="setSection('formations')" style="cursor:pointer;">
+          <div class="fcq-icon">🔭</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Explorer le catalogue</div>
+            <div class="fcq-desc">{{ totalFormations }} formation(s) disponibles à découvrir</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
+        <a class="feature-card-quick" (click)="setSection('mesInscriptions')" style="cursor:pointer;">
+          <div class="fcq-icon">📖</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Mes formations</div>
+            <div class="fcq-desc">{{ inscriptionsPayees }} formation(s) achetée(s) — accédez aux supports</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
+        <a class="feature-card-quick" (click)="setSection('attestation')" style="cursor:pointer;">
+          <div class="fcq-icon">🏆</div>
+          <div class="fcq-body">
+            <div class="fcq-title">Mes Attestations</div>
+            <div class="fcq-desc">Téléchargez vos certificats de réussite</div>
+          </div>
+          <span class="fcq-arrow">›</span>
+        </a>
       </div>
 
+      <!-- Progression globale -->
       <div class="card-section" *ngIf="progression > 0">
-        <h5 class="section-title">📈 Progression globale</h5>
+        <h5 class="section-title">📊 Progression globale</h5>
         <div class="progression-bar-wrap">
           <div class="progression-bar-track">
             <div class="progression-bar-fill"
@@ -95,35 +129,15 @@
         </div>
       </div>
 
-      <div class="card-section">
-        <h5 class="section-title">Démarrez votre apprentissage</h5>
-        <div class="quick-actions">
-          <div class="quick-card" (click)="setSection('formations')">
-            <div class="qc-icon">🔍</div>
-            <div class="qc-title">Explorer le catalogue</div>
-            <div class="qc-desc">Découvrez toutes nos formations disponibles</div>
-          </div>
-          <div class="quick-card" (click)="setSection('mesInscriptions')">
-            <div class="qc-icon">📖</div>
-            <div class="qc-title">Mes formations</div>
-            <div class="qc-desc">Accédez aux supports de vos formations achetées</div>
-          </div>
-          <div class="quick-card" (click)="setSection('progression')">
-            <div class="qc-icon">📈</div>
-            <div class="qc-title">Ma progression</div>
-            <div class="qc-desc">Suivez votre avancement par formation</div>
-          </div>
-        </div>
-      </div>
-
+      <!-- Dernières acquisitions -->
       <div class="card-section" *ngIf="mesInscriptions.length > 0">
-        <h5 class="section-title">Dernières acquisitions</h5>
+        <h5 class="section-title">🛒 Dernières acquisitions</h5>
         <div class="recent-list">
           <div class="recent-item" *ngFor="let i of mesInscriptions.slice(0,3)">
             <div class="recent-icon">📘</div>
             <div class="recent-info">
               <div class="recent-title">{{ i.titre }}</div>
-              <div class="recent-date">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date">📅 Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
             </div>
             <div class="price-tag">{{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}</div>
           </div>
@@ -452,6 +466,83 @@
       </div>
     </section>
 
+
+    <!-- ===== MES QUIZ ===== -->
+    <section *ngIf="activeSection === 'quiz'">
+      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
+      <div class="page-title">
+        <h2>📝 Mes Quiz</h2>
+        <p>Passez vos quiz de validation pour débloquer vos attestations</p>
+      </div>
+
+      <div *ngIf="quizSectionLoading" class="quiz-section-loading">
+        <div class="quiz-spinner"></div> Chargement...
+      </div>
+
+      <div *ngIf="!quizSectionLoading && inscriptionsPayees === 0" class="empty-state">
+        <span>📭</span>
+        <p>Vous n'êtes inscrit à aucune formation.</p>
+        <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
+      </div>
+
+      <div class="quiz-cards-grid" *ngIf="!quizSectionLoading && inscriptionsPayees > 0">
+        <div class="quiz-card" *ngFor="let f of mesInscriptions | slice:0:100">
+          <ng-container *ngIf="f.statut_paiement === 'payé'">
+
+            <div class="quiz-card-top">
+              <div class="quiz-card-title">{{ f.titre }}</div>
+              <div class="quiz-card-formateur" *ngIf="f.formateur_nom">👤 {{ f.formateur_nom }}</div>
+            </div>
+
+            <div *ngIf="quizStatuts[f.formation_id] && !quizStatuts[f.formation_id]?.has_quiz"
+                 class="quiz-card-status quiz-no-quiz">
+              <span>📋</span> Aucun quiz pour cette formation
+            </div>
+
+            <div *ngIf="!quizStatuts[f.formation_id]" class="quiz-card-status quiz-loading-inline">
+              Chargement...
+            </div>
+
+            <ng-container *ngIf="quizStatuts[f.formation_id]?.has_quiz">
+              <div *ngIf="quizStatuts[f.formation_id]?.reussi" class="quiz-card-status quiz-passed">
+                <span>✅</span> Quiz réussi — Score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
+              </div>
+              <ng-container *ngIf="!quizStatuts[f.formation_id]?.reussi">
+                <div class="quiz-card-status quiz-pending">
+                  <span>📝</span>
+                  <span *ngIf="quizStatuts[f.formation_id]?.tentatives === 0">Pas encore passé</span>
+                  <span *ngIf="quizStatuts[f.formation_id]?.tentatives > 0">
+                    Dernier score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
+                    (seuil : {{ quizStatuts[f.formation_id]?.seuil_reussite }}%)
+                  </span>
+                </div>
+                <div class="quiz-card-tentatives">
+                  Tentatives : {{ quizStatuts[f.formation_id]?.tentatives || 0 }} /
+                  {{ quizStatuts[f.formation_id]?.nb_tentatives_max }}
+                </div>
+                <div *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) >= quizStatuts[f.formation_id]?.nb_tentatives_max"
+                     class="quiz-card-no-more">
+                  ❌ Tentatives épuisées
+                </div>
+                <button *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
+                        class="btn-passer-quiz-card"
+                        (click)="ouvrirQuiz(f)">
+                  📝 Passer le quiz
+                </button>
+              </ng-container>
+            </ng-container>
+
+            <div class="quiz-card-prog" *ngIf="eligibiliteMap[f.formation_id]">
+              <div class="quiz-card-prog-bar">
+                <div class="quiz-card-prog-fill" [style.width.%]="eligibiliteMap[f.formation_id]?.progression"></div>
+              </div>
+              <span class="quiz-card-prog-label">Modules : {{ eligibiliteMap[f.formation_id]?.progression }}%</span>
+            </div>
+
+          </ng-container>
+        </div>
+      </div>
+    </section>
 
     <!-- ===== PROFIL ===== -->
     <section *ngIf="activeSection === 'profil'">
@@ -860,6 +951,82 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- ===== QUIZ MODAL ===== -->
+<div class="quiz-overlay" *ngIf="showQuizModal" (click)="fermerQuizApresResultat()"></div>
+<div class="quiz-modal" *ngIf="showQuizModal" (click)="$event.stopPropagation()">
+
+  <div class="quiz-modal-header">
+    <h3>{{ quizData?.titre || 'Quiz de validation' }}</h3>
+    <button class="quiz-close-btn" (click)="fermerQuizApresResultat()">✕</button>
+  </div>
+
+  <div *ngIf="quizLoading" class="quiz-loading-state">
+    <div class="quiz-spinner"></div>
+    <p>Chargement du quiz...</p>
+  </div>
+
+  <div *ngIf="!quizLoading && quizData && !quizResultat" class="quiz-body">
+    <div class="quiz-meta-bar">
+      <span class="quiz-meta-chip">Seuil : <strong>{{ quizData.seuil_reussite }}%</strong></span>
+      <span class="quiz-meta-chip">Tentatives max : <strong>{{ quizData.nb_tentatives }}</strong></span>
+      <span class="quiz-meta-chip">{{ quizData.questions?.length }} question(s)</span>
+    </div>
+
+    <div class="quiz-questions-list">
+      <div class="quiz-question-block" *ngFor="let q of quizData.questions; let qi = index">
+        <div class="quiz-q-number">Question {{ qi + 1 }}</div>
+        <div class="quiz-q-text">{{ q.question }}</div>
+        <div class="quiz-reponses-list">
+          <label class="quiz-rep-label" *ngFor="let r of q.reponses"
+                 [class.quiz-rep-selected]="quizReponses[q.id] === r.id">
+            <input type="radio" [name]="'q_' + q.id" [value]="r.id" [(ngModel)]="quizReponses[q.id]">
+            <span class="quiz-rep-text">{{ r.reponse }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="quiz-modal-footer">
+      <button class="btn-cancel" (click)="fermerQuizApresResultat()">Annuler</button>
+      <button class="btn-confirm-pay" (click)="soumettreQuiz()" [disabled]="quizSubmitting">
+        {{ quizSubmitting ? 'Envoi en cours...' : 'Soumettre le quiz' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!quizLoading && quizResultat" class="quiz-resultat-body">
+    <div class="quiz-score-circle-wrap"
+         [class.quiz-success]="quizResultat.reussi"
+         [class.quiz-fail]="!quizResultat.reussi">
+      <div class="quiz-score-big">{{ quizResultat.score }}%</div>
+      <div class="quiz-score-label">{{ quizResultat.reussi ? '🎉 Félicitations !' : '❌ Non réussi' }}</div>
+    </div>
+    <div class="quiz-score-details">
+      <p>{{ quizResultat.correct }} / {{ quizResultat.total }} bonnes réponses</p>
+      <p *ngIf="!quizResultat.reussi">Seuil requis : <strong>{{ quizResultat.seuil_reussite }}%</strong></p>
+      <p *ngIf="!quizResultat.reussi && quizResultat.tentatives_restantes > 0" class="quiz-retry-info">
+        Il vous reste <strong>{{ quizResultat.tentatives_restantes }}</strong> tentative(s).
+      </p>
+      <p *ngIf="!quizResultat.reussi && quizResultat.tentatives_restantes === 0" class="quiz-no-more">
+        Vous avez épuisé toutes vos tentatives.
+      </p>
+    </div>
+    <div class="quiz-modal-footer">
+      <button *ngIf="!quizResultat.reussi && quizResultat.tentatives_restantes > 0"
+              class="btn-cancel" (click)="ouvrirQuiz({ formation_id: quizFormationId })">
+        Réessayer
+      </button>
+      <button class="btn-confirm-pay" (click)="fermerQuizApresResultat()">Fermer</button>
+    </div>
+  </div>
+
+  <div *ngIf="!quizLoading && !quizData && !quizResultat" class="quiz-empty-state">
+    <p>Aucun quiz disponible pour cette formation.</p>
+    <button class="btn-cancel" (click)="fermerQuizApresResultat()">Fermer</button>
+  </div>
+
 </div>
 
 <!-- ===== CHATBOT IA ===== -->

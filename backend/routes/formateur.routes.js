@@ -733,4 +733,54 @@ router.put('/justificatifs/:id', async (req, res) => {
   }
 });
 
+/* ========================= QUIZ ========================= */
+router.post('/formations/:id/quiz', async (req, res) => {
+  const formationId = parseInt(req.params.id);
+  if (isNaN(formationId)) return res.status(400).json({ error: 'ID formation invalide' });
+  const { titre = 'Quiz de validation', seuil_reussite = 70, nb_tentatives = 3, questions = [] } = req.body;
+  if (!questions.length) return res.status(400).json({ error: 'Le quiz doit avoir au moins une question.' });
+  try {
+    await db.query('DELETE FROM quiz WHERE formation_id = ?', [formationId]);
+    const [result] = await db.query(
+      'INSERT INTO quiz (formation_id, titre, seuil_reussite, nb_tentatives) VALUES (?, ?, ?, ?)',
+      [formationId, titre, seuil_reussite, nb_tentatives]
+    );
+    const quizId = result.insertId;
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      const [qResult] = await db.query(
+        'INSERT INTO questions_quiz (quiz_id, question, ordre) VALUES (?, ?, ?)', [quizId, q.question, i]
+      );
+      for (const r of (q.reponses || [])) {
+        await db.query(
+          'INSERT INTO reponses_quiz (question_id, reponse, est_correcte) VALUES (?, ?, ?)',
+          [qResult.insertId, r.reponse, r.est_correcte ? 1 : 0]
+        );
+      }
+    }
+    res.json({ message: 'Quiz créé avec succès.', quizId });
+  } catch (err) {
+    console.error('Erreur création quiz (formateur):', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/formations/:id/quiz', async (req, res) => {
+  const formationId = parseInt(req.params.id);
+  if (isNaN(formationId)) return res.status(400).json({ error: 'ID formation invalide' });
+  try {
+    const [[quiz]] = await db.query('SELECT * FROM quiz WHERE formation_id = ?', [formationId]);
+    if (!quiz) return res.json(null);
+    const [questions] = await db.query(
+      'SELECT * FROM questions_quiz WHERE quiz_id = ? ORDER BY ordre ASC', [quiz.id]
+    );
+    for (const q of questions) {
+      const [reponses] = await db.query('SELECT * FROM reponses_quiz WHERE question_id = ?', [q.id]);
+      q.reponses = reponses;
+    }
+    quiz.questions = questions;
+    res.json(quiz);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
 module.exports = router;

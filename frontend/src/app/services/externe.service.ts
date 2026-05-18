@@ -87,4 +87,16 @@ export class ExterneService {
   getEnAttente(externeId: number) {
     return this.http.get<any[]>(`${this.apiUrl}/en-attente/${externeId}`);
   }
+
+  getQuiz(formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz/${formationId}`);
+  }
+
+  getQuizScore(externeId: number, formationId: number) {
+    return this.http.get<any>(`${this.apiUrl}/quiz-score/${externeId}/${formationId}`);
+  }
+
+  soumettreQuiz(body: { externe_id: number; quiz_id: number; reponses: { question_id: number; reponse_id: number }[] }) {
+    return this.http.post<any>(`${this.apiUrl}/quiz/soumettre`, body);
+  }
 }

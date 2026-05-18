@@ -222,7 +222,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     if (!this.etudiantId) return;
     this.etudiantService.inscrire(this.etudiantId, formationId).subscribe({
       next: () => {
-        this.showMessage('Inscription réussie !');
+        this.showMessage("Demande envoyée ! En attente d'approbation par l'administrateur.");
         this.loadMesFormations();
         this.loadFormations();
       },
@@ -232,6 +232,19 @@ export class EtudiantComponent implements OnInit, OnDestroy {
 
   estDejaInscrit(formationId: number): boolean {
     return this.mesFormations.some(f => f.formation_id === formationId);
+  }
+
+  getStatutInscription(formationId: number): string | null {
+    return this.mesFormations.find(f => f.formation_id === formationId)?.statut || null;
+  }
+
+  get aFormationActive(): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.mesFormations.some(f => {
+      if (!f.date_fin) return true;
+      return new Date(f.date_fin) >= today;
+    });
   }
 
   // ===== Mes formations =====
@@ -258,7 +271,7 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   }
 
   getStatutBadge(statut: string): string {
-    const map: any = { 'Inscrit': 'bg-primary', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
+    const map: any = { 'Inscrit': 'bg-primary', 'en_attente': 'bg-warning', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
     return map[statut] || 'bg-secondary';
   }
 
