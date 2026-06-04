@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Auth } from '../../services/auth';
@@ -7,7 +7,7 @@ import { Auth } from '../../services/auth';
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-login.component.html',
   styleUrls: ['./admin-login.component.css']
 })
@@ -16,7 +16,7 @@ export class AdminLoginComponent {
   email = '';
   password = '';
   error = '';
-  loading = false; // 🔥 UX pro
+  loading = false;
 
   constructor(
     private router: Router,
@@ -25,9 +25,8 @@ export class AdminLoginComponent {
 
   login() {
 
-    // 🔴 Vérification simple
     if (!this.email || !this.password) {
-      this.error = "Veuillez remplir tous les champs ❗";
+      this.error = "Veuillez remplir tous les champs.";
       return;
     }
 
@@ -44,22 +43,19 @@ export class AdminLoginComponent {
 
         const user = res?.user;
 
-        // 🔴 sécurité supplémentaire
         if (!user) {
-          this.error = "Erreur serveur ❌";
+          this.error = "Erreur serveur.";
           return;
         }
 
         if (user.role !== 'admin') {
-          this.error = "Accès refusé ❌ Admin uniquement";
+          this.error = "Accès refusé. Admin uniquement.";
           return;
         }
 
-        // ✅ stockage sécurisé
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        // 🔥 redirection admin
         this.router.navigate(['/admin']);
       },
 
@@ -67,9 +63,9 @@ export class AdminLoginComponent {
         this.loading = false;
 
         if (err.status === 401) {
-          this.error = "Email ou mot de passe incorrect ❌";
+          this.error = "Email ou mot de passe incorrect.";
         } else {
-          this.error = "Erreur serveur ❌";
+          this.error = "Erreur serveur.";
         }
       }
     });

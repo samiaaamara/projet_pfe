@@ -1,0 +1,54 @@
+@startuml Sprint2_Sequence_CreerFormation
+title Diagramme de Séquence — Créer une formation (Formateur)
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceMessageAlign left
+skinparam sequenceBoxBackgroundColor White
+skinparam sequenceBoxBorderColor Black
+skinparam participantBackgroundColor White
+skinparam participantBorderColor Black
+skinparam actorBackgroundColor White
+skinparam actorBorderColor Black
+skinparam databaseBackgroundColor White
+skinparam databaseBorderColor Black
+
+actor "Formateur" as F
+participant "Interface" as UI
+participant "Système" as SYS
+database "Base de données" as DB
+
+F -> UI: Accède à la section Mes formations
+F -> UI: Clique sur Créer une formation
+UI -> SYS: Récupère la spécialité du formateur
+SYS -> DB: SELECT specialite FROM formateurs WHERE id = ?
+DB --> SYS: Spécialité du formateur
+SYS --> UI: Affiche le formulaire\n(spécialité pré-remplie automatiquement)
+
+F -> UI: Remplit titre, description, photo
+F -> UI: Ajoute les modules et le programme pédagogique
+F -> UI: Dépose les supports pédagogiques\n(PDF, vidéo, document, ZIP, image ou lien URL)
+F -> UI: Crée le quiz de validation
+F -> UI: Soumet le formulaire
+
+UI -> SYS: Envoie les informations
+
+SYS -> SYS: Vérifie les données
+
+alt Données invalides
+    SYS --> UI: Affiche les erreurs
+    UI --> F: Retour au formulaire
+else Données valides
+    SYS -> DB: Enregistre la formation (statut brouillon)
+    SYS -> DB: Enregistre les modules et le programme
+    SYS -> DB: Enregistre les supports pédagogiques
+    SYS -> DB: Enregistre le quiz
+    DB --> SYS: Formation créée
+    SYS --> UI: Formation créée avec succès
+    UI --> F: Affiche la formation dans la liste
+end
+
+@enduml

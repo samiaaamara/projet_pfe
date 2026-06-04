@@ -6,46 +6,64 @@
       <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="avatar avatar-img" alt="Photo de profil">
       <div *ngIf="!profilePhotoUrl" class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
+      <div class="sidebar-email">{{ user?.email }}</div>
       <div class="sidebar-role">Utilisateur Externe</div>
       <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
     </div>
 
     <nav class="sidebar-nav">
+      <span class="nav-group-label">Mon espace</span>
       <a class="nav-item" [class.active]="activeSection === 'accueil'" (click)="setSection('accueil')">
-        <span class="nav-icon">🏠</span> Accueil
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        Accueil
       </a>
+      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        Mon profil
+      </a>
+
+      <span class="nav-group-label">Formations</span>
       <a class="nav-item" [class.active]="activeSection === 'formations'" (click)="setSection('formations')">
-        <span class="nav-icon">📚</span> Catalogue
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+        Formations
         <span class="nav-badge" *ngIf="totalFormations > 0">{{ totalFormations }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'mesInscriptions'" (click)="setSection('mesInscriptions')">
-        <span class="nav-icon">🎓</span> Mes formations
-        <span class="nav-badge" *ngIf="mesInscriptions.length > 0">{{ mesInscriptions.length }}</span>
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        Mes inscriptions
+        <span class="nav-badge" *ngIf="mesInscriptions.length + demandesEnAttente.length > 0">{{ mesInscriptions.length + demandesEnAttente.length }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'progression'" (click)="setSection('progression')">
-        <span class="nav-icon">📈</span> Ma progression
-      </a>
-      <a class="nav-item" [class.active]="activeSection === 'attestation'" (click)="setSection('attestation')">
-        <span class="nav-icon">🏆</span> Attestations
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        Ma progression
       </a>
       <a class="nav-item" [class.active]="activeSection === 'quiz'" (click)="ouvrirSectionQuiz()">
-        <span class="nav-icon">📝</span> Mes Quiz
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        Mes Quiz
         <span class="nav-badge" *ngIf="nbQuizDisponibles() > 0">{{ nbQuizDisponibles() }}</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
-        <span class="nav-icon">👤</span> Mon profil
+      <a class="nav-item" [class.active]="activeSection === 'attestation'" (click)="setSection('attestation')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+        Attestations
       </a>
+
+      <span class="nav-group-label">Communication</span>
       <a class="nav-item" [class.active]="activeSection === 'notifications'" (click)="openNotifications()">
-        <span class="nav-icon">🔔</span> Notifications
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        Notifications
         <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
-        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        Messagerie
         <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
       </a>
     </nav>
 
-    <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+    <button class="logout-btn" (click)="logout()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </button>
   </aside>
 
   <!-- CONTENU PRINCIPAL -->
@@ -58,86 +76,72 @@
     </div>
 
     <!-- ===== ACCUEIL ===== -->
-    <section *ngIf="activeSection === 'accueil'">
+    <section *ngIf="activeSection === 'accueil'" class="pay-section">
 
-      <!-- Welcome Banner -->
-      <div class="welcome-banner">
-        <div class="welcome-left">
-          <div class="welcome-role-tag">🏢 Externe · ISET Tozeur</div>
-          <div class="welcome-greeting">Bonjour, {{ user?.nom }} 👋</div>
-          <div class="welcome-sub">Bienvenue dans votre espace de formation externe. Explorez, apprenez et progressez à votre rythme.</div>
-          <a class="btn-action-banner" (click)="setSection('formations')" style="cursor:pointer;">
-            🔭 Explorer le catalogue →
-          </a>
+      <div class="pay-section-header">
+        <div>
+          <div class="pay-section-title">Tableau de bord</div>
+          <div class="pay-section-sub">Bonjour, {{ user?.nom }} — Externe · ISET Tozeur</div>
         </div>
-        <div class="welcome-stats-mini">
-          <div class="wsm-item">
-            <span class="wsm-val">{{ totalFormations }}</span>
-            <span class="wsm-lbl">📚 Catalogue</span>
-          </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ inscriptionsPayees }}</span>
-            <span class="wsm-lbl">🛒 Achetées</span>
-          </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ progression }}%</span>
-            <span class="wsm-lbl">📊 Progression</span>
-          </div>
+        <button class="btn-primary" (click)="setSection('formations')" style="align-self:flex-start;font-size:13px;padding:8px 16px">Explorer le catalogue →</button>
+      </div>
+
+      <div class="pay-stats-row">
+        <div class="pay-stat-card" (click)="setSection('formations')">
+          <div class="psc-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="psc-val">{{ totalFormations }}</div>
+          <div class="psc-lbl">Catalogue</div>
+        </div>
+        <div class="pay-stat-card" (click)="setSection('mesInscriptions')">
+          <div class="psc-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+          <div class="psc-val">{{ inscriptionsPayees }}</div>
+          <div class="psc-lbl">Formations achetées</div>
+        </div>
+        <div class="pay-stat-card" (click)="setSection('progression')">
+          <div class="psc-icon orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="psc-val">{{ progression }}%</div>
+          <div class="psc-lbl">Progression</div>
         </div>
       </div>
 
       <!-- Accès rapide -->
       <div class="feature-cards-row">
-        <a class="feature-card-quick" (click)="setSection('formations')" style="cursor:pointer;">
-          <div class="fcq-icon">🔭</div>
+        <div class="feature-card-quick" (click)="setSection('formations')">
+          <div class="fcq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Explorer le catalogue</div>
             <div class="fcq-desc">{{ totalFormations }} formation(s) disponibles à découvrir</div>
           </div>
-          <span class="fcq-arrow">›</span>
-        </a>
-        <a class="feature-card-quick" (click)="setSection('mesInscriptions')" style="cursor:pointer;">
-          <div class="fcq-icon">📖</div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="setSection('mesInscriptions')">
+          <div class="fcq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Mes formations</div>
             <div class="fcq-desc">{{ inscriptionsPayees }} formation(s) achetée(s) — accédez aux supports</div>
           </div>
-          <span class="fcq-arrow">›</span>
-        </a>
-        <a class="feature-card-quick" (click)="setSection('attestation')" style="cursor:pointer;">
-          <div class="fcq-icon">🏆</div>
+          <div class="fcq-arrow">›</div>
+        </div>
+        <div class="feature-card-quick" (click)="setSection('attestation')">
+          <div class="fcq-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Mes Attestations</div>
             <div class="fcq-desc">Téléchargez vos certificats de réussite</div>
           </div>
-          <span class="fcq-arrow">›</span>
-        </a>
-      </div>
-
-      <!-- Progression globale -->
-      <div class="card-section" *ngIf="progression > 0">
-        <h5 class="section-title">📊 Progression globale</h5>
-        <div class="progression-bar-wrap">
-          <div class="progression-bar-track">
-            <div class="progression-bar-fill"
-                 [style.width.%]="progression"
-                 [style.background]="getProgressColor()"></div>
-          </div>
-          <span class="progression-pct">{{ progression }}%</span>
+          <div class="fcq-arrow">›</div>
         </div>
       </div>
 
+
       <!-- Dernières acquisitions -->
       <div class="card-section" *ngIf="mesInscriptions.length > 0">
-        <h5 class="section-title">🛒 Dernières acquisitions</h5>
+        <h5 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Dernières acquisitions</h5>
         <div class="recent-list">
           <div class="recent-item" *ngFor="let i of mesInscriptions.slice(0,3)">
-            <div class="recent-icon">📘</div>
+            <div class="recent-icon-wrap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
             <div class="recent-info">
               <div class="recent-title">{{ i.titre }}</div>
-              <div class="recent-date">📅 Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
             </div>
             <div class="price-tag">{{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}</div>
           </div>
@@ -146,23 +150,30 @@
     </section>
 
     <!-- ===== CATALOGUE FORMATIONS ===== -->
-    <section *ngIf="activeSection === 'formations'">
+    <section *ngIf="activeSection === 'formations'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>📚 Catalogue des formations</h2>
-        <p>{{ totalFormations }} formation(s) disponible(s) à venir</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Catalogue des formations</div>
+          <div class="pay-section-sub">{{ totalFormations }} formation(s) disponible(s)</div>
+        </div>
       </div>
 
       <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="recherche"
-               placeholder="🔍 Rechercher une formation...">
+        <select class="filter-select" [(ngModel)]="filtreSpecialite">
+          <option value="">Toutes les spécialités</option>
+          <option *ngFor="let s of specialitesDispo" [value]="s">{{ s }}</option>
+        </select>
+        <button *ngIf="filtreSpecialite" class="btn-reset-filtres" (click)="filtreSpecialite = ''">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Toutes
+        </button>
       </div>
 
       <div class="formations-grid">
         <div class="formation-card" *ngFor="let f of formationsFiltrees">
           <div class="formation-card-img-wrapper">
             <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="formation-card-img" [alt]="f.titre">
-            <div *ngIf="!f.photo" class="formation-card-img-placeholder">📚</div>
+            <div *ngIf="!f.photo" class="formation-card-img-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
           </div>
           <div class="formation-header">
             <span class="formation-niveau" *ngIf="f.niveau">{{ f.niveau }}</span>
@@ -177,40 +188,48 @@
           <p class="formation-desc">{{ f.description }}</p>
 
           <div class="formation-meta">
-            <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="f.formateur_nom">👨‍🏫 {{ f.formateur_nom }}</span>
+            <span *ngIf="f.date_debut"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="f.date_fin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="f.formateur_nom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>{{ f.formateur_nom }}</span>
           </div>
 
           <div class="price-section">
             <div class="price-display" [class.free]="!f.prix || f.prix == 0">
-              {{ (!f.prix || f.prix == 0) ? '🆓 Gratuit' : (f.prix + ' EUR') }}
-            </div>
-            <div class="places-info" *ngIf="f.nb_places !== null">
-              👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
+              {{ (!f.prix || f.prix == 0) ? 'Gratuit' : (f.prix + ' EUR') }}
             </div>
           </div>
 
           <div class="formation-footer">
-            <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
-            <span *ngIf="estDejaInscrit(f.id)" class="badge-inscrit">✓ Acheté</span>
+            <button class="btn-programme" (click)="voirProgramme(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Programme</button>
+
+            <!-- Déjà payé -->
+            <span *ngIf="!estEnAttenteApprobation(f.id) && !peutPayer(f.id) && estDejaInscrit(f.id)" class="badge-inscrit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Acheté</span>
+
+            <!-- En attente d'approbation admin -->
+            <span *ngIf="estEnAttenteApprobation(f.id)" class="badge-approbation-attente"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente d'approbation</span>
+
+            <!-- Approuvé, doit payer -->
+            <button *ngIf="peutPayer(f.id)" class="btn-payer-maintenant" [disabled]="paiementEnCours" (click)="payerMaintenant(f.id)">
+              <span *ngIf="paiementEnCours" class="spinner-sm"></span>
+              <span *ngIf="!paiementEnCours"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Payer maintenant</span>
+            </button>
+
+            <!-- Pas encore inscrit -->
             <ng-container *ngIf="!estDejaInscrit(f.id)">
               <ng-container *ngIf="estComplet(f)">
-                <span class="badge-complet">Complet</span>
                 <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
-                  ⏳ Liste d'attente
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Liste d'attente
                 </button>
                 <span *ngIf="estEnAttente(f.id)" class="badge-en-attente">
-                  En attente #{{ positionAttente(f.id) }}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente
                 </span>
-                <button *ngIf="estEnAttente(f.id)" class="btn-quitter-attente" (click)="quitterListeAttente(f.id)">
-                  ✕ Quitter
-                </button>
+                <button *ngIf="estEnAttente(f.id)" class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
               </ng-container>
               <button *ngIf="!estComplet(f)"
                       class="btn-payer"
                       [class.btn-gratuit]="!f.prix || f.prix == 0"
                       (click)="ouvrirPaiement(f)">
-                {{ (!f.prix || f.prix == 0) ? "S'inscrire" : '💳 Acheter — ' + f.prix + ' EUR' }}
+                {{ (!f.prix || f.prix == 0) ? "S'inscrire" : 'Acheter — ' + f.prix + ' EUR' }}
               </button>
             </ng-container>
           </div>
@@ -218,7 +237,7 @@
       </div>
 
       <p *ngIf="formationsFiltrees.length === 0" class="empty-state">
-        <span>🔎</span><br>Aucune formation ne correspond à votre recherche.
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br>Aucune formation ne correspond à votre recherche.
       </p>
 
       <div class="pagination" *ngIf="totalPages > 1">
@@ -230,16 +249,62 @@
     </section>
 
     <!-- ===== MES INSCRIPTIONS ===== -->
-    <section *ngIf="activeSection === 'mesInscriptions'">
+    <section *ngIf="activeSection === 'mesInscriptions'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>🎓 Mes formations</h2>
-        <p>{{ inscriptionsPayees }} formation(s) achetée(s)</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Mes formations</div>
+          <div class="pay-section-sub">{{ inscriptionsPayees }} formation(s) confirmée(s)<ng-container *ngIf="demandesEnAttente.length > 0"> · {{ demandesEnAttente.length }} demande(s) en attente</ng-container><ng-container *ngIf="enAttente.length > 0"> · {{ enAttente.length }} en liste d'attente</ng-container></div>
+        </div>
       </div>
 
-      <div *ngIf="mesInscriptions.length === 0" class="empty-state">
-        <span>📭</span>
-        <p>Vous n'avez encore acheté aucune formation.</p>
+      <!-- Demandes en attente d'approbation admin -->
+      <div *ngIf="demandesEnAttente.length > 0" class="demandes-attente-block">
+        <h5 class="demandes-attente-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Demandes en attente d'approbation</h5>
+        <div class="demandes-attente-list">
+          <div class="demande-attente-item" *ngFor="let d of demandesEnAttente">
+            <div class="demande-attente-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="demande-attente-info">
+              <div class="demande-attente-titre">{{ d.titre }}</div>
+              <div class="demande-attente-date" *ngIf="d.date_debut"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ d.date_debut | date:'dd/MM/yyyy' }}</div>
+            </div>
+            <span class="demande-attente-badge">En attente d'approbation admin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- En liste d'attente (formation complète) -->
+      <div *ngIf="enAttente.length > 0" class="demandes-attente-block">
+        <h5 class="demandes-attente-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          En liste d'attente — formation complète
+        </h5>
+        <div class="demandes-attente-list">
+          <div class="demande-attente-item" *ngFor="let a of enAttente">
+            <div class="demande-attente-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="demande-attente-info">
+              <div class="demande-attente-titre">{{ a.titre }}</div>
+              <div class="demande-attente-date" *ngIf="a.date_debut">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                {{ a.date_debut | date:'dd/MM/yyyy' }}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <span class="demande-attente-badge" style="background:#fff3e0;color:#e65100;border-color:#ffcc80">En attente de place</span>
+              <button class="btn-quitter-attente" (click)="quitterListeAttente(a.formation_id)" title="Quitter la liste">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Quitter
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mesInscriptions.length === 0 && demandesEnAttente.length === 0 && enAttente.length === 0" class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
+        <p>Vous n'avez encore aucune formation.</p>
         <button class="btn-primary" (click)="setSection('formations')">Explorer le catalogue</button>
       </div>
 
@@ -247,64 +312,76 @@
         <div class="my-formation-card" *ngFor="let i of mesInscriptions"
              [class.card-pending]="i.statut_paiement !== 'payé'">
 
-          <!-- Photo / Bannière -->
-          <div class="myf-img-wrapper">
-            <img *ngIf="i.photo" [src]="'http://localhost:3000' + i.photo" class="myf-img" [alt]="i.titre">
-            <div *ngIf="!i.photo" class="myf-img-placeholder">📘</div>
-            <span class="myf-status-badge" [ngClass]="getStatutBadgeClass(i.statut_paiement)">
-              {{ i.statut_paiement === 'payé' ? '✅ Payé' : i.statut_paiement === 'en_attente' ? '⏳ En attente' : '↩️ Remboursé' }}
-            </span>
+          <!-- Photo -->
+          <div class="myf-photo-wrapper">
+            <img *ngIf="i.photo" [src]="'http://localhost:3000' + i.photo" class="myf-photo" [alt]="i.titre">
+            <div *ngIf="!i.photo" class="myf-photo-placeholder"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <span class="myf-status-badge" [ngClass]="getStatutFormationBadge(getStatutFormation(i))">{{ getStatutFormation(i) }}</span>
           </div>
 
           <!-- Corps -->
           <div class="myf-body">
-            <div class="myf-specialite" *ngIf="i.specialite">{{ i.specialite }}</div>
-            <h4 class="myf-title">{{ i.titre }}</h4>
-            <p class="myf-desc" *ngIf="i.description">{{ i.description }}</p>
-
+            <div class="myf-spec" *ngIf="i.specialite">{{ i.specialite }}</div>
+            <div class="myf-title">{{ i.titre }}</div>
+            <p class="myf-desc">{{ i.description }}</p>
             <div class="myf-meta">
-              <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}<ng-container *ngIf="i.date_fin"> → {{ i.date_fin | date:'dd/MM/yyyy' }}</ng-container></span>
-              <span *ngIf="i.formateur_nom">👨‍🏫 {{ i.formateur_nom }}</span>
+              <span *ngIf="i.date_debut"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ i.date_debut | date:'dd/MM/yyyy' }}<ng-container *ngIf="i.date_fin"> → {{ i.date_fin | date:'dd/MM/yyyy' }}</ng-container></span>
+              <span *ngIf="i.formateur_nom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{{ i.formateur_nom }}</span>
             </div>
 
-            <!-- Barre de progression (si inscrit et payé) -->
-            <ng-container *ngIf="i.statut_paiement === 'payé' && eligibiliteMap[i.formation_id] as elig">
-              <div class="myf-prog-row">
-                <span class="myf-prog-label">Progression</span>
-                <div class="myf-prog-track">
-                  <div class="myf-prog-fill"
-                       [style.width.%]="elig.progression"
-                       [style.background]="getProgressColor()"></div>
-                </div>
-                <span class="myf-prog-pct">{{ elig.progression }}%</span>
+            <!-- Barre de progression -->
+            <div class="myf-prog-wrap" *ngIf="i.statut_paiement === 'payé' && eligibiliteMap[i.formation_id]">
+              <div class="myf-prog-bar-track">
+                <div class="myf-prog-bar-fill" [style.width.%]="eligibiliteMap[i.formation_id]?.progression"></div>
               </div>
-            </ng-container>
-
-            <!-- Notation étoiles -->
-            <div class="myf-stars" *ngIf="i.statut_paiement === 'payé'">
-              <span *ngFor="let star of [1,2,3,4,5]"
-                    class="star"
-                    [class.filled]="star <= getNoteAffichee(i.formation_id)"
-                    (mouseenter)="setNoteHover(i.formation_id, star)"
-                    (mouseleave)="clearNoteHover(i.formation_id)"
-                    (click)="noterFormation(i.formation_id, star)">★</span>
-              <span class="myf-stars-hint">{{ mesNotes[i.formation_id] ? 'Ma note : ' + mesNotes[i.formation_id] + '/5' : 'Noter cette formation' }}</span>
+              <span class="myf-prog-pct">{{ eligibiliteMap[i.formation_id]?.progression }}%</span>
             </div>
+
+            <!-- Chips éligibilité -->
+            <div class="myf-elig-row" *ngIf="i.statut_paiement === 'payé' && eligibiliteMap[i.formation_id]">
+              <span class="elig-chip"
+                    [class.elig-ok]="eligibiliteMap[i.formation_id]?.progression === 100"
+                    [class.elig-ko]="eligibiliteMap[i.formation_id]?.progression < 100">
+                <ng-container *ngIf="eligibiliteMap[i.formation_id]?.progression === 100"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                <ng-container *ngIf="eligibiliteMap[i.formation_id]?.progression !== 100"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></ng-container>
+                Modules {{ eligibiliteMap[i.formation_id]?.progression }}%
+              </span>
+              <span *ngIf="eligibiliteMap[i.formation_id]?.has_quiz" class="elig-chip"
+                    [class.elig-ok]="eligibiliteMap[i.formation_id]?.quiz_ok"
+                    [class.elig-ko]="!eligibiliteMap[i.formation_id]?.quiz_ok">
+                <ng-container *ngIf="eligibiliteMap[i.formation_id]?.quiz_ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Quiz réussi ({{ eligibiliteMap[i.formation_id]?.quiz_score }}%)</ng-container>
+                <ng-container *ngIf="!eligibiliteMap[i.formation_id]?.quiz_ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Quiz non passé</ng-container>
+              </span>
+            </div>
+            <button *ngIf="i.status === 'terminée' && eligibiliteMap[i.formation_id]?.has_quiz && !eligibiliteMap[i.formation_id]?.quiz_ok && eligibiliteMap[i.formation_id]?.progression === 100 && (eligibiliteMap[i.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[i.formation_id]?.nb_tentatives_max || 3)"
+                    class="btn-passer-quiz" (click)="ouvrirQuiz(i)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Passer le quiz</button>
+
           </div>
 
           <!-- Pied de carte -->
           <div class="myf-footer">
-            <div class="myf-price">
-              {{ i.montant > 0 ? (i.montant + ' EUR') : 'Gratuit' }}
-              <span class="myf-date-achat">· Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</span>
+            <div>
+              <div class="myf-date-inscr">Acheté le {{ i.date_inscription | date:'dd/MM/yyyy' }}</div>
+              <div class="myf-price-tag" *ngIf="i.montant > 0">{{ i.montant }} EUR</div>
             </div>
-            <div class="myf-actions" *ngIf="i.statut_paiement === 'payé'">
-              <button class="btn-supports" (click)="voirSupports(i)" title="Supports pédagogiques">📂</button>
-              <button class="btn-presences" (click)="voirMesPresences(i)" title="Mes présences">📋</button>
-              <button class="btn-progression" (click)="voirProgressionFormation(i)" title="Progression par module">📈</button>
-              <button class="btn-attestation"
+
+            <!-- Paiement requis -->
+            <button class="btn-payer-maintenant" *ngIf="i.statut_inscription === 'confirmé' && i.statut_paiement === 'en_attente' && i.montant > 0 && i.status !== 'en_cours' && i.status !== 'terminée' && i.status !== 'archivée'"
+                    [disabled]="paiementEnCours" (click)="payerMaintenant(i.formation_id)">
+              <span *ngIf="paiementEnCours" class="spinner-sm"></span>
+              <span *ngIf="!paiementEnCours"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Payer {{ i.montant }} EUR</span>
+            </button>
+
+            <!-- Boutons icônes si payé -->
+            <div class="myf-footer-actions" *ngIf="i.statut_paiement === 'payé'">
+              <button class="myf-icon-btn" title="Supports pédagogiques" (click)="voirSupports(i)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
+              <button *ngIf="i.status !== 'published'" class="myf-icon-btn" title="Mes présences" (click)="voirMesPresences(i)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></button>
+              <button *ngIf="i.status !== 'published'" class="myf-icon-btn" title="Progression" (click)="voirProgressionFormation(i)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></button>
+              <button class="myf-icon-btn myf-btn-gold" title="Télécharger l'attestation"
                       *ngIf="eligibiliteMap[i.formation_id]?.eligible"
-                      (click)="ouvrirAttestation(i)" title="Télécharger l'attestation">🏆</button>
+                      (click)="ouvrirAttestation(i)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></button>
+              <button class="myf-icon-btn myf-btn-locked" title="Attestation non disponible"
+                      *ngIf="!eligibiliteMap[i.formation_id]?.eligible" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
             </div>
           </div>
         </div>
@@ -312,15 +389,17 @@
     </section>
 
     <!-- ===== SUPPORTS ===== -->
-    <section *ngIf="activeSection === 'supports'">
-      <div class="page-title">
-        <button class="btn-back" (click)="setSection('mesInscriptions')">← Retour</button>
-        <h2>📂 Supports — {{ formationSelectionnee?.titre }}</h2>
-        <p>Ressources pédagogiques de votre formation</p>
+    <section *ngIf="activeSection === 'supports'" class="pay-section">
+      <div class="pay-section-header">
+        <div>
+          <div class="pay-section-title">Supports pédagogiques</div>
+          <div class="pay-section-sub">{{ formationSelectionnee?.titre }}</div>
+        </div>
+        <button class="btn-back-dash" (click)="setSection('mesInscriptions')">← Retour</button>
       </div>
 
       <div *ngIf="supports.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <p>Aucun support disponible pour cette formation.</p>
       </div>
 
@@ -338,59 +417,71 @@
     </section>
 
     <!-- ===== PROGRESSION ===== -->
-    <section *ngIf="activeSection === 'progression'">
+    <section *ngIf="activeSection === 'progression'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>📈 Ma progression</h2>
-        <p>Suivez votre avancement dans chaque formation</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Ma progression</div>
+          <div class="pay-section-sub">Suivez votre avancement dans chaque formation</div>
+        </div>
       </div>
 
-      <div class="progression-global-card">
-        <div class="prog-global-label">Progression globale (tous modules)</div>
-        <div class="progression-bar-wrap">
-          <div class="progression-bar-track">
-            <div class="progression-bar-fill"
-                 [style.width.%]="progression"
-                 [style.background]="getProgressColor()"></div>
-          </div>
-          <span class="progression-pct">{{ progression }}%</span>
+
+      <div class="pay-stats-row" style="margin-bottom:24px">
+        <div class="pay-stat-card">
+          <div class="psc-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+          <div class="psc-val">{{ formationsTerminees }}</div>
+          <div class="psc-lbl">Formations terminées</div>
+        </div>
+        <div class="pay-stat-card">
+          <div class="psc-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="psc-val">{{ inscriptionsPayees }}</div>
+          <div class="psc-lbl">Formations achetées</div>
+        </div>
+        <div class="pay-stat-card">
+          <div class="psc-icon orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div class="psc-val">{{ mesInscriptions.length }}</div>
+          <div class="psc-lbl">Total inscriptions</div>
         </div>
       </div>
 
       <div *ngIf="mesInscriptions.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <p>Achetez une formation pour suivre votre progression.</p>
       </div>
 
       <div class="inscriptions-list" *ngIf="mesInscriptions.length > 0">
         <div class="inscription-card" *ngFor="let i of mesInscriptions">
           <div class="inscription-left">
-            <div class="inscription-icon">📘</div>
+            <div class="inscription-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div>
               <div class="inscription-title">{{ i.titre }}</div>
               <div class="inscription-meta">
-                <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="i.date_debut"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="i.date_fin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ i.date_fin | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
           </div>
-          <div class="inscription-right" *ngIf="i.statut_paiement === 'payé'">
-            <button class="btn-progression" (click)="voirProgressionFormation(i)">📈 Voir les modules</button>
-            <button class="btn-presences" (click)="voirMesPresences(i)">📋 Présences</button>
+          <div class="inscription-right" *ngIf="i.statut_paiement === 'payé' && i.status !== 'published'">
+            <button class="btn-progression" (click)="voirProgressionFormation(i)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Voir les modules</button>
+            <button class="btn-presences" (click)="voirMesPresences(i)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Présences</button>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===== ATTESTATION ===== -->
-    <section *ngIf="activeSection === 'attestation' && !formationAttestation">
+    <section *ngIf="activeSection === 'attestation' && !formationAttestation" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>🏆 Attestations de réussite</h2>
-        <p>Téléchargez vos attestations pour les formations complétées</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Attestations de réussite</div>
+          <div class="pay-section-sub">Téléchargez vos attestations pour les formations complétées</div>
+        </div>
       </div>
 
       <div *ngIf="inscriptionsPayees === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <p>Aucune formation achetée pour le moment.</p>
       </div>
 
@@ -398,25 +489,35 @@
         <div class="inscription-card" *ngFor="let i of mesInscriptions">
           <ng-container *ngIf="i.statut_paiement === 'payé'">
             <div class="inscription-left">
-              <div class="inscription-icon">📘</div>
+              <div class="inscription-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
               <div>
                 <div class="inscription-title">{{ i.titre }}</div>
                 <div class="inscription-meta">
-                  <span *ngIf="i.date_debut">📅 {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                  <span *ngIf="i.date_debut"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+                  <span *ngIf="i.date_fin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ i.date_fin | date:'dd/MM/yyyy' }}</span>
                 </div>
               </div>
             </div>
             <div class="inscription-right">
-              <ng-container *ngIf="eligibiliteMap[i.formation_id] as elig">
-                <div class="elig-info">
-                  <span>Progression : {{ elig.progression }}%</span>
-                  <span>Présences : {{ elig.presences_ok ? '✅' : '❌' }}</span>
-                </div>
-                <button class="btn-attestation" *ngIf="elig.eligible" (click)="ouvrirAttestation(i)">
-                  🏆 Télécharger l'attestation
-                </button>
-                <span class="badge-non-eligible" *ngIf="!elig.eligible">Non éligible</span>
-              </ng-container>
+              <div class="myf-elig-row" *ngIf="eligibiliteMap[i.formation_id]">
+                <span class="elig-chip"
+                      [class.elig-ok]="eligibiliteMap[i.formation_id]?.progression === 100"
+                      [class.elig-ko]="eligibiliteMap[i.formation_id]?.progression < 100">
+                  <ng-container *ngIf="eligibiliteMap[i.formation_id]?.progression === 100"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                  <ng-container *ngIf="eligibiliteMap[i.formation_id]?.progression !== 100"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></ng-container>
+                  Modules {{ eligibiliteMap[i.formation_id]?.progression }}%
+                </span>
+                <span *ngIf="eligibiliteMap[i.formation_id]?.has_quiz" class="elig-chip"
+                      [class.elig-ok]="eligibiliteMap[i.formation_id]?.quiz_ok"
+                      [class.elig-ko]="!eligibiliteMap[i.formation_id]?.quiz_ok">
+                  <ng-container *ngIf="eligibiliteMap[i.formation_id]?.quiz_ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Quiz réussi ({{ eligibiliteMap[i.formation_id]?.quiz_score }}%)</ng-container>
+                  <ng-container *ngIf="!eligibiliteMap[i.formation_id]?.quiz_ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Quiz non passé</ng-container>
+                </span>
+              </div>
+              <button class="btn-attestation" *ngIf="eligibiliteMap[i.formation_id]?.eligible" (click)="ouvrirAttestation(i)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Télécharger</button>
+              <button *ngIf="i.status === 'terminée' && eligibiliteMap[i.formation_id]?.has_quiz && !eligibiliteMap[i.formation_id]?.quiz_ok && eligibiliteMap[i.formation_id]?.progression === 100 && (eligibiliteMap[i.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[i.formation_id]?.nb_tentatives_max || 3)"
+                      class="btn-passer-quiz" (click)="ouvrirQuiz(i)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Passer le quiz</button>
+              <span class="badge-non-eligible" *ngIf="!eligibiliteMap[i.formation_id]?.eligible"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Non éligible</span>
             </div>
           </ng-container>
         </div>
@@ -427,52 +528,72 @@
     <section *ngIf="activeSection === 'attestation' && formationAttestation" class="attestation-print-section">
       <div class="no-print">
         <button class="btn-back-dash" (click)="formationAttestation = null">&#8592; Retour aux attestations</button>
-        <button class="btn-print" (click)="imprimerAttestation()">🖨️ Imprimer / Télécharger PDF</button>
+        <button class="btn-print" (click)="imprimerAttestation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimer / Télécharger PDF</button>
       </div>
 
-      <div *ngIf="attestationLoading" class="empty-state"><span>⏳</span><p>Chargement...</p></div>
+      <div *ngIf="attestationLoading" class="empty-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><p>Chargement...</p></div>
 
-      <div class="attestation-certificate" *ngIf="attestationData && !attestationLoading">
-        <div class="cert-header">
-          <div class="cert-logo">🎓</div>
-          <div class="cert-institution">ISET — Institut Supérieur des Études Technologiques</div>
+      <div class="attest-doc" *ngIf="attestationData && !attestationLoading">
+
+        <!-- En-tête institution -->
+        <div class="attest-header">
+          <img src="/images/iset_logo.png" class="attest-logo-img" alt="Logo ISET" />
+          <div class="attest-logo-sub">Institut Supérieur d'Enseignement Technologique</div>
         </div>
-        <div class="cert-title">ATTESTATION DE RÉUSSITE</div>
-        <div class="cert-body">
-          <p class="cert-intro">Nous certifions que</p>
-          <p class="cert-name">{{ attestationData.etudiant_nom }}</p>
-          <p class="cert-intro">a suivi et validé avec succès la formation</p>
-          <p class="cert-formation">« {{ attestationData.titre }} »</p>
-          <div class="cert-details">
-            <span *ngIf="attestationData.date_debut">Du {{ attestationData.date_debut | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="attestationData.date_fin"> au {{ attestationData.date_fin | date:'dd/MM/yyyy' }}</span>
+
+        <!-- Date -->
+        <p class="attest-date">Tunis, le {{ getTodayStr() }}</p>
+
+        <!-- Titre -->
+        <h2 class="attest-title">ATTESTATION DE FORMATION</h2>
+
+        <!-- Corps -->
+        <p class="attest-para">Le Directeur de l'ISET atteste par la présente que :</p>
+
+        <p class="attest-name">{{ attestationData.etudiant_nom }}</p>
+
+        <p class="attest-para">
+          a suivi avec succès la formation <strong>« {{ attestationData.titre }} »</strong>
+          dispensée au sein de l'ISET durant la période suivante :
+        </p>
+
+        <p class="attest-period">
+          Du {{ attestationData.date_debut ? (attestationData.date_debut | date:'dd/MM/yyyy') : '—' }}
+          au {{ attestationData.date_fin ? (attestationData.date_fin | date:'dd/MM/yyyy') : '—' }}
+        </p>
+
+        <p class="attest-para" *ngIf="attestationData.taux !== null && attestationData.taux !== undefined">
+          avec un taux de présence de <strong>{{ attestationData.taux }}%</strong>.
+        </p>
+
+        <p class="attest-legal">
+          Cette attestation est délivrée à l'intéressé(e) pour servir et valoir ce que de droit.
+        </p>
+
+        <!-- Séparateur -->
+        <hr class="attest-line"/>
+
+        <!-- Bas : réf + QR -->
+        <div class="attest-bottom">
+          <span class="attest-ref">Réf : {{ attestationData.ref_id }}</span>
+          <div class="attest-qr-block" *ngIf="attestationData.qr_data_url">
+            <img [src]="attestationData.qr_data_url" class="attest-qr-img" alt="QR" />
+            <p class="attest-qr-label">2D-DOC</p>
           </div>
-          <div class="cert-stats">
-            <div class="cert-stat-item">
-              <span class="cert-stat-val">{{ attestationData.taux ?? 'N/A' }}%</span>
-              <span class="cert-stat-lbl">Taux de présence</span>
-            </div>
-            <div class="cert-stat-item">
-              <span class="cert-stat-val">{{ attestationData.seances_presentes }}/{{ attestationData.total_seances }}</span>
-              <span class="cert-stat-lbl">Séances</span>
-            </div>
-          </div>
-          <p class="cert-formateur">Formateur : {{ attestationData.formateur_nom }}</p>
         </div>
-        <div class="cert-footer">
-          <div class="cert-date">Délivré le {{ getTodayStr() }}</div>
-          <div class="cert-seal">✅ Certifié ISET</div>
-        </div>
+
       </div>
     </section>
 
 
     <!-- ===== MES QUIZ ===== -->
-    <section *ngIf="activeSection === 'quiz'">
+    <section *ngIf="activeSection === 'quiz'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>📝 Mes Quiz</h2>
-        <p>Passez vos quiz de validation pour débloquer vos attestations</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Mes Quiz</div>
+          <div class="pay-section-sub">Passez vos quiz de validation pour débloquer vos attestations</div>
+        </div>
       </div>
 
       <div *ngIf="quizSectionLoading" class="quiz-section-loading">
@@ -480,7 +601,7 @@
       </div>
 
       <div *ngIf="!quizSectionLoading && inscriptionsPayees === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         <p>Vous n'êtes inscrit à aucune formation.</p>
         <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
       </div>
@@ -491,12 +612,12 @@
 
             <div class="quiz-card-top">
               <div class="quiz-card-title">{{ f.titre }}</div>
-              <div class="quiz-card-formateur" *ngIf="f.formateur_nom">👤 {{ f.formateur_nom }}</div>
+              <div class="quiz-card-formateur" *ngIf="f.formateur_nom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>{{ f.formateur_nom }}</div>
             </div>
 
             <div *ngIf="quizStatuts[f.formation_id] && !quizStatuts[f.formation_id]?.has_quiz"
                  class="quiz-card-status quiz-no-quiz">
-              <span>📋</span> Aucun quiz pour cette formation
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Aucun quiz pour cette formation
             </div>
 
             <div *ngIf="!quizStatuts[f.formation_id]" class="quiz-card-status quiz-loading-inline">
@@ -505,11 +626,11 @@
 
             <ng-container *ngIf="quizStatuts[f.formation_id]?.has_quiz">
               <div *ngIf="quizStatuts[f.formation_id]?.reussi" class="quiz-card-status quiz-passed">
-                <span>✅</span> Quiz réussi — Score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Quiz réussi — Score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
               </div>
               <ng-container *ngIf="!quizStatuts[f.formation_id]?.reussi">
                 <div class="quiz-card-status quiz-pending">
-                  <span>📝</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                   <span *ngIf="quizStatuts[f.formation_id]?.tentatives === 0">Pas encore passé</span>
                   <span *ngIf="quizStatuts[f.formation_id]?.tentatives > 0">
                     Dernier score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
@@ -522,12 +643,20 @@
                 </div>
                 <div *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) >= quizStatuts[f.formation_id]?.nb_tentatives_max"
                      class="quiz-card-no-more">
-                  ❌ Tentatives épuisées
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Tentatives épuisées
                 </div>
-                <button *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
+                <div *ngIf="f.status !== 'terminée'" class="quiz-card-locked">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Le quiz sera accessible une fois la formation terminée
+                </div>
+                <div *ngIf="f.status === 'terminée' && (eligibiliteMap[f.formation_id]?.progression || 0) < 100 && (quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
+                     class="quiz-card-locked">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Complétez 100% des modules pour accéder au quiz
+                  ({{ eligibiliteMap[f.formation_id]?.progression || 0 }}% accompli)
+                </div>
+                <button *ngIf="f.status === 'terminée' && (eligibiliteMap[f.formation_id]?.progression || 0) === 100 && (quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
                         class="btn-passer-quiz-card"
                         (click)="ouvrirQuiz(f)">
-                  📝 Passer le quiz
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Passer le quiz
                 </button>
               </ng-container>
             </ng-container>
@@ -545,11 +674,13 @@
     </section>
 
     <!-- ===== PROFIL ===== -->
-    <section *ngIf="activeSection === 'profil'">
+    <section *ngIf="activeSection === 'profil'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>👤 Mon profil</h2>
-        <p>Gérez vos informations personnelles</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Mon profil</div>
+          <div class="pay-section-sub">Gérez vos informations personnelles</div>
+        </div>
       </div>
 
       <div class="profile-grid">
@@ -559,7 +690,7 @@
             <div class="profile-photo-wrapper" (click)="photoInputExt.click()" title="Changer la photo de profil">
               <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="profile-photo-img" alt="Photo de profil">
               <div *ngIf="!profilePhotoUrl" class="profile-photo-placeholder">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
-              <div class="profile-photo-overlay">📷</div>
+              <div class="profile-photo-overlay"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
             </div>
             <input #photoInputExt type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden (change)="onPhotoSelected($event)">
             <div>
@@ -571,84 +702,83 @@
           </div>
           <div class="form-group">
             <label>Nom complet</label>
-            <div class="input-wrap"><span class="input-prefix">👤</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
               <input type="text" [(ngModel)]="profileNom" placeholder="Votre nom">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Email</label>
-            <div class="input-wrap"><span class="input-prefix">✉️</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></span>
               <input type="email" [(ngModel)]="profileEmail" placeholder="Votre email">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Téléphone</label>
-            <div class="input-wrap"><span class="input-prefix">📞</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg></span>
               <input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Entreprise / Organisation</label>
-            <div class="input-wrap"><span class="input-prefix">🏢</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
               <input type="text" [(ngModel)]="profileEntreprise" placeholder="Nom de votre entreprise">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Spécialité</label>
-            <div class="input-wrap"><span class="input-prefix">💡</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
               <input type="text" [(ngModel)]="profileSpecialite" placeholder="Ex: Marketing, Finance...">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Date de naissance</label>
-            <div class="input-wrap"><span class="input-prefix">📅</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
               <input type="date" [(ngModel)]="profileDateNaissance">
             </div>
           </div>
-          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
+          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Enregistrer</button>
         </div>
 
         <div class="form-card">
-          <h5 class="section-title">🔑 Changer le mot de passe</h5>
+          <h5 class="section-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Changer le mot de passe</h5>
           <div class="form-group">
             <label>Ancien mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔒</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
               <input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Nouveau mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔑</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span>
               <input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)">
             </div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Confirmer</label>
-            <div class="input-wrap"><span class="input-prefix">✅</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
               <input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le mot de passe">
             </div>
           </div>
-          <button class="btn-save" style="margin-top:20px;background:#0077b6" (click)="changerMotDePasse()">🔄 Modifier</button>
+          <button class="btn-save" style="margin-top:20px;background:#0077b6" (click)="changerMotDePasse()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>Modifier</button>
         </div>
       </div>
     </section>
 
 
     <!-- ===== NOTIFICATIONS ===== -->
-    <section *ngIf="activeSection === 'notifications'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <section *ngIf="activeSection === 'notifications'" class="pay-section">
+      <div class="pay-section-header">
         <div>
-          <h2>🔔 Notifications</h2>
-          <p>{{ unreadCount }} non lue(s) · {{ notifications.length }} au total</p>
+          <div class="pay-section-title">Notifications</div>
+          <div class="pay-section-sub">{{ unreadCount }} non lue(s) · {{ notifications.length }} au total</div>
         </div>
         <button class="btn-mark-all" *ngIf="notifications.length > 0" (click)="marquerToutLu()">
-          ✅ Tout marquer comme lu
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>Tout marquer comme lu
         </button>
       </div>
 
       <div *ngIf="notifications.length === 0" class="empty-state">
-        <span>🔔</span>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cfe0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <p>Aucune notification pour le moment.</p>
       </div>
 
@@ -656,9 +786,16 @@
         <div class="notif-item" *ngFor="let n of notifications"
              [class.unread]="!n.lu" (click)="marquerLu(n)">
           <div class="notif-dot" *ngIf="!n.lu"></div>
-          <div class="notif-icon-wrap">{{ getNotifIcon(n.type) }}</div>
+          <div class="notif-icon-wrap">
+            <svg *ngIf="n.type==='inscription'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg *ngIf="n.type==='approbation'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <svg *ngIf="n.type==='rejet'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <svg *ngIf="n.type==='presence'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <svg *ngIf="n.type==='progression'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            <svg *ngIf="n.type!=='inscription' && n.type!=='approbation' && n.type!=='rejet' && n.type!=='presence' && n.type!=='progression'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
           <div class="notif-body">
-            <div class="notif-message">{{ n.message }}</div>
+            <div class="notif-message">{{ stripNotifEmoji(n.message) }}</div>
             <div class="notif-time">{{ n.date_creation | date:'dd/MM/yyyy à HH:mm' }}</div>
           </div>
           <button class="notif-close" (click)="supprimerNotif(n.id, $event)">×</button>
@@ -667,11 +804,13 @@
     </section>
 
     <!-- ===== MESSAGERIE ===== -->
-    <section *ngIf="activeSection === 'messages'">
+    <section *ngIf="activeSection === 'messages'" class="pay-section">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>💬 Messagerie</h2>
-        <p>Échangez des messages avec vos formateurs</p>
+      <div class="pay-section-header" style="margin-top:16px">
+        <div>
+          <div class="pay-section-title">Messagerie</div>
+          <div class="pay-section-sub">Échangez des messages avec vos formateurs</div>
+        </div>
       </div>
       <div class="chat-container">
         <!-- Contacts -->
@@ -680,7 +819,7 @@
             <span class="contacts-count">{{ filteredExterneContacts.length }}</span>
           </div>
           <div class="contacts-search-wrap">
-            <input class="contacts-search" type="text" [(ngModel)]="externeContactSearch" placeholder="🔍 Rechercher un formateur…">
+            <input class="contacts-search" type="text" [(ngModel)]="externeContactSearch" placeholder="Rechercher un formateur…">
           </div>
           <div class="contacts-list">
             <div *ngFor="let c of filteredExterneContacts"
@@ -729,13 +868,13 @@
                       rows="2"
                       (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
             <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
-              Envoyer ✉️
+              Envoyer <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-left:4px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             </button>
           </div>
         </div>
         <ng-template #noConvExt>
           <div class="no-conv-placeholder">
-            <div class="no-conv-icon">💬</div>
+            <div class="no-conv-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <p>Sélectionnez un formateur pour démarrer une conversation</p>
           </div>
         </ng-template>
@@ -749,7 +888,7 @@
 <div class="modal-backdrop" *ngIf="showPaiementModal" (click)="fermerModal()">
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>💳 Confirmation {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'd\'inscription' : 'de paiement' }}</h3>
+      <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Demande d'inscription</h3>
       <button class="modal-close" (click)="fermerModal()">×</button>
     </div>
     <div class="modal-body">
@@ -757,11 +896,11 @@
 
       <div class="modal-details">
         <div class="modal-row" *ngIf="formationPaiement?.date_debut">
-          <span>📅 Date de début</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Date de début</span>
           <span>{{ formationPaiement?.date_debut | date:'dd/MM/yyyy' }}</span>
         </div>
         <div class="modal-row" *ngIf="formationPaiement?.formateur_nom">
-          <span>👨‍🏫 Formateur</span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Formateur</span>
           <span>{{ formationPaiement?.formateur_nom }}</span>
         </div>
       </div>
@@ -775,19 +914,22 @@
         </div>
       </div>
 
-      <p class="modal-note" *ngIf="formationPaiement?.prix > 0">
-        🔒 Paiement sécurisé via <strong>Stripe</strong> — carte bancaire (Visa, Mastercard, etc.).
-        Vous serez redirigé vers la page de paiement Stripe.
-      </p>
+      <div class="modal-info-approbation">
+        <span class="modal-info-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <div>
+          <strong>Approbation requise</strong>
+          <p>Votre demande sera examinée par l'administrateur. Vous recevrez une notification dès qu'elle sera approuvée.
+          <ng-container *ngIf="formationPaiement?.prix > 0"> Le paiement sera demandé après approbation.</ng-container>
+          </p>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel-modal" (click)="fermerModal()" [disabled]="paiementEnCours">Annuler</button>
       <button class="btn-confirm-pay" (click)="confirmerPaiement()" [disabled]="paiementEnCours">
         <span *ngIf="paiementEnCours" class="spinner-sm"></span>
-        <span *ngIf="!paiementEnCours">
-          {{ (!formationPaiement?.prix || formationPaiement?.prix == 0) ? 'Confirmer l\'inscription ✅' : '💳 Payer ' + formationPaiement?.prix + ' EUR' }}
-        </span>
-        <span *ngIf="paiementEnCours">Redirection en cours...</span>
+        <span *ngIf="!paiementEnCours">Envoyer la demande <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-left:4px"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <span *ngIf="paiementEnCours">Envoi en cours...</span>
       </button>
     </div>
   </div>
@@ -798,7 +940,7 @@
   <div class="modal-programme" (click)="$event.stopPropagation()">
     <div class="modal-prog-header">
       <div>
-        <h3>📋 Programme de la formation</h3>
+        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Programme de la formation</h3>
         <p class="prog-formation-title">{{ programmeFormation?.titre }}</p>
       </div>
       <button class="modal-close" (click)="fermerProgramme()">×</button>
@@ -810,25 +952,25 @@
       <div *ngIf="!programmeLoading && programmeData">
         <!-- Description globale -->
         <div class="prog-block" *ngIf="programmeData.programme?.description_globale">
-          <h5 class="prog-block-title">📖 Description</h5>
+          <h5 class="prog-block-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Description</h5>
           <p class="prog-block-text">{{ programmeData.programme.description_globale }}</p>
         </div>
 
         <!-- Objectifs -->
         <div class="prog-block" *ngIf="programmeData.programme?.objectifs">
-          <h5 class="prog-block-title">🎯 Objectifs pédagogiques</h5>
+          <h5 class="prog-block-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Objectifs pédagogiques</h5>
           <p class="prog-block-text">{{ programmeData.programme.objectifs }}</p>
         </div>
 
         <!-- Prérequis -->
         <div class="prog-block" *ngIf="programmeData.programme?.prerequis">
-          <h5 class="prog-block-title">✅ Prérequis</h5>
+          <h5 class="prog-block-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>Prérequis</h5>
           <p class="prog-block-text">{{ programmeData.programme.prerequis }}</p>
         </div>
 
         <!-- Modules -->
         <div class="prog-block" *ngIf="programmeData.modules?.length > 0">
-          <h5 class="prog-block-title">📚 Contenu — {{ programmeData.modules.length }} module(s)</h5>
+          <h5 class="prog-block-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Contenu — {{ programmeData.modules.length }} module(s)</h5>
           <div class="prog-modules-list">
             <div class="prog-module-item" *ngFor="let m of programmeData.modules; let i = index">
               <div class="prog-module-num">{{ i + 1 }}</div>
@@ -841,7 +983,7 @@
         </div>
 
         <div class="prog-empty" *ngIf="!programmeData.programme && programmeData.modules?.length === 0">
-          <span>📋</span>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
           <p>Le programme de cette formation n'a pas encore été renseigné.</p>
         </div>
       </div>
@@ -853,7 +995,7 @@
 <div class="modal-backdrop" *ngIf="showProgressionModal" (click)="fermerProgressionFormation()">
   <div class="modal-box modal-large" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>📈 Progression — {{ formationProgressionSelectionnee?.titre }}</h3>
+      <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Progression — {{ formationProgressionSelectionnee?.titre }}</h3>
       <button class="modal-close" (click)="fermerProgressionFormation()">×</button>
     </div>
     <div class="modal-body">
@@ -879,7 +1021,9 @@
             'mod-encours': m.statut === 'en_cours',
             'mod-noncommence': m.statut === 'non_commence'
           }">
-            {{ m.statut === 'termine' ? '✅ Terminé' : m.statut === 'en_cours' ? '🔄 En cours' : '⬜ Non commencé' }}
+            <ng-container *ngIf="m.statut === 'termine'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Terminé</ng-container>
+            <ng-container *ngIf="m.statut === 'en_cours'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>En cours</ng-container>
+            <ng-container *ngIf="m.statut !== 'termine' && m.statut !== 'en_cours'">Non commencé</ng-container>
           </span>
         </div>
       </div>
@@ -894,11 +1038,11 @@
 <div class="modal-backdrop" *ngIf="showPresencesModal" (click)="fermerPresences()">
   <div class="modal-box modal-large" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>📋 Présences — {{ presencesFormation?.titre }}</h3>
+      <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Présences — {{ presencesFormation?.titre }}</h3>
       <button class="modal-close" (click)="fermerPresences()">×</button>
     </div>
     <div class="modal-body">
-      <div *ngIf="!presencesData" class="empty-state"><span>⏳</span><p>Chargement...</p></div>
+      <div *ngIf="!presencesData" class="empty-state"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><p>Chargement...</p></div>
       <ng-container *ngIf="presencesData">
         <div class="presences-summary">
           <span>{{ presencesData.presents }} / {{ presencesData.total }} présence(s)</span>
@@ -909,17 +1053,14 @@
             <div class="seance-info">
               <span class="seance-date">{{ s.date_seance | date:'dd/MM/yyyy' }}</span>
               <span class="seance-heure" *ngIf="s.heure_debut">{{ s.heure_debut }} – {{ s.heure_fin }}</span>
-              <span class="seance-salle" *ngIf="s.salle">📍 {{ s.salle }}</span>
+              <span class="seance-salle" *ngIf="s.salle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ s.salle }}</span>
             </div>
             <span class="presence-badge" [ngClass]="getPresenceClass(s.statut_presence)">
-              {{ s.statut_presence === 'présent' ? '✅ Présent' :
-                 s.statut_presence === 'retard' ? '⚠️ Retard' :
-                 s.statut_presence === 'excusé' ? '📋 Excusé' : '❌ Absent' }}
+              <ng-container *ngIf="s.statut_presence === 'présent'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Présent</ng-container>
+              <ng-container *ngIf="s.statut_presence === 'retard'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Retard</ng-container>
+              <ng-container *ngIf="s.statut_presence === 'excusé'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Excusé</ng-container>
+              <ng-container *ngIf="s.statut_presence !== 'présent' && s.statut_presence !== 'retard' && s.statut_presence !== 'excusé'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Absent</ng-container>
             </span>
-            <button class="btn-justif" *ngIf="s.statut_presence === 'absent'"
-                    (click)="ouvrirJustificatif(s.seance_id)">
-              📝 Justifier
-            </button>
           </div>
         </div>
         <div *ngIf="presencesData.seances?.length === 0" class="empty-state">
@@ -934,7 +1075,7 @@
 <div class="modal-backdrop" *ngIf="justifSeanceId !== null" (click)="fermerJustificatif()">
   <div class="modal-box" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h3>📝 Soumettre un justificatif</h3>
+      <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Soumettre un justificatif</h3>
       <button class="modal-close" (click)="fermerJustificatif()">×</button>
     </div>
     <div class="modal-body">
@@ -947,7 +1088,7 @@
     <div class="modal-footer">
       <button class="btn-cancel-modal" (click)="fermerJustificatif()">Annuler</button>
       <button class="btn-confirm-pay" (click)="soumettreJustificatif()" [disabled]="!justifMotif.trim()">
-        Envoyer ✅
+        Envoyer <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-left:4px"><polyline points="20 6 9 17 4 12"/></svg>
       </button>
     </div>
   </div>
@@ -959,7 +1100,7 @@
 
   <div class="quiz-modal-header">
     <h3>{{ quizData?.titre || 'Quiz de validation' }}</h3>
-    <button class="quiz-close-btn" (click)="fermerQuizApresResultat()">✕</button>
+    <button class="quiz-close-btn" (click)="fermerQuizApresResultat()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 
   <div *ngIf="quizLoading" class="quiz-loading-state">
@@ -1001,7 +1142,10 @@
          [class.quiz-success]="quizResultat.reussi"
          [class.quiz-fail]="!quizResultat.reussi">
       <div class="quiz-score-big">{{ quizResultat.score }}%</div>
-      <div class="quiz-score-label">{{ quizResultat.reussi ? '🎉 Félicitations !' : '❌ Non réussi' }}</div>
+      <div class="quiz-score-label">
+        <ng-container *ngIf="quizResultat.reussi">Félicitations !</ng-container>
+        <ng-container *ngIf="!quizResultat.reussi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Non réussi</ng-container>
+      </div>
     </div>
     <div class="quiz-score-details">
       <p>{{ quizResultat.correct }} / {{ quizResultat.total }} bonnes réponses</p>

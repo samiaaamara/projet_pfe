@@ -1,0 +1,137 @@
+@startuml Sprint2_CasUtilisation_Global
+title Diagramme de Cas d'Utilisation Global — Sprint 2 FormaPro
+
+left to right direction
+
+scale 0.5
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 15
+skinparam ranksep 20
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Formateur" as F
+actor "Administrateur" as ADMIN
+actor "Candidat ISET / Externe" as USER
+
+' --- Côté Formateur ---
+usecase "Gérer ses formations (Formateur)" as UC1
+
+together {
+    usecase "Créer une formation (Formateur)" as UC1_1
+    usecase "Modifier une formation (Formateur)" as UC1_4
+    usecase "Supprimer une formation (Formateur)" as UC1_5
+    usecase "Consulter la liste des inscrits" as UC1_7
+    usecase "Soumettre à l'approbation" as UC2
+}
+
+together {
+    usecase "Gérer les modules" as UC1_2
+    usecase "Définir le programme pédagogique" as UC1_2d
+    usecase "Créer le quiz" as UC1_3
+    usecase "Déposer des supports pédagogiques" as UC1_6
+}
+
+together {
+    usecase "Ajouter un module" as UC1_2a
+    usecase "Modifier un module" as UC1_2b
+    usecase "Supprimer un module" as UC1_2c
+}
+
+' --- Côté Admin ---
+usecase "Gérer les formations (Admin)" as UC3
+usecase "Modifier une formation (Admin)" as UC3_3
+usecase "Supprimer une formation (Admin)" as UC3_4
+usecase "Consulter toutes les formations" as UC3_5
+
+usecase "Créer et assigner une formation (Admin)" as UC3_1
+
+together {
+    usecase "Assigner un formateur" as UC3_1a
+    usecase "Définir les places, le prix et la date" as UC3_1b
+    usecase "Planifier les séances" as UC3_2
+}
+
+together {
+    usecase "Créer une séance" as UC3_2a
+    usecase "Modifier une séance" as UC3_2b
+    usecase "Supprimer une séance" as UC3_2c
+}
+
+usecase "Gérer le processus d'approbation" as UC4
+
+together {
+    usecase "Accepter une formation" as UC4_1
+    usecase "Rejeter une formation" as UC4_2
+    usecase "Publier une formation" as UC4_3
+    usecase "Approuver une demande d'inscription" as UC4_4
+    usecase "Rejeter une demande d'inscription" as UC4_5
+}
+
+' --- Côté Candidat ISET / Externe ---
+usecase "Consulter le catalogue des formations" as UC5
+usecase "Soumettre une demande d'inscription" as UC6
+usecase "Consulter mes formations inscrites" as UC7
+
+' --- Relations acteurs ---
+F     -- UC1
+ADMIN -- UC3
+ADMIN -- UC4
+USER  -- UC5
+USER  -- UC6
+USER  -- UC7
+
+' --- Hiérarchie Formateur ---
+UC1    <|-- UC1_1
+UC1    <|-- UC1_4
+UC1    <|-- UC1_5
+UC1    <|-- UC1_7
+UC1    <|-- UC2
+
+UC1_1  <|-- UC1_2
+UC1_1  <|-- UC1_2d
+UC1_1  <|-- UC1_3
+UC1_1  <|-- UC1_6
+
+UC1_2  <|-- UC1_2a
+UC1_2  <|-- UC1_2b
+UC1_2  <|-- UC1_2c
+
+' --- Hiérarchie Admin ---
+UC3    <|-- UC3_1
+UC3    <|-- UC3_3
+UC3    <|-- UC3_4
+UC3    <|-- UC3_5
+
+UC3_1  ..>  UC1_1 : <<include>>
+UC3_1  <|-- UC3_1a
+UC3_1  <|-- UC3_1b
+UC3_1  <|-- UC3_2
+
+UC3_2  <|-- UC3_2a
+UC3_2  <|-- UC3_2b
+UC3_2  <|-- UC3_2c
+
+UC4    <|-- UC4_1
+UC4    <|-- UC4_2
+UC4    <|-- UC4_3
+UC4    <|-- UC4_4
+UC4    <|-- UC4_5
+
+UC4    ..>  UC2 : <<extend>>
+UC4_4  ..>  UC6 : <<extend>>
+UC4_5  ..>  UC6 : <<extend>>
+
+@enduml

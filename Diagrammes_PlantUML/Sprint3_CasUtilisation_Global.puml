@@ -1,0 +1,81 @@
+@startuml Sprint3_CasUtilisation_Global
+title Diagramme de Cas d'Utilisation Global — Sprint 3 FormaPro
+
+left to right direction
+
+scale 900 width
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 50
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Administrateur" as ADMIN
+actor "Utilisateur" as USER
+actor "Candidat ISET" as CISET
+actor "Utilisateur externe" as EXT
+actor "Formateur" as F
+
+CISET --|> USER
+EXT   --|> USER
+
+ADMIN -[hidden]d- F
+ADMIN -[hidden]d- USER
+
+usecase "Consulter le catalogue" as UC1
+usecase "Consulter mes demandes et formations" as UC2
+usecase "Suivre ma progression" as UC3
+usecase "S'inscrire à une formation" as UC1_1
+usecase "Rejoindre la liste d'attente" as UC1_2
+usecase "Accéder aux supports pédagogiques" as UC1_3
+usecase "Se désinscrire de la liste d'attente" as UC2_1
+usecase "Consulter mes présences" as UC3_1
+usecase "Suivre la progression par module" as UC3_2
+usecase "Effectuer un paiement Stripe" as UC9
+usecase "Valider les présences par séance" as UC10
+usecase "Marquer présent / absent / excusé" as UC10_1
+usecase "Gérer les demandes d'inscription" as UC11
+usecase "Consulter les paiements" as UC13
+usecase "Approuver une inscription" as UC11_1
+usecase "Rejeter une inscription" as UC11_2
+usecase "Gérer la liste d'attente" as UC12
+usecase "Inscrire manuellement depuis la liste" as UC12_1
+usecase "Retirer de la liste d'attente" as UC12_2
+usecase "Consulter ma position dans la file" as UC1_2a
+
+USER  -- UC1
+USER  -- UC2
+USER  -- UC3
+EXT   -- UC9
+F     -- UC10
+ADMIN -- UC11
+ADMIN -- UC13
+
+UC1   ..> UC1_1  : <<extend>>
+UC1   .> UC1_2  : <<extend>>
+UC1_1 -[hidden]d- UC1_2
+UC1_2 .> UC1_2a  : <<extend>>
+UC2   ..> UC1_3  : <<extend>>
+UC2   ..> UC2_1  : <<extend>>
+UC3   ..> UC3_1  : <<include>>
+UC3   ..> UC3_2  : <<include>>
+UC11  ..> UC11_1 : <<extend>>
+UC11  ..> UC11_2 : <<extend>>
+UC11  ..> UC12   : <<extend>>
+UC12  ..> UC12_1 : <<extend>>
+UC12  ..> UC12_2 : <<extend>>
+UC10   ..> UC10_1 : <<include>>
+
+@enduml

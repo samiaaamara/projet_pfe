@@ -1,0 +1,41 @@
+@startuml Sprint1_Activite_ReinitialisationMdp
+title Diagramme d'Activité — Réinitialiser le mot de passe
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam backgroundColor White
+skinparam activity {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam arrow {
+    Color Black
+    FontColor Black
+}
+
+start
+:L'utilisateur clique sur « Mot de passe oublié »;
+:Saisit son adresse email;
+
+if (Email trouvé ?) then (non)
+    :Affiche message générique;
+    stop
+else (oui)
+    :Génère un token sécurisé (1h);
+    :Envoie un email avec le lien;
+    :L'utilisateur clique sur le lien;
+
+    if (Token valide ?) then (non)
+        :Affiche « Lien expiré ou invalide »;
+        stop
+    else (oui)
+        :L'utilisateur saisit son nouveau mot de passe;
+        :Hache le mot de passe (bcrypt);
+        :Met à jour le mot de passe;
+        :Redirige vers la page de connexion;
+        stop
+    endif
+endif
+
+@enduml

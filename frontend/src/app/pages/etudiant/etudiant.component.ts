@@ -27,7 +27,6 @@ export class EtudiantComponent implements OnInit, OnDestroy {
   page = 1;
   totalPages = 1;
   totalFormations = 0;
-  filtreSpecialite: string | null = null;
   specialites: string[] = [];
   recherche = '';
   
@@ -175,7 +174,6 @@ export class EtudiantComponent implements OnInit, OnDestroy {
         this.formations = res.data;
         this.totalPages = res.pagination.pages;
         this.totalFormations = res.pagination.total;
-        this.filtreSpecialite = res.filtre_specialite || null;
         this.formations.forEach(f => this.chargerMaNote(f.id));
       },
       error: () => this.showMessage('Erreur chargement des formations', 'danger')
@@ -270,8 +268,37 @@ export class EtudiantComponent implements OnInit, OnDestroy {
     });
   }
 
+  getStatutFormation(f: any): string {
+    if (f.statut === 'en_attente') return 'En attente';
+    if (!f.date_debut) return f.statut || '—';
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const toLocal = (d: string) => {
+      const s = typeof d === 'string' ? d.substring(0, 10) : new Date(d).toISOString().substring(0, 10);
+      return new Date(s + 'T00:00:00');
+    };
+
+    const debut = toLocal(f.date_debut);
+    const fin   = f.date_fin ? toLocal(f.date_fin) : null;
+
+    if (debut > today) return 'À venir';
+    if (fin && fin < today) return 'Terminée';
+    return 'En cours';
+  }
+
   getStatutBadge(statut: string): string {
-    const map: any = { 'Inscrit': 'bg-primary', 'en_attente': 'bg-warning', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
+    const map: any = {
+      'Inscrit'   : 'bg-primary',
+      'en_attente': 'bg-warning',
+      'En attente': 'bg-warning',
+      'À venir'   : 'bg-info',
+      'En cours'  : 'bg-success',
+      'Terminée'  : 'bg-secondary',
+      'présent'   : 'bg-success',
+      'absent'    : 'bg-danger',
+    };
     return map[statut] || 'bg-secondary';
   }
 
@@ -486,15 +513,11 @@ sauvegarderProfil() {
     });
   }
 
-  getNotifIcon(type: string): string {
-    const icons: any = {
-      'inscription': '📚',
-      'approbation': '✅',
-      'rejet': '❌',
-      'presence': '🏆',
-      'info': 'ℹ️'
-    };
-    return icons[type] || '🔔';
+  getNotifIcon(type: string): string { return type; }
+
+  stripNotifEmoji(msg: string): string {
+    if (!msg) return '';
+    return msg.replace(/^[\u{1F300}-\u{1F9FF}✅❌⚠️]️?\s*/u, '');
   }
 
   openNotifications() {

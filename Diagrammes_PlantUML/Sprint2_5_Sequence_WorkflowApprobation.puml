@@ -1,0 +1,76 @@
+@startuml Sprint2_Sequence_WorkflowApprobation
+title Diagramme de Séquence — Processus d'approbation
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceMessageAlign left
+skinparam sequenceBoxBackgroundColor White
+skinparam sequenceBoxBorderColor Black
+skinparam participantBackgroundColor White
+skinparam participantBorderColor Black
+skinparam actorBackgroundColor White
+skinparam actorBorderColor Black
+skinparam databaseBackgroundColor White
+skinparam databaseBorderColor Black
+
+actor "Formateur" as F
+actor "Administrateur" as ADMIN
+participant "Interface" as UI
+participant "Système" as SYS
+database "Base de données" as DB
+
+F -> UI: Clique sur Soumettre à l'approbation
+UI -> SYS: Envoie la demande de soumission
+SYS -> DB: Vérifie qu'il y a au moins un module
+
+alt Aucun module
+    DB --> SYS: Aucun module trouvé
+    SYS --> UI: Erreur — ajoutez au moins un module
+    UI --> F: Affiche le message d'erreur
+else Module(s) présent(s)
+    DB --> SYS: Modules trouvés
+    SYS -> DB: Met à jour le statut — en attente d'approbation
+    SYS -> DB: Envoie une notification à l'administrateur
+    DB --> SYS: Confirmation
+    SYS --> UI: Soumission réussie
+    UI --> F: Formation en attente d'approbation
+
+    ADMIN -> UI: Consulte les formations en attente d'approbation
+    UI -> SYS: Récupère la liste
+    SYS -> DB: Recherche les formations en attente d'approbation
+    DB --> SYS: Liste des formations
+    SYS --> UI: Affiche la liste
+    UI --> ADMIN: Affiche les formations en attente
+
+    alt Rejeter
+        ADMIN -> UI: Clique sur Rejeter avec une raison
+        UI -> SYS: Envoie la décision et la raison
+        SYS -> DB: Met à jour le statut — brouillon
+        SYS -> DB: Notifie le formateur avec la raison du rejet
+        DB --> SYS: Confirmation
+        SYS --> UI: Formation rejetée
+        UI --> ADMIN: Confirmation de rejet
+    else Accepter
+        ADMIN -> UI: Clique sur Accepter
+        UI -> SYS: Envoie la décision
+        SYS -> DB: Met à jour le statut — acceptée
+        SYS -> DB: Notifie le formateur de l'acceptation
+        DB --> SYS: Confirmation
+        SYS --> UI: Formation acceptée
+        UI --> ADMIN: Formulaire de publication
+
+        ADMIN -> UI: Définit le nombre de places,\nle prix, les dates et les séances
+        UI -> SYS: Envoie les informations de publication
+        SYS -> DB: Met à jour le statut — publiée
+        SYS -> DB: Enregistre les séances
+        SYS -> DB: Notifie le formateur de la publication
+        DB --> SYS: Confirmation
+        SYS --> UI: Formation publiée dans le catalogue
+        UI --> ADMIN: Confirmation de publication
+    end
+end
+
+@enduml

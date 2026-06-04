@@ -1,0 +1,42 @@
+@startuml Sprint4_Sequence_Messagerie
+title Diagramme de Séquence — Messagerie interne
+
+scale 0.8
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor Black
+skinparam sequenceParticipantBackgroundColor White
+
+actor "Expéditeur" as S
+participant "Frontend" as FE
+participant "Backend" as BE
+database "Base de données" as DB
+actor "Destinataire" as R
+
+S -> FE : Saisir et envoyer un message
+FE -> BE : POST /messages
+BE -> DB : Enregistrer message
+DB --> BE : OK
+BE -> DB : Créer notification destinataire
+DB --> BE : OK
+BE --> FE : Message envoyé
+FE --> S : Message affiché
+
+R -> FE : Consulter la messagerie
+FE -> BE : GET /messages/conversations
+BE -> DB : Récupérer conversations
+DB --> BE : Conversations + badge non lus
+BE --> FE : Liste conversations
+FE --> R : Badge indique messages non lus
+
+R -> FE : Ouvrir la conversation
+FE -> BE : PUT /messages/:id/lire
+BE -> DB : Marquer messages comme lus
+DB --> BE : OK
+BE --> FE : Badge réinitialisé
+FE --> R : Messages affichés
+
+@enduml

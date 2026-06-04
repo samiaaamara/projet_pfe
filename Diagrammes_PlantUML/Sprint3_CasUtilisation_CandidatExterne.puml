@@ -1,0 +1,63 @@
+@startuml Sprint3_CasUtilisation_CandidatExterne
+title Diagramme de Cas d'Utilisation — Sprint 3 : Candidat ISET & Utilisateur externe
+
+left to right direction
+
+scale 0.7
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 30
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Utilisateur" as USER
+actor "Candidat ISET" as CISET
+actor "Utilisateur externe" as EXT
+
+CISET --|> USER
+EXT   --|> USER
+
+usecase "Consulter le catalogue" as UC1
+usecase "S'inscrire à une formation" as UC1_1
+usecase "Rejoindre la liste d'attente" as UC1_2
+usecase "Consulter ma position dans la file" as UC1_2a
+usecase "Consulter mes demandes et formations" as UC2
+usecase "Accéder aux supports pédagogiques" as UC1_3
+usecase "Se désinscrire de la liste d'attente" as UC2_1
+usecase "Suivre ma progression" as UC3
+usecase "Consulter mes présences" as UC3_1
+usecase "Suivre la progression par module" as UC3_2
+usecase "Effectuer un paiement Stripe" as UC9
+
+USER -- UC1
+USER -- UC2
+USER -- UC3
+EXT  -- UC9
+
+UC1   ..> UC1_1  : <<extend>>
+UC1   .>  UC1_2  : <<extend>>
+UC1_1 -[hidden]d- UC1_2
+UC1_2 .>  UC1_2a : <<extend>>
+UC2   ..> UC1_3  : <<extend>>
+UC2   ..> UC2_1  : <<extend>>
+UC3   ..> UC3_1  : <<include>>
+UC3   ..> UC3_2  : <<include>>
+
+note right of UC1_3
+  Candidat ISET : accessible après approbation
+  Utilisateur externe : accessible après paiement Stripe
+end note
+
+@enduml

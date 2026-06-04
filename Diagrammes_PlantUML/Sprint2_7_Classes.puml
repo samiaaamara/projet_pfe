@@ -1,0 +1,144 @@
+@startuml Sprint2_Classes
+title Diagramme de Classes — Sprint 2
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+skinparam classAttributeFontColor Black
+skinparam classFontColor Black
+skinparam classAttributeIconSize 0
+
+class Formation {
+    - id : int
+    - titre : string
+    - description : string
+    - specialite : string
+    - prix : decimal
+    - places_disponibles : int
+    - date_debut : date
+    - date_fin : date
+    - statut : brouillon | en_attente | acceptee | publiee | archivee
+    - photo_couverture : string
+    --
+    + creer() : Formation
+    + modifier() : void
+    + supprimer() : void
+    + soumettre() : void
+}
+
+class Module {
+    - id : int
+    - titre : string
+    - description : string
+    - duree_heures : int
+    - ordre : int
+    --
+    + ajouter() : Module
+    + modifier() : void
+    + supprimer() : void
+}
+
+class ProgrammeFormation {
+    - id : int
+    - description_globale : string
+    - objectifs : string
+    - prerequis : string
+    --
+    + enregistrer() : void
+}
+
+class Seance {
+    - id : int
+    - module_id : int
+    - salle : string
+    - date : date
+    - duree_minutes : int
+    --
+    + ajouter() : Seance
+    + modifier() : void
+    + supprimer() : void
+}
+
+class Support {
+    - id : int
+    - titre : string
+    - type : pdf | video | document | zip | image | url
+    - fichier_path : string
+    - url : string
+    --
+    + deposer() : Support
+    + supprimer() : void
+}
+
+class Formateur {
+    - id : int
+    - specialite : string
+    - telephone : string
+    --
+    + getProfil() : Formateur
+    + isDisponible() : boolean
+}
+
+class Admin {
+    - id : int
+    --
+    + accepterFormation(id) : void
+    + rejeterFormation(id, raison) : void
+    + publierFormation(id, data) : void
+    + approuverInscription(id) : void
+    + rejeterInscription(id, raison) : void
+}
+
+class Candidat {
+    - id : int
+    --
+    + soumettreInscription() : DemandeInscription
+    + consulterFormations() : void
+}
+
+class CandidatISET {
+    - specialite : string
+    - niveau : string
+}
+
+class Externe {
+    - entreprise : string
+    - cin : string
+}
+
+class DemandeInscription {
+    - id : int
+    - statut : en_attente | approuvee | rejetee
+    - date_demande : date
+    --
+    + soumettre() : void
+}
+
+class Quiz {
+    - id : int
+    - titre : string
+    - seuil_reussite : int
+    - nb_tentatives_max : int
+    --
+    + creer() : Quiz
+    + modifier() : void
+}
+
+CandidatISET --|> Candidat
+Externe      --|> Candidat
+
+Formateur "1" -- "0..*" Formation : crée
+Admin "1" -- "0..*" Formation : gère
+Formation "1" *-- "0..1" ProgrammeFormation : contient
+Formation "1" *-- "1..*" Module : contient
+Formation "1" *-- "0..*" Support : possède
+Formation "1" *-- "0..1" Quiz : possède
+Module "1" *-- "0..*" Seance : planifie
+Candidat "1" -- "0..*" DemandeInscription : soumet
+Formation "1" -- "0..*" DemandeInscription : reçoit
+Admin "1" -- "0..*" DemandeInscription : traite
+
+@enduml

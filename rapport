@@ -1,312 +1,335 @@
+Remerciements
+
+Avant de clore ce travail, je tiens à exprimer ma plus profonde gratitude à toutes les personnes qui ont contribué, de près ou de loin, à la réalisation de ce projet de fin d'études.
+
+Mes remerciements les plus sincères vont en premier lieu à Madame Souhir Hedfi, mon encadrante académique, pour son accompagnement constant, sa disponibilité, sa rigueur scientifique et la richesse de ses conseils. Sa patience, son professionnalisme et ses orientations pertinentes ont été des atouts majeurs dans l'avancement et l'aboutissement de ce projet.
+
+J'exprime aussi ma gratitude à l'Institut Supérieur des Études Technologiques de Tozeur ainsi qu'à l'ensemble du corps enseignant et administratif, pour la qualité de la formation reçue durant ces années et pour les valeurs de rigueur et de persévérance transmises.
+
+Je tiens également à remercier les membres du jury pour l'honneur qu'ils me font en acceptant d'évaluer ce travail. Leur regard critique et bienveillant représente pour moi un réel privilège.
+
+Ce projet de fin d'études est l'aboutissement d'un parcours que je n'aurais pu accomplir sans le soutien et les encouragements de toutes ces personnes, que je remercie du fond du cœur.
+
+
+
+
 Introduction Générale
 
-Aujourd'hui, l’informatique occupe une place essentielle dans tous les domaines, notamment dans celui de la formation professionnelle, où la transformation numérique devient une nécessité pour améliorer la gestion administrative et pédagogique.
-Les solutions informatiques permettent de proposer des outils fiables, rapides et efficaces afin d’automatiser plusieurs tâches liées à la gestion des formations. Dans ce contexte, j’ai développé la plateforme « FormaPro », conçue pour faciliter et améliorer la gestion des formations au sein de l’Institut Supérieur des Études Technologiques de Tozeur.
-Ce rapport présente les différentes étapes suivies pour la réalisation de cette application au cours de ce projet de fin d’études. Il est organisé en plusieurs chapitres :
-•	Le premier chapitre intitulé « Présentation du projet » présente le cadre général du projet, l’étude de l’existant, la problématique, la solution proposée ainsi que la méthodologie SCRUM adoptée. 
-•	Le deuxième chapitre intitulé « Sprint 0 » décrit les besoins fonctionnels et non fonctionnels, le backlog produit ainsi que l’architecture technique et les technologies utilisées. 
-•	Le troisième chapitre intitulé « Sprint 1 » présente le backlog du sprint, la phase de conception à travers les différents diagrammes UML ainsi que la réalisation des premières fonctionnalités. 
-•	Le quatrième chapitre intitulé « Sprint 2 » présente les fonctionnalités développées durant ce sprint ainsi que leur conception et leur implémentation. 
-•	Le cinquième chapitre intitulé « Sprint 3 » décrit les nouvelles fonctionnalités réalisées ainsi que les différentes étapes de conception et de développement. 
-•	Le sixième chapitre intitulé « Sprint 4 » présente les dernières fonctionnalités développées ainsi que les améliorations apportées à la plateforme. 
-Enfin, ce rapport se termine par une conclusion générale résumant les travaux réalisés ainsi que les perspectives d’amélioration et les évolutions futures du projet.
+Aujourd'hui, l'informatique occupe une place essentielle dans tous les domaines, notamment dans celui de la formation professionnelle, où la transformation numérique devient une nécessité pour améliorer la gestion administrative et pédagogique.
+Les solutions informatiques permettent de proposer des outils fiables, rapides et efficaces afin d'automatiser plusieurs tâches liées à la gestion des formations. Dans ce contexte, j'ai développé la plateforme « FormaPro », conçue pour faciliter et améliorer la gestion des formations au sein de l'Institut Supérieur des Études Technologiques de Tozeur.
+Ce rapport présente les différentes étapes suivies pour la réalisation de cette application au cours de ce projet de fin d'études. Il est organisé en plusieurs chapitres :
+•	Le premier chapitre intitulé « Présentation du projet » présente le cadre général du projet, l'étude de l'existant, la problématique, la solution proposée ainsi que la méthodologie SCRUM adoptée.
+•	Le deuxième chapitre intitulé « Phase de Spécification » décrit les besoins fonctionnels et non fonctionnels, le backlog produit ainsi que l'architecture technique et les technologies utilisées.
+•	Le troisième chapitre intitulé « Sprint 1 » présente le backlog du sprint, la phase de conception à travers les différents diagrammes UML ainsi que la réalisation des premières fonctionnalités.
+•	Le quatrième chapitre intitulé « Sprint 2 » présente les fonctionnalités développées durant ce sprint ainsi que leur conception et leur implémentation.
+•	Le cinquième chapitre intitulé « Sprint 3 » décrit les nouvelles fonctionnalités réalisées ainsi que les différentes étapes de conception et de développement.
+•	Le sixième chapitre intitulé « Sprint 4 » présente les dernières fonctionnalités développées ainsi que les améliorations apportées à la plateforme.
+Enfin, ce rapport se termine par une conclusion générale résumant les travaux réalisés ainsi que les perspectives d'amélioration et les évolutions futures du projet.
 
 
 
-Chapitre 
-1	   Présentation du projet
+
+Chapitre
+   Présentation du projet
 
 Introduction
 Ce premier chapitre présente le cadre général de mon projet de fin d'études intitulé « Plateforme de Gestion des Formations ». Je commencerai par une présentation de l'organisme d'accueil afin de situer le contexte général du projet. Ensuite, j'étudierai les solutions existantes afin d'identifier leurs limites et de justifier la mise en place d'une nouvelle solution adaptée aux besoins des centres de formation professionnelle. Par la suite, je présenterai la solution proposée, la méthodologie adoptée, les outils et technologies utilisés ainsi que le pilotage du projet avec la méthode SCRUM.
-I.	Présentation de l’organisme d’accueil
-Dans le cadre de mon projet de fin d'études, j'ai effectué mon stage au sein de l'Institut Supérieur des Études Technologiques de Tozeur (ISET Tozeur). L'ISET Tozeur est un établissement universitaire public appartenant au réseau des Instituts Supérieurs des Études Technologiques en Tunisie. Il assure des formations académiques et professionnelles dans plusieurs domaines technologiques et informatiques afin de préparer les étudiants à intégrer le marché du travail. L'établissement propose plusieurs spécialités liées au développement informatique, aux réseaux, au multimédia, à la gestion et aux technologies de l'information. Grâce à son environnement pédagogique moderne, l'institut encourage également l'innovation, la recherche scientifique et la transformation numérique. Cette structure représente un environnement favorable pour la réalisation de projets innovants, notamment ma plateforme intelligente de gestion des formations..
- 
-Figure 1:Logo de l'ISET Tozeur
-1.	Les activités de l’ISET Tozeur
-L’ISET Tozeur assure plusieurs activités académiques et administratives, parmi lesquelles :
+I.	Présentation de l'organisme d'accueil
+Dans le cadre de mon projet de fin d'études, j'ai effectué mon stage au sein de l'Institut Supérieur des Études Technologiques de Tozeur (ISET Tozeur). L'ISET Tozeur est un établissement universitaire public appartenant au réseau des Instituts Supérieurs des Études Technologiques en Tunisie. Il assure des formations académiques et professionnelles dans plusieurs domaines technologiques et informatiques afin de préparer les étudiants à intégrer le marché du travail. L'établissement propose plusieurs spécialités liées au développement informatique, aux réseaux, au multimédia, à la gestion et aux technologies de l'information. Grâce à son environnement pédagogique moderne, l'institut encourage également l'innovation, la recherche scientifique et la transformation numérique. Cette structure représente un environnement favorable pour la réalisation de projets innovants, notamment ma plateforme intelligente de gestion des formations.
+
+Figure 1:ISET Tozeur
+1.	Les activités de l'ISET Tozeur
+L'ISET Tozeur assure plusieurs activités académiques et administratives, parmi lesquelles :
 •	Formation académique
-L’établissement propose des formations universitaires dans plusieurs spécialités technologiques et professionnelles.
+L'établissement propose des formations universitaires dans plusieurs spécialités technologiques et professionnelles.
 •	Encadrement pédagogique
-L’institut accompagne les étudiants à travers des projets, stages et travaux pratiques afin de développer leurs compétences techniques et professionnelles.
+L'institut accompagne les étudiants à travers des projets, stages et travaux pratiques afin de développer leurs compétences techniques et professionnelles.
 •	Innovation et recherche
-L’ISET encourage les projets innovants et les activités de recherche scientifique dans différents domaines technologiques.
+L'ISET encourage les projets innovants et les activités de recherche scientifique dans différents domaines technologiques.
 •	Transformation numérique
-L’établissement participe à la digitalisation des processus administratifs et pédagogiques.
+L'établissement participe à la digitalisation des processus administratifs et pédagogiques.
 •	Gestion des stages
-L’institut assure le suivi des stages académiques et professionnels des étudiants.
-2.	Organigramme
-L’organisation administrative et pédagogique de l’ISET Tozeur repose sur plusieurs services et départements :
-•	Direction générale ; 
-•	Secrétariat général ; 
-•	Départements académiques ; 
-•	Service informatique ; 
-•	Service administratif ; 
-•	Service des stages ; 
-•	Enseignants ; 
-•	Étudiants. 
+L'institut assure le suivi des stages académiques et professionnels des étudiants.
 II.	Contexte et Présentation du Projet
 1.	Présentation du projet
-Ce travail s'inscrit dans le cadre de mon projet de fin d'études pour l'obtention de la Licence en Développement des Systèmes d'Information à l'Institut Supérieur des Études Technologiques de Tozeur. Dans ce contexte, j'ai développé une plateforme web intelligente nommée « FormaPro », dédiée à la gestion des formations professionnelles. Cette plateforme vise à digitaliser et automatiser les différentes opérations liées à la gestion des formations, des inscriptions, des paiements ainsi qu'au suivi pédagogique des apprenants Cette plateforme vise à digitaliser et automatiser les différentes opérations liées à la gestion des formations, des inscriptions, des paiements ainsi qu’au suivi pédagogique des apprenants.
+Ce travail s'inscrit dans le cadre de mon projet de fin d'études pour l'obtention de la Licence en Développement des Systèmes d'Information à l'Institut Supérieur des Études Technologiques de Tozeur. Dans ce contexte, j'ai développé une plateforme web intelligente nommée « FormaPro », dédiée à la gestion des formations professionnelles. Cette plateforme vise à digitaliser et automatiser les différentes opérations liées à la gestion des formations, des inscriptions, des paiements ainsi qu'au suivi pédagogique des apprenants.
 
-2.	Étude et critique de l’existant
-Avant de développer cette plateforme, j’ai étudié plusieurs solutions existantes utilisées dans le domaine de la gestion des formations et de l’apprentissage en ligne :
-• Moodle
-Plateforme open source de gestion des cours et des évaluations. 
- 
+2.	Étude et critique de l'existant
+Avant de développer cette plateforme, j'ai étudié plusieurs solutions existantes utilisées dans le domaine de la gestion des formations et de l'apprentissage en ligne :
+
+•	Moodle
+Plateforme open source de gestion des cours et des évaluations.
+
 Figure 2: Logo MOODLE
-
-• Google Classroom
+•	Google Classroom
 Plateforme éducative permettant le partage de documents et la gestion des cours.
- 
+
 Figure 3: Logo Google Classroom
-• Coursera
+•	Coursera
 Plateforme internationale proposant des formations et certifications en ligne.
- 
+
 Figure 4: Logo Coursera
 
-	Critique de l’existant :
+	Critique de l'existant :
 Les solutions existantes présentent plusieurs limites :
-•	absence de centralisation complète ; 
+•	absence de centralisation complète ;
 •	manque de personnalisation selon le profil de l'utilisateur ;
-•	 absence de gestion avancée des paiements ; 
-•	communication limitée entre les acteurs ; 
-•	absence d'assistant intelligent intégré ; 
+•	absence de gestion avancée des paiements ;
+•	communication limitée entre les acteurs ;
+•	absence d'assistant intelligent intégré ;
 •	suivi pédagogique insuffisant ;
-•	 absence de workflow de validation et d'approbation des formations ; 
-•	impossibilité d'upload de supports pédagogiques multiformat directement intégrée à la plateforme.
+•	absence de workflow de validation et d'approbation des formations ;
+•	impossibilité d'upload de supports pédagogiques multiformat directement intégrée à la plateforme ;
+•	absence de système de quiz de validation et d'attestation de formation ;
+•	absence de gestion des présences des apprenants ;
+•	absence de liste d'attente pour les formations complètes.
 Ces limites justifient la nécessité de développer une nouvelle solution plus adaptée aux besoins des centres de formation professionnelle.
 
 3.	Problématique
 Le processus actuel de gestion des formations présente plusieurs difficultés pour les différents acteurs.
 Pour les administrateurs
 •	gestion manuelle des inscriptions ;
-•	 difficulté de suivi des formations et de leur cycle de vie ;
-•	 absence de statistiques centralisées et de tableau de bord ;
-•	 difficulté de gestion des paiements ;
-•	 absence de processus structuré d'approbation des formations soumises par les formateurs.
+•	difficulté de suivi des formations et de leur cycle de vie ;
+•	absence de statistiques centralisées et de tableau de bord ;
+•	difficulté de gestion des paiements ;
+•	absence de processus structuré d'approbation des formations soumises par les formateurs ;
+•	absence de gestion de la liste d'attente pour les formations complètes.
 Pour les formateurs
-•	difficulté de suivi pédagogique des étudiants ; 
-•	absence d'outils modernes de communication ; 
+•	difficulté de suivi pédagogique des Candidats ISET ;
+•	absence d'outils modernes de communication ;
 •	gestion complexe des séances, modules et supports de cours ;
-•	 absence d'un circuit de soumission et de validation des formations.
-Pour les étudiants
+•	absence d'un circuit de soumission et de validation des formations ;
+•	impossibilité de créer des quiz de validation pour les apprenants ;
+•	gestion manuelle des présences.
+Pour les Candidats ISET
 •	difficulté d'accès aux informations et supports pédagogiques ;
-•	 suivi limité des inscriptions ; absence de communication centralisée ;
-•	 pas d'assistant intelligent pour répondre aux questions fréquentes.
+•	suivi limité des inscriptions ; absence de communication centralisée ;
+•	pas d'assistant intelligent pour répondre aux questions fréquentes ;
+•	absence de suivi de progression par module ;
+•	impossibilité d'obtenir une attestation de formation numérique.
 Pour les utilisateurs externes
-•	difficulté d'inscription aux formations ; 
+•	difficulté d'inscription aux formations ;
 •	absence de paiement en ligne sécurisé ;
-•	 manque d'informations sur les formations disponibles.
+•	manque d'informations sur les formations disponibles ;
+•	absence de suivi de progression et d'attestation après formation.
+
 Solution proposée :
 Notre solution consiste à développer une plateforme web intelligente permettant :
-•	la gestion complète des formations; 
-•	la gestion des utilisateurs ; 
-•	la gestion des modules et des séances ;
-•	la gestion du programme de formation
-•	les inscriptions en ligne avec vérification de la disponibilité des places et filtrage par spécialité ;
-•	le paiement sécurisé via Stripe pour les utilisateurs externes souhaitant s'inscrire à des formations payantes  ; 
-•	le suivi pédagogique des étudiants par les formateurs; 
+•	la gestion complète des formations avec processus d'approbation (draft → pending_approval → accepted → published) et archivage automatique des formations expirées ;
+•	la gestion des utilisateurs avec photo de profil et réinitialisation du mot de passe par email (lien sécurisé via Nodemailer/Gmail SMTP) ;
+•	la gestion des modules, séances et programme de formation ;
+•	les inscriptions en ligne avec approbation par l'administrateur et liste d'attente automatique avec notifications ;
+•	le paiement sécurisé via Stripe (Checkout Sessions + Webhook) pour les utilisateurs externes ;
+•	le suivi des présences par séance avec calcul automatique du taux de présence et alertes ;
+•	la progression pédagogique par module calculée automatiquement via les présences ;
+•	les quiz de validation avec seuil de réussite configurable et nombre de tentatives limité ;
+•	la délivrance d'attestations de formation pour les apprenants éligibles (progression 100% + quiz réussi) ;
 •	la messagerie interne entre les acteurs de la plateforme ;
-•	l’intégration d’un assistant intelligent basé sur l’intelligence artificielle ;
+•	l'intégration d'un assistant intelligent basé sur l'intelligence artificielle ;
 •	un tableau de bord statistique pour l'administrateur.
- 
+
 
 III.	Méthodologie adoptée :
-La méthodologie utilisée pour la réalisation d’un projet représente une étape importante afin d’assurer une bonne organisation du travail et de faciliter le développement des fonctionnalités d’un système logiciel. Il existe plusieurs méthodologies de développement, chacune présentant des avantages et des limites. Le choix de la méthode dépend principalement des besoins du projet ainsi que de l’organisation de l’équipe.
+La méthodologie utilisée pour la réalisation d'un projet représente une étape importante afin d'assurer une bonne organisation du travail et de faciliter le développement des fonctionnalités d'un système logiciel. Il existe plusieurs méthodologies de développement, chacune présentant des avantages et des limites. Le choix de la méthode dépend principalement des besoins du projet ainsi que de l'organisation de l'équipe.
 1.	Méthodologie de travail (Méthode Agile) :
-Afin de répondre aux exigences de notre application, j’ai choisi d’adopter la méthodologie Agile. Cette approche permet une meilleure flexibilité, une adaptation rapide aux changements ainsi qu’une amélioration continue du projet.
-Après avoir adopté le développement Agile, j’ai réalisé une comparaison entre plusieurs méthodes agiles afin de sélectionner la stratégie la plus adaptée à mon projet.
-
+Afin de répondre aux exigences de notre application, j'ai choisi d'adopter la méthodologie Agile. Cette approche permet une meilleure flexibilité, une adaptation rapide aux changements ainsi qu'une amélioration continue du projet.
+Après avoir adopté le développement Agile, j'ai réalisé une comparaison entre plusieurs méthodes agiles afin de sélectionner la stratégie la plus adaptée à mon projet.
 Méthode	Description	Points forts	Limitations
 XP	Une méthode agile qui met l'accent sur la qualité du code et la livraison rapide.	- Code de qualité (tests automatisés).
-- Bonne collaboration.	- Difficile  à  appliquer
+- Bonne collaboration.	- Difficile à appliquer
 - Nécessite une équipe expérimentée
-Kanban	Une méthode agile qui optimise le flux de travail à l’aide de tableaux visuels.	- Visualisation claire.
+Kanban	Une méthode agile qui optimise le flux de travail à l'aide de tableaux visuels.	- Visualisation claire.
 - Flexibilité continue.	- Moins adapté aux équipes distantes.
 - Mise en œuvre complexe.
 Scrum	Un espace de travail qui utilise des sprints pour livrer des fonctionnalités de manière itérative.	- Bonne communication.
 - Livraison rapide.	- Nécessite une gestion de projet rigoureuse
 - Nécessite des rôles bien définis.
 Tableau 1:Une comparaison de méthodes agiles
-
-Après comparaison, j’ai choisi la méthode SCRUM car elle offre une meilleure organisation du travail, une gestion efficace des tâches ainsi qu’un suivi continu et structuré de l’avancement du projet.
+Après comparaison, j'ai choisi la méthode SCRUM car elle offre une meilleure organisation du travail, une gestion efficace des tâches ainsi qu'un suivi continu et structuré de l'avancement du projet.
 2.	SCRUM :
-Scrum c’est un espace de travail comprend les éléments suivants : les 3 piliers, définit les trois rôles et les quatres évènements : 
-Les 3 Piliers de Scrum : 
-
+Scrum est un framework qui comprend les éléments suivants : les 3 piliers, les trois rôles et les cinq évènements :
+Les 3 Piliers de Scrum :
 •	Transparence : Toutes les informations importantes sont visibles par tous les membres et parties prenantes.
-•	Inspection : Le travail est régulièrement contrôlé pour éviter les erreurs et assurer la qualité dès le départ. 
-•	Adaptation : L’équipe ajuste un travail continu grâce à l’expérience et au contexte du projet.
- Les rôles Scrum : 
+•	Inspection : Le travail est régulièrement contrôlé pour éviter les erreurs et assurer la qualité dès le départ.
+•	Adaptation : L'équipe ajuste un travail continu grâce à l'expérience et au contexte du projet.
+ Les rôles Scrum :
 •	Product Owner : Porte la vision du produit, priorise les besoins (backlog) et représente le client
-•	Scrum Master : est le garant de la méthodologie SCRUM. Un pédagogue et diplomate qui assure les équipes en charge des projets adoptent les principes et les valeurs de SCRUM. 
-•	Equipe de développement : se compose idéalement mois de dix employés et responsable de la production des produits demandés par les clients.  
-	Les Evènements SCRUM : 
-•	Le Sprint : Selon le projet, cela peut varier quatre semaines maximum. Il s’agit d’un intervalle de temps appelé itération, pendant lequel l’équipe de développement conçoit, construit et teste de nouvelles fonctionnalités. 
-•	Le Sprint Planning : Planification du travail à réaliser pendant le sprint, en accord avec le Product Owner. 
-•	Le Daily Scrum ou Mêlée : Réunion quotidienne (15 min) pour suivre l’avancement et ajuster si besoin
-•	La Sprint review : Mener à la fin du sprint, elle comprend la présentation des fonctionnalités développées au cours du sprint aux parties prenantes, la collecte de leurs commentaires et l'évaluation de l'avancement global du projet. 
-•	La Sprint Rétrospective : il a pour but d'échanger sur les problématiques méthodologiques ou organisationnelles rencontrées tout au long du sprint, d'en tirer des enseignements et d'en tirer profit pour une amélioration continue collective. 
- 
+•	Scrum Master : est le garant de la méthodologie SCRUM. Un pédagogue et diplomate qui assure les équipes en charge des projets adoptent les principes et les valeurs de SCRUM.
+•	Equipe de développement : se compose idéalement de moins de dix employés et responsable de la production des produits demandés par les clients.
+	Les Evènements SCRUM :
+•	Le Sprint : Selon le projet, cela peut varier quatre semaines maximum. Il s'agit d'un intervalle de temps appelé itération, pendant lequel l'équipe de développement conçoit, construit et teste de nouvelles fonctionnalités.
+•	Le Sprint Planning : Planification du travail à réaliser pendant le sprint, en accord avec le Product Owner.
+•	Le Daily Scrum ou Mêlée : Réunion quotidienne (15 min) pour suivre l'avancement et ajuster si besoin
+•	La Sprint review : Mener à la fin du sprint, elle comprend la présentation des fonctionnalités développées au cours du sprint aux parties prenantes, la collecte de leurs commentaires et l'évaluation de l'avancement global du projet.
+•	La Sprint Rétrospective : il a pour but d'échanger sur les problématiques méthodologiques ou organisationnelles rencontrées tout au long du sprint, d'en tirer des enseignements et d'en tirer profit pour une amélioration continue collective.
+
 Figure 5:Cycle de vie de SCRUM
 
-
-
 IV.	Langage de modélisation (UML) :
-UML se définit comme un langage de modélisation graphique et textuel destiné à comprendre et décrire les besoins, spécifier et documenter les systèmes, concevoir des solutions logicielles et représenter les différents aspects d’un système informatique.
-UML contient plusieurs types de diagrammes permettant de modéliser le fonctionnement et la structure d’une application. Dans le cadre de ce projet, j’ai choisi d’utiliser les diagrammes suivants afin d’expliquer le fonctionnement de la plateforme :
-•	Le diagramme de cas d’utilisation : représente les interactions entre les acteurs et le système ainsi que les différentes fonctionnalités offertes. 
-•	Le diagramme de séquence : illustre les échanges de messages entre les objets dans une séquence temporelle. 
-•	Le diagramme d’activité : modélise le flux des actions et des processus sous forme d’étapes et de transitions. 
+UML se définit comme un langage de modélisation graphique et textuel destiné à comprendre et décrire les besoins, spécifier et documenter les systèmes, concevoir des solutions logicielles et représenter les différents aspects d'un système informatique.
+UML contient plusieurs types de diagrammes permettant de modéliser le fonctionnement et la structure d'une application. Dans le cadre de ce projet, j'ai choisi d'utiliser les diagrammes suivants afin d'expliquer le fonctionnement de la plateforme :
+•	Le diagramme de cas d'utilisation : représente les interactions entre les acteurs et le système ainsi que les différentes fonctionnalités offertes.
+•	Le diagramme de séquence : illustre les échanges de messages entre les objets dans une séquence temporelle.
+•	Le diagramme d'activité : modélise le flux des actions et des processus sous forme d'étapes et de transitions.
 •	Le diagramme de classes : décrit la structure statique du système à travers les classes, les attributs, les méthodes et les relations entre les différentes entités.
- 
+
 Figure 6:Logo UML
 
-V.	Pilotage de projet avec SCRUM :
+V.	Pilotage du projet avec SCRUM :
 1.	Rôles et équipes
 Rôles Scrum	Personnes affectées
-Product Owner	Moi-même
+Product Owner	ISET TOZEUR
 Scrum Master	Mme. HEDFI Souhir
 Team	Moi-même
 Tableau 2: Rôles et équipes
 2.	Identification des acteurs :
-La plateforme de gestion des formations est composée de plusieurs acteurs principaux :
-•	Étudiant
-Utilisateur inscrit sur la plateforme qui peut consulter les formations filtrées par sa spécialité, s'inscrire, suivre sa progression et accéder aux supports pédagogiques.
+La plateforme est composée de quatre acteurs principaux :
+
+•	Candidat ISET
+Étudiant ou enseignant de l'ISET Tozeur (type_candidat : Étudiant ISET ou Enseignant ISET) qui peut consulter le catalogue des formations, s'inscrire, suivre sa progression par module, passer des quiz de validation et télécharger son attestation de formation.
+
 •	Formateur
-Responsable de la création et de la gestion des formations. Il soumet les formations à l'approbation de l'administrateur, publie les supports de cours, gère les modules et les séances, et suit les étudiants. 
+Peut créer et gérer ses propres formations. Il soumet les formations à l'approbation de l'administrateur, publie les supports de cours, gère les modules, les séances et valide les présences des apprenants.
+
 •	Administrateur
-Gestionnaire principal de la plateforme. Il supervise les utilisateurs, valide et publie les formations selon le workflow d'approbation, gère les catégories, consulte les statistiques et assure le bon fonctionnement global du système. 
+Gestionnaire principal de la plateforme. Il peut créer des formations et les assigner à un formateur, supervise les utilisateurs, valide et publie les formations selon le processus d'approbation, approuve les inscriptions et consulte les statistiques globales.
+
 •	Utilisateur externe
-Personne extérieure à l'ISET (professionnel, entreprise, particulier) qui doit d'abord créer un compte et s'authentifier sur la plateforme, puis peut consulter le catalogue et s'inscrire à une formation payante avec paiement sécurisé via Stripe.
+Personne extérieure à l'ISET (professionnel, entreprise, particulier) qui consulte le catalogue, s'inscrit à une formation et effectue un paiement sécurisé via Stripe après approbation de l'administrateur.
+
 3.	Le Backlog du projet
-Le backlog produit regroupe l’ensemble des fonctionnalités de la plateforme, organisées par acteur et par priorité. Il permet de planifier le développement du système de manière structurée et progressive.
+Le backlog produit regroupe l'ensemble des fonctionnalités de la plateforme, organisées par acteur et par priorité.
 
+Administrateur
+Acteur	Je veux	PBI	Priorité
+Administrateur	S'authentifier	PBI 1	Élevée
+Administrateur	Créer les comptes formateurs et les assigner aux formations	PBI 2	Élevée
+Administrateur	Gérer les utilisateurs (consultation + suppression)	PBI 3	Élevée
+Administrateur	Gérer les formations (CRUD complet)	PBI 4	Élevée
+Administrateur	Approuver ou rejeter les formations en attente	PBI 5	Élevée
+Administrateur	Publier les formations acceptées dans le catalogue	PBI 6	Élevée
+Administrateur	Consulter les statistiques du tableau de bord	PBI 7	Moyenne
+Administrateur	Approuver ou rejeter les demandes d'inscription (candidats ISET et externes)	PBI 8	Élevée
+Administrateur	Gérer la liste d'attente globale	PBI 9	Moyenne
+Administrateur	Consulter les paiements des utilisateurs externes	PBI 10	Moyenne
+Administrateur	Gérer les quiz des formations	PBI 11	Élevée
+Tableau 3 : Backlog Administrateur
 
-En tant que	Je veux	PBI	Priorité
-Étudiant	S’inscrire à la plateforme	PBI 1	Élevée
-Étudiant	S’authentifier	PBI 2	Élevée
-Étudiant	Consulter les formations disponibles (filtrées par spécialité)	PBI 3	Élevée
-Étudiant	S’inscrire à une formation	PBI 4	Élevée
-Étudiant	Suivre mes formations inscrites	PBI 5	Moyenne
-Étudiant	Accéder aux supports de cours	PBI 6	Moyenne
-Étudiant	Recevoir des notifications	PBI 7	Moyenne
-Étudiant	Utiliser l'assistant IA pour des questions sur mes formations	PBI 8	Moyenne
-Étudiant	Envoyer et recevoir des messages internes	PBI 9	Faible
-Formateur	S’inscrire à la plateforme	PBI 10	Élevée
-Formateur	S’authentifier	PBI 11	Élevée
-Formateur	Créer des formations	PBI 12	Élevée
-Formateur	Gérer les modules et le programme d'une formation	PBI 13	Élevée
+Formateur
+Acteur	Je veux	PBI	Priorité
+Formateur	S'authentifier	PBI 12	Élevée
+Formateur	Créer une formation complète (programme, modules, séances, supports, quiz) avec photo	PBI 13	Élevée
 Formateur	Soumettre une formation à l'approbation de l'administrateur	PBI 14	Élevée
-Formateur	Uploader des supports pédagogiques (PDF, vidéos, documents)	PBI 15	Élevée
-Formateur	Gérer les séances d'une formation	PBI 16	Élevée
-Formateur	Suivre les étudiants inscrits	PBI 17	Élevée
-Formateur	Évaluer et noter les étudiants	PBI 18	Moyenne
-Formateur	Envoyer et recevoir des messages internes	PBI 19	Faible
-Administrateur	S'authentifier	PBI 20	Élevée
-Administrateur	Gérer les utilisateurs (CRUD)	PBI 21	Élevée
-Administrateur	Gérer les formations (CRUD)	PBI 22	Élevée
-Administrateur	Approuver ou rejeter les formations en attente	PBI 23	Élevée
-Administrateur	Publier les formations acceptées dans le catalogue	PBI 24	Élevée
-Administrateur	Gérer les modules de formation	PBI 25	Élevée
-Administrateur	Consulter les statistiques du tableau de bord	PBI 26	Moyenne
-Administrateur	Gérer les formateurs (CRUD)	PBI 27	Élevée
-Utilisateur externe	S’inscrire à la plateforme	PBI 28
-	Élevée
-Utilisateur externe	S’authentifier	PBI 29	Élevée
-Utilisateur externe	Consulter le catalogue de formations	PBI 30	Élevée
-Utilisateur externe	S'inscrire à une formation payante	PBI 31	Élevée
-Utilisateur externe	Effectuer un paiement Stripe	PBI 32	Élevée
-Tableau 3:Backlog du projet
+Formateur	Valider la présence des étudiants par séance	PBI 15	Élevée
+Formateur	Consulter la liste des inscrits (candidats et externes)	PBI 16	Élevée
+Formateur	Envoyer et recevoir des messages internes	PBI 17	Faible
+Formateur	Réinitialiser mon mot de passe par email	PBI 18	Moyenne
+Tableau 4 : Backlog Formateur
+
+Candidat ISET / Utilisateur externe
+Acteur	Je veux	PBI	Priorité
+Candidat ISET / Externe	S'inscrire à la plateforme	PBI 19	Élevée
+Candidat ISET / Externe	S'authentifier	PBI 20	Élevée
+Candidat ISET / Externe	Consulter le catalogue formations	PBI 21	Élevée
+Candidat ISET / Externe	S'inscrire à une formation (demande en attente d'approbation)	PBI 22	Élevée
+Candidat ISET / Externe	Consulter mes formations inscrites et mes demandes	PBI 23	Moyenne
+Candidat ISET / Externe	Accéder aux supports pédagogiques	PBI 24	Moyenne
+Candidat ISET / Externe	Recevoir des notifications	PBI 25	Moyenne
+Candidat ISET / Externe	Utiliser l'assistant IA pour des questions sur mes formations	PBI 26	Moyenne
+Candidat ISET / Externe	Envoyer et recevoir des messages internes	PBI 27	Faible
+Candidat ISET / Externe	Rejoindre la liste d'attente d'une formation complète	PBI 28	Moyenne
+Candidat ISET / Externe	Consulter mes présences et mon taux de présence	PBI 29	Moyenne
+Candidat ISET / Externe	Suivre ma progression par module	PBI 30	Moyenne
+Candidat ISET / Externe	Passer le quiz de validation d'une formation	PBI 31	Élevée
+Candidat ISET / Externe	Télécharger mon attestation de formation (si éligible)	PBI 32	Élevée
+Candidat ISET / Externe	Modifier mon profil et téléverser ma photo	PBI 33	Faible
+Candidat ISET / Externe	Réinitialiser mon mot de passe par email	PBI 34	Moyenne
+Utilisateur externe	Effectuer un paiement Stripe après approbation admin	PBI 35	Élevée
+Tableau 5 : Backlog Candidat ISET / Utilisateur externe
 
 Conclusion :
-Dans ce chapitre, j'ai présenté le contexte général de mon projet, étudié les solutions existantes et leurs limites, défini la problématique et la solution proposée, puis décrit. Cette présentation sera complétée dans le chapitre suivant intitulé « Sprint 0 », qui détaillera la conception et l'analyse du système à travers les diagrammes UML.
+Dans ce chapitre, j'ai présenté le contexte général de mon projet, étudié les solutions existantes et leurs limites, défini la problématique et la solution proposée, puis décrit la méthodologie SCRUM adoptée. Cette présentation sera complétée dans le chapitre suivant intitulé « Phase de Spécification », qui détaillera la conception et l'analyse du système.
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Chapitre 
-2	   Sprint 0
+Chapitre
+   Phase de Spécification
 
 Introduction
-Dans ce chapitre, je vais me concentrer sur la spécification des besoins de la plateforme web « FormaPro ». J’expliquerai les besoins fonctionnels et non fonctionnels à travers des User Stories, je présenterai la planification des sprints, ainsi que l’environnement de travail utilisé pour le développement de l’application.
+Dans ce chapitre, je vais me concentrer sur la spécification des besoins de la plateforme web « FormaPro ». J'expliquerai les besoins fonctionnels et non fonctionnels à travers des User Stories, je présenterai la planification des sprints, ainsi que l'environnement de travail utilisé pour le développement de l'application.
 
 I.	Spécification des besoins
 1.	Les besoins fonctionnels (User Stories)
-Le tableau ci-dessous présente en détail l'ensemble des exigences fonctionnelles de notre plateforme.
-Acteur	PBI	User Story ID	User Stories
-Étudiant	PBI 1	US1	S'inscrire à la plateforme
-	PBI 2	US2	S'authentifier
-	PBI 3	US3	Consulter le catalogue des formations disponibles
-		US4	Filtrer les formations par spécialité
-	PBI 4	US5	S'inscrire à une formation
-	PBI 5	US6	Consulter mes formations inscrites
-		US7	Consulter mon statut de présence
-	PBI 6	US8	Accéder aux supports pédagogiques
-	PBI 7	US9	Recevoir des notifications
-	PBI 8	US10	Utiliser l'assistant intelligent pour des questions
-	PBI 9	US11	Envoyer et recevoir des messages internes
-Formateur	PBI 10	US12	S'inscrire à la plateforme
-	PBI 11	US13	S'authentifier
-	PBI 12	US14	Créer une formation (brouillon)
-	PBI 13	US15	Ajouter des modules à une formation
-		US16	Définir le programme et les objectifs
-	PBI 14	US17	Soumettre une formation à l'approbation de l'administrateur
-	PBI 15	US18	Uploader des supports pédagogiques (PDF, vidéo, document)
-		US19	Supprimer un support pédagogique
-	PBI 16	US20	Gérer les séances d'une formation
-	PBI 17	US21	Consulter la liste des étudiants inscrits
-		US22	Valider la présence des étudiants
-	PBI 18	US23	Évaluer et noter les étudiants
-	PBI 19	US24	Envoyer et recevoir des messages internes
-Administrateur	PBI 20	US25	S'authentifier
-	PBI 21	US26	Consulter la liste des utilisateurs
-		US27	Filtrer les utilisateurs par rôle et spécialité
-		US28	Supprimer un utilisateur
-	PBI 22	US29	Consulter toutes les formations
-		US30	Créer une formation directement
-		US31	Modifier une formation
-		US32	Supprimer une formation
-	PBI 23	US33	Accepter une formation en attente
-		US34	Rejeter une formation en attente
-	PBI 24	US35	Publier une formation acceptée dans le catalogue
-	PBI 25	US36	Gérer les modules de formation
-	PBI 26	US37	Consulter les statistiques du tableau de bord
-	PBI 27	US38	Créer un compte formateur
-		US39	Modifier un compte formateur
-		US40	Supprimer un compte formateur
-Utilisateur externe	PBI 28	US41	S'inscrire à la plateforme
-	PBI 29	US42	S'authentifier
-	PBI 30	US43	Consulter le catalogue des formations disponibles
-	PBI 31	US44	S'inscrire à une formation payante
-	PBI 32	US45	Effectuer un paiement sécurisé via Stripe
-		US46	Accéder aux supports pédagogiques après paiement
-Tableau 4:Besoins fonctionnels (User Stories)
+Les tableaux suivants présentent en détail l'ensemble des exigences fonctionnelles de la plateforme FormaPro, organisées par acteur : Administrateur, Formateur et Candidat ISET / Utilisateur externe.
+Acteur	PBI	Id	User Stories	Priorité
+Administrateur	PBI 1	US 1	S'authentifier	Élevée
+Administrateur	PBI 2	US 2	Créer un compte formateur	Élevée
+Administrateur	PBI 2	US 3	Modifier un compte formateur	Élevée
+Administrateur	PBI 2	US 4	Supprimer un formateur	Élevée
+Administrateur	PBI 2	US 5	Consulter la liste des formateurs avec leur disponibilité	Élevée
+Administrateur	PBI 3	US 6	Consulter la liste complète des utilisateurs	Élevée
+Administrateur	PBI 3	US 7	Supprimer un utilisateur	Élevée
+Administrateur	PBI 4	US 8	Créer une formation et l'assigner à un formateur	Élevée
+Administrateur	PBI 4	US 9	Modifier une formation	Élevée
+Administrateur	PBI 4	US 10	Supprimer une formation	Élevée
+Administrateur	PBI 4	US 11	Consulter toutes les formations (tous statuts)	Élevée
+Administrateur	PBI 5	US 12	Accepter une formation en attente d'approbation	Élevée
+Administrateur	PBI 5	US 13	Rejeter une formation (avec raison obligatoire)	Élevée
+Administrateur	PBI 6	US 14	Publier une formation acceptée dans le catalogue	Élevée
+Administrateur	PBI 7	US 15	Consulter le tableau de bord statistique	Moyenne
+Administrateur	PBI 8	US 16	Approuver une demande d'inscription	Élevée
+Administrateur	PBI 8	US 17	Rejeter une demande d'inscription	Élevée
+Administrateur	PBI 9	US 18	Consulter la liste d'attente globale	Moyenne
+Administrateur	PBI 9	US 19	Inscrire manuellement un candidat depuis la liste d'attente	Moyenne
+Administrateur	PBI 9	US 20	Retirer un candidat de la liste d'attente	Moyenne
+Administrateur	PBI 10	US 21	Consulter les transactions Stripe des Utilisateurs externes	Moyenne
+Administrateur	PBI 11	US 22	Créer un quiz QCM pour une formation	Élevée
+Administrateur	PBI 11	US 23	Modifier un quiz existant	Élevée
+Administrateur	PBI 11	US 24	Supprimer le quiz d'une formation	Élevée
+Tableau 6 : Besoins fonctionnels (User Stories) — Administrateur (PBI 1–11)
+
+Acteur	PBI	Id	User Stories	Priorité
+Formateur	PBI 12	US 25	S'authentifier avec le compte créé par l'administrateur	Élevée
+Formateur	PBI 13	US 26	Créer une formation (statut draft)	Élevée
+Formateur	PBI 13	US 27	Modifier une formation (statut draft uniquement)	Élevée
+Formateur	PBI 13	US 28	Supprimer une formation non publiée	Élevée
+Formateur	PBI 13	US 29	Gérer le programme pédagogique et les modules	Élevée
+Formateur	PBI 13	US 30	Gérer les séances	Élevée
+Formateur	PBI 13	US 31	Déposer des supports pédagogiques	Élevée
+Formateur	PBI 14	US 32	Soumettre une formation à l'approbation de l'administrateur	Élevée
+Formateur	PBI 15	US 33	Valider la présence par séance	Élevée
+Formateur	PBI 16	US 34	Consulter la liste des Candidats ISET et Utilisateurs externes inscrits	Élevée
+Formateur	PBI 17	US 35	Envoyer et recevoir des messages internes	Faible
+Formateur	PBI 18	US 36	Réinitialiser mon mot de passe par email	Moyenne
+Tableau 7 : Besoins fonctionnels (User Stories) — Formateur (PBI 12–18)
+
+Acteur	PBI	Id	User Stories	Priorité
+Candidat ISET / Utilisateur externe	PBI 19	US 37	S'inscrire	Élevée
+Candidat ISET / Utilisateur externe	PBI 20	US 38	S'authentifier	Élevée
+Candidat ISET / Utilisateur externe	PBI 21	US 39	Consulter le catalogue des formations	Élevée
+Candidat ISET / Utilisateur externe	PBI 21	US 40	Filtrer les formations par spécialité	Élevée
+Candidat ISET / Utilisateur externe	PBI 22	US 41	S'inscrire à une formation (demande soumise à l'approbation admin)	Élevée
+Candidat ISET / Utilisateur externe	PBI 23	US 42	Consulter mes formations confirmées et mes demandes en attente	Moyenne
+Candidat ISET / Utilisateur externe	PBI 24	US 43	Accéder aux supports pédagogiques	Moyenne
+Candidat ISET / Utilisateur externe	PBI 25	US 44	Recevoir des notifications automatiques	Moyenne
+Candidat ISET / Utilisateur externe	PBI 26	US 45	Utiliser l'assistant IA pour des questions sur mes formations	Moyenne
+Candidat ISET / Utilisateur externe	PBI 27	US 46	Envoyer et recevoir des messages internes	Faible
+Candidat ISET / Utilisateur externe	PBI 28	US 47	Rejoindre la liste d'attente d'une formation complète	Moyenne
+Candidat ISET / Utilisateur externe	PBI 28	US 48	Consulter ma position dans la liste d'attente	Moyenne
+Candidat ISET / Utilisateur externe	PBI 28	US 49	Me désinscrire de la liste d'attente	Moyenne
+Candidat ISET / Utilisateur externe	PBI 29	US 50	Consulter mon historique de présence séance par séance	Moyenne
+Candidat ISET / Utilisateur externe	PBI 29	US 51	Consulter mon taux de présence global	Moyenne
+Candidat ISET / Utilisateur externe	PBI 30	US 52	Suivre ma progression par module (non_commencé / en_cours / terminé)	Moyenne
+Candidat ISET / Utilisateur externe	PBI 31	US 53	Passer le quiz de validation d'une formation	Élevée
+Candidat ISET / Utilisateur externe	PBI 31	US 54	Consulter mes résultats du quiz (score, tentatives utilisées et restantes)	Élevée
+Candidat ISET / Utilisateur externe	PBI 32	US 55	Vérifier mon éligibilité à l'attestation (progression 100% + quiz réussi)	Élevée
+Candidat ISET / Utilisateur externe	PBI 32	US 56	Télécharger mon attestation de formation	Élevée
+Candidat ISET / Utilisateur externe	PBI 33	US 57	Modifier mes informations personnelles (nom, email, téléphone, spécialité)	Faible
+Candidat ISET / Utilisateur externe	PBI 33	US 58	Déposer ma photo de profil	Faible
+Candidat ISET / Utilisateur externe	PBI 34	US 59	Réinitialiser mon mot de passe par email	Moyenne
+Utilisateur externe (en plus)	PBI 35	US 60	Effectuer un paiement Stripe après approbation admin	Élevée
+Tableau 8 : Besoins fonctionnels (User Stories) — Candidat ISET / Utilisateur externe (PBI 19–35)
 
 2.	Les besoins non fonctionnels
 Les besoins non fonctionnels influencent de manière indirecte la qualité, la fiabilité et la performance de la plateforme. Les exigences suivantes ont été prises en compte :
@@ -319,13 +342,13 @@ Les besoins non fonctionnels influencent de manière indirecte la qualité, la f
 
 II.	Planification du projet
 Sprint 1	Sprint 2	Sprint 3	Sprint 4
-PBI 1, 2 : Inscription & Authentification	PBI 12 : Créer une formation	PBI 4 : Inscription formation	PBI 9, 19, 24 : Messagerie
-PBI 20 : Auth Administrateur	PBI 13 : Modules & Programme	PBI 28, 29 : Inscription externe	PBI 7 : Notifications
-PBI 21 : Gestion des utilisateurs	PBI 14 : Soumission approbation	PBI 31, 32 : Paiement Stripe	PBI 8 : Assistant IA (Ollama)
-PBI 27 : Gestion des formateurs	PBI 23, 24 : Accepter/Publier	PBI 15 : Supports pédagogiques	PBI 18 : Notation formations
-PBI 26 : Statistiques dashboard	PBI 22 : Gestion formations admin	PBI 17 : Présences étudiants	Questions / Réponses
-Tableau 5:Planification des sprints
-
+Semaines 1–3	Semaines 4–6	Semaines 7–9	Semaines 10–13
+Authentification, inscription, gestion des utilisateurs, des formateurs et réinitialisation mot de passe	Cycle de vie des formations, catalogue, inscription aux formations et consultation des inscrits	Inscriptions approuvées, paiement Stripe, accès aux supports, présences, liste d'attente et progression	Quiz de validation, attestations, messagerie, notifications, profil et assistant IA
+PBI 1, 12, 19, 20 : Authentification et inscription (tous les acteurs)	PBI 4, 5, 6 : Gestion des formations — Admin (CRUD, approbation, publication)	PBI 8, 9, 28 : Gestion des inscriptions et liste d'attente	PBI 11, 31, 32 : Quiz de validation et attestations
+PBI 2, 3 : Gestion des utilisateurs et des formateurs	PBI 13, 14 : Créer et soumettre une formation (Formateur)	PBI 10, 35 : Paiements Stripe	PBI 17, 25, 27 : Messagerie et notifications
+PBI 7 : Tableau de bord statistique	PBI 16 : Consulter les inscrits (Formateur)	PBI 15, 29, 30 : Présences et progression pédagogique	PBI 26 : Assistant IA
+PBI 18, 34 : Réinitialiser le mot de passe	PBI 21, 22, 23 : Catalogue et inscription aux formations	PBI 24 : Accéder aux supports pédagogiques	PBI 33 : Modifier profil et photo
+Tableau 9 : Planification des sprints
 
 
 III.	Environnement de travail
@@ -337,7 +360,7 @@ RAM	16 Go
 Processeur	Intel Core i5
 Disque dur	512 Go SSD
 Système d'exploitation	Windows 11
-Tableau 6 :Caractéristiques de l'ordinateur
+Tableau 10 :configuration de l'ordinateur
 
 2.	Environnement Logiciel
 Logo	Description
@@ -345,30 +368,28 @@ Logo	Description
  	XAMPP est un environnement de développement local incluant Apache, MySQL, PHP, permettant de tester des applications web en local.
  	Éditeur de code open-source développé par Microsoft, supportant Angular, TypeScript et Node.js via des extensions.
  	Outil permettant de tester et documenter les routes de l'API REST, facilitant l'intégration entre le frontend et le backend.
- 	Outil de modélisation UML permettant la conception des diagrammes (cas d'utilisation, classes, séquences, activités).
+	Outil de modélisation UML permettant la conception des diagrammes (cas d'utilisation, classes, séquences, activités).
  	Interface graphique web pour administrer la base de données MySQL et visualiser les tables.
  	Outil en ligne de commande pour générer, développer et builder le projet Angular.
-Tableau 7:Environnement logiciel
-
-
+Tableau 11:Environnement logiciel
 
 
 
 
 3.	SGBD
 Logo	Description
-  	Système de gestion de base de données relationnelle utilisé pour stocker les données des utilisateurs, formations, inscriptions, supports et notifications. La base de données est nommée gestion_formations.
-Tableau 8:SGBD
+  	Système de gestion de base de données relationnelle utilisé pour stocker les données des utilisateurs, formations, inscriptions, supports, présences, quiz, attestations et notifications. La base de données est nommée gestion_formations.
+Tableau 12:SGBD
 
 4.	Langages utilisés
 Logo	Description
  	Langage de programmation typé basé sur JavaScript, utilisé pour développer le frontend Angular et garantir la robustesse du code.
- 
+
 Langage de programmation utilisé côté backend avec Node.js pour la logique métier et les routes API.
  	Langage de structuration des pages web, utilisé dans les templates Angular.
  	Langage de mise en forme des éléments HTML, complété par Bootstrap 5.
  	Langage de requêtes utilisé pour manipuler et interroger la base de données MySQL.
-Tableau 9: Langages utilisés
+Tableau 13: Langages utilisés
 
 
 
@@ -378,237 +399,159 @@ Logo	Description
  	Framework CSS open source permettant un design moderne, responsive et compatible multi-appareils.
  	Environnement d'exécution JavaScript côté serveur, performant et adapté aux applications web grâce à son architecture événementielle.
  	Framework web pour construire des API RESTful avec Node.js. Utilisé pour définir toutes les routes backend de FormaPro.
- 	Middleware Node.js pour la gestion de l'upload de fichiers (PDF, vidéos, documents) avec contrôle du type et de la taille.
- 
-Bibliothèque de paiement en ligne sécurisé utilisée pour la gestion des transactions des utilisateurs externes.
- 
+ 	Middleware Node.js pour la gestion de l'upload de fichiers (PDF, vidéos, documents, images) avec contrôle du type et de la taille.
+
+Bibliothèque de paiement en ligne sécurisé utilisée pour la gestion des transactions des utilisateurs externes via Stripe Checkout Sessions et webhooks de confirmation.
+
+Bibliothèque Node.js pour l'envoi d'emails transactionnels (réinitialisation de mot de passe) via SMTP Gmail.
+
 Outil d'exécution locale de modèles de langage (LLM) utilisé pour intégrer l'assistant intelligent de la plateforme.
-Tableau 10: Frameworks et bibliothèques
+Tableau 14: Frameworks et bibliothèques
 
 Conclusion
-Durant ce chapitre, j’ai mis l’accent sur les besoins fonctionnels et non fonctionnels du projet à travers les différentes User Stories et les PBIs définis pour la plateforme FormaPro. J’ai également présenté la planification des différents sprints ainsi que l’environnement matériel et logiciel utilisé pour le développement de l’application.
+Durant ce chapitre, j'ai mis l'accent sur les besoins fonctionnels et non fonctionnels du projet à travers les différentes User Stories et les PBIs définis pour la plateforme FormaPro. J'ai également présenté la planification des différents sprints ainsi que l'environnement matériel et logiciel utilisé pour le développement de l'application.
 
-Chapitre 
-3	  Sprint 1
+Chapitre
+  Sprint 1
+
 Introduction
 
-Dans ce chapitre, je vais détailler les différentes étapes nécessaires à la réalisation du premier incrément de la plateforme FormaPro. Ce sprint constitue la base du système en mettant en place les fonctionnalités d’inscription, d’authentification ainsi que la gestion des utilisateurs pour les différents acteurs de la plateforme.
+Dans ce chapitre, je vais détailler les différentes étapes nécessaires à la réalisation du premier incrément de la plateforme FormaPro. Ce sprint constitue la base du système en mettant en place les fonctionnalités d'inscription, d'authentification ainsi que la gestion des utilisateurs pour les différents acteurs de la plateforme.
 
 I.	Objectif du Sprint
 
 Les objectifs de ce sprint sont :
 
-•	Inscription des utilisateurs (étudiant, formateur, utilisateur externe).
-•	Authentification sécurisée avec JWT.
-•	Gestion du profil utilisateur.
-•	Gestion des utilisateurs par l'administrateur (CRUD).
-•	Gestion des formateurs par l'administrateur (CRUD).
+•	Inscription des utilisateurs (Candidat ISET, Utilisateur externe).
+•	Authentification sécurisée avec JWT pour tous les rôles (Candidat ISET, Formateur, Utilisateur externe, Administrateur).
+•	Gestion des utilisateurs par l'administrateur (consultation, suppression).
+•	Gestion des formateurs par l'administrateur (CRUD complet + consultation de disponibilité).
 •	Consultation du tableau de bord statistique.
+•	Réinitialisation du mot de passe par email pour tous les rôles (Formateur, Candidat ISET, Utilisateur externe).
 
 II.	Backlog du Sprint
 
 Le tableau suivant décrit en détail les tâches qui seront effectuées pendant ce sprint :
 
-
-
-
-
 Thème	User Stories
-Inscription étudiant	En tant qu'étudiant, je veux créer un compte avec mes informations personnelles (nom, email, mot de passe, spécialité, niveau, CIN, téléphone).
-Inscription formateur	En tant que formateur, je veux créer un compte avec mes informations (nom, email, mot de passe, spécialité, téléphone).
-Inscription externe	En tant qu'utilisateur externe, je veux créer un compte pour pouvoir accéder au catalogue et m'inscrire à des formations payantes.
-Authentification	En tant qu'utilisateur (étudiant, formateur, externe), je veux m'authentifier avec mon email et mot de passe afin d'accéder à mon espace personnel.
-Authentification admin	En tant qu'administrateur, je veux m'authentifier via une page dédiée afin d'accéder au tableau de bord d'administration.
-Gérer mon profil	En tant qu'utilisateur connecté, je veux consulter et modifier mes informations personnelles (nom, email, téléphone, spécialité).
-Changer mot de passe	En tant qu'utilisateur connecté, je veux modifier mon mot de passe en fournissant l'ancien et le nouveau.
-Tableau de bord statistique	En tant qu'administrateur, je veux consulter un tableau de bord affichant les statistiques globales (nombre d'étudiants, formateurs, formations publiées, formations en attente).
-Consulter les utilisateurs	En tant qu'administrateur, je veux consulter la liste des utilisateurs avec filtres par rôle et spécialité.
-Supprimer un utilisateur	En tant qu'administrateur, je veux supprimer un compte utilisateur de la plateforme.
-Créer un formateur	En tant qu'administrateur, je veux créer directement un compte formateur avec ses informations (nom, email, mot de passe, spécialité).
-Modifier un formateur	En tant qu'administrateur, je veux modifier les informations d'un compte formateur existant.
-Supprimer un formateur	En tant qu'administrateur, je veux supprimer un compte formateur de la plateforme.
-Consulter les formateurs	En tant qu'administrateur, je veux consulter la liste des formateurs avec tri et filtrage par spécialité.
+Inscription Candidat ISET	En tant que candidat ISET, je veux créer un compte avec mes informations personnelles (nom, email, mot de passe, spécialité, niveau, CIN, téléphone, type_candidat). Le CIN doit être unique.
+Inscription externe	En tant qu'utilisateur externe, je veux créer un compte (nom, email, mot de passe, téléphone, entreprise) pour pouvoir accéder au catalogue et m'inscrire à des formations.
+Authentification	En tant qu'utilisateur (candidat, formateur, externe), je veux m'authentifier avec mon email et mot de passe. Le système génère un token JWT et retourne l'identifiant du profil (candidatId, formateurId ou externeId).
+Authentification Administrateur	En tant qu'administrateur, je veux m'authentifier via une page dédiée. Le système vérifie que mon rôle est bien « admin » avant d'autoriser l'accès.
+Réinitialisation du mot de passe par email	En tant qu'utilisateur (formateur, candidat ISET ou externe), je veux réinitialiser mon mot de passe via un lien sécurisé envoyé par email. Le lien est valable 1 heure et est invalidé après utilisation.
+Tableau de bord statistique	En tant qu'administrateur, je veux consulter un tableau de bord affichant le nombre total de candidats, formateurs, formations et inscriptions en attente.
+Consulter les utilisateurs	En tant qu'administrateur, je veux consulter la liste complète des utilisateurs avec leur rôle et leur spécialité, avec des filtres par rôle.
+Supprimer un utilisateur	En tant qu'administrateur, je veux supprimer un compte utilisateur. L'opération est bloquée si le compte est un admin ou un formateur ayant des formations actives.
+Créer un compte formateur	En tant qu'administrateur, je veux créer un compte formateur (nom, email, mot de passe, spécialité) afin qu'il puisse se connecter et créer des formations.
+Modifier un compte formateur	En tant qu'administrateur, je veux modifier les informations d'un formateur (nom, email, spécialité).
+Supprimer un formateur	En tant qu'administrateur, je veux supprimer un formateur. L'opération est bloquée si des formations lui sont associées.
+Consulter la disponibilité des formateurs	En tant qu'administrateur, je veux consulter la liste des formateurs avec une indication de leur disponibilité (formation en cours ou non).
 
-Tableau 11: Backlog du Sprint 1
+Tableau 15 : Backlog du Sprint 1
 
 
 Ces fonctionnalités constitueront la base des prochains incréments de développement et permettront d'automatiser et d'optimiser le processus de gestion des formations au sein de l'ISET Tozeur.
 
 III.	Conception
 
-Dans cette section, je vais réaliser les diagrammes de cas d’utilisation, les diagrammes de séquence, les diagrammes d’activité ainsi que le diagramme de classes du Sprint 1.
+Dans cette section, je vais réaliser les diagrammes de cas d'utilisation, les diagrammes de séquence, les diagrammes d'activité ainsi que le diagramme de classes du Sprint 1.
 
 1.	Diagrammes de cas d'utilisation
 
-Je commencerai par présenter le diagramme de cas d’utilisation global du Sprint 1, avant de détailler les différentes fonctionnalités attendues pour chaque acteur lors du raffinement.
+Ce diagramme présente les interactions entre les quatre acteurs (Candidat ISET, Utilisateur externe, Formateur et Administrateur) et les fonctionnalités principales du Sprint 1 : inscription, authentification, réinitialisation du mot de passe, gestion des utilisateurs, gestion des formateurs et consultation du tableau de bord statistique.
 
-Figure 8 : Diagramme de cas d'utilisation global — Sprint 1
-________________________________________
-1.1	Raffinement de cas d'utilisation — Utilisateur (Étudiant / Formateur / Externe)
+Figure 7 : Diagramme de cas d'utilisation global — Sprint 1
 
-Ce diagramme détaille les cas d'utilisation liés à l'inscription, la connexion et la gestion du profil pour les utilisateurs non-admin.
+1.1	Raffinement de cas d'utilisation — Utilisateur (Candidat ISET / Formateur / Externe)
 
-Figure 9 : Raffinement de cas d'utilisation — Utilisateur
-________________________________________
-1.2	Raffinement de cas d'utilisation — Administrateur
+Ce diagramme détaille les cas d'utilisation liés à l'inscription, l'authentification et la réinitialisation du mot de passe pour les utilisateurs non-administrateurs.
 
-Ce diagramme illustre les fonctionnalités accessibles à l'administrateur dans ce sprint : gestion des utilisateurs, gestion des formateurs et consultation des statistiques.
+Figure 8 : Raffinement de cas d'utilisation — Utilisateur
 
-Figure 10 : Raffinement de cas d'utilisation — Administrateur
-________________________________________
-	Scénario du cas d'utilisation « S'inscrire » :
+1.2	Diagramme de cas d'utilisation — Administrateur
+
+Ce diagramme illustre les fonctionnalités accessibles à l'administrateur : gestion des utilisateurs, gestion des formateurs et consultation du tableau de bord statistique.
+
+Figure 9 : Diagramme de cas d'utilisation — Administrateur
+
+	Scénario du cas d'utilisation « S'inscrire » :
 Titre	S'inscrire à la plateforme
-Acteur	Étudiant / Formateur / Utilisateur externe
+Acteur	Candidat ISET / Utilisateur externe
 Objectif	Créer un nouveau compte utilisateur selon son rôle.
 Préconditions	L'utilisateur n'est pas encore inscrit. Il dispose d'une adresse email valide.
-Scénario nominal	1. L'utilisateur accède à la page d'inscription. 
-2. Il sélectionne son rôle (étudiant, formateur, externe). 
+Scénario nominal	1. L'utilisateur accède à la page d'inscription.
+2. Il sélectionne son rôle (Candidat ISET ou Externe).
 3. Le système affiche le formulaire adapté au rôle.
- 4. L'utilisateur remplit ses informations. 
-5. Le système vérifie la validité des données. 
-6. Le système hache le mot de passe avec bcrypt.
- 7. Le système enregistre l'utilisateur et son profil dans la base de données. 
+4. L'utilisateur remplit ses informations.
+5. Le système vérifie la validité des données (email unique, CIN unique pour Candidat ISET).
+6. Le système hache le mot de passe avec bcrypt (10 rounds).
+7. Le système enregistre l'utilisateur dans users et son profil dans la table correspondante.
 8. Le système redirige l'utilisateur vers la page de connexion.
-Scénario alternatif	5a. Si l'email est déjà utilisé, le système affiche un message d'erreur. 
-5b. Si un champ obligatoire est vide, le système affiche le message d'erreur correspondant.
+Scénario alternatif	5a. Si l'email est déjà utilisé, le système affiche un message d'erreur.
+5b. Si le CIN est déjà enregistré (Candidat ISET uniquement), le système affiche un message d'erreur.
+5c. Si un champ obligatoire est vide, le système affiche le message d'erreur correspondant.
 Post-condition	Le compte est créé. L'utilisateur peut se connecter à son espace.
 
-Tableau 12: Scénario du cas d'utilisation « S'inscrire »
+Tableau 16: Scénario du cas d'utilisation « S'inscrire »
 
 
-	Scénario du cas d'utilisation « Gérer les formateurs » :
+	Scénario du cas d'utilisation « S'authentifier » :
 
-Titre	Créer un compte formateur
-Acteur	Administrateur
-Objectif	Ajouter un nouveau formateur directement depuis le dashboard admin.
-Préconditions	L'administrateur est authentifié.
-Scénario nominal	1. L'administrateur accède à la section « Formateurs ». 
-2. Il clique sur « Ajouter un formateur ». 
-3. Le système affiche un formulaire (nom, email, mot de passe, spécialité).
- 4. L'administrateur remplit et soumet le formulaire.
- 5. Le système valide les données.
- 6. Le système crée le compte dans users et le profil dans formateurs. 
-7. Un message de confirmation s'affiche.
-Scénario alternatif	5a. Si l'email existe déjà, le système affiche un message d'erreur.
-Post-condition	Le formateur peut se connecter et créer des formations.
+Titre	S'authentifier sur la plateforme
+Acteur	Candidat ISET / Utilisateur externe / Formateur / Administrateur
+Objectif	Accéder à son espace personnel via email et mot de passe.
+Préconditions	L'utilisateur dispose d'un compte actif.
+Scénario nominal	1. L'utilisateur accède à la page de connexion.
+2. Il saisit son email et son mot de passe.
+3. Le système vérifie les identifiants via bcrypt.
+4. Le système génère un token JWT (expiration 24h).
+5. Le système redirige l'utilisateur vers son dashboard selon son rôle.
+Scénario alternatif	3a. Si les identifiants sont incorrects, un message d'erreur est affiché.
+3b. Si le compte est bloqué (rate limiting), le message « Trop de tentatives » est affiché.
+Post-condition	L'utilisateur est connecté et accède à son espace.
 
-Tableau 13: Scénario du cas d'utilisation « S'inscrire »
+Tableau 17 : Scénario du cas d'utilisation « S'authentifier »
+
+
 
 
 2.	Diagrammes de séquence
-Dans cette partie, je vais présenter les diagrammes de séquence illustrant les interactions entre les acteurs et le système pour les principales fonctionnalités du Sprint 1, notamment l’authentification et l’inscription des utilisateurs.
+Dans cette partie, je vais présenter les diagrammes de séquence illustrant les interactions entre les acteurs et le système pour les principales fonctionnalités du Sprint 1.
 
 2.1	Diagramme de séquence « S'authentifier »
 
-Ce diagramme illustre le processus d'authentification d'un utilisateur dans le système.
-Utilisateur     Page Login     Backend Express     Base de données
-    │               │                │                   │
-    │─Email+Mdp────►│                │                   │
-    │               │─POST /auth/login──────────────────►│
-    │               │                │─SELECT user WHERE─►│
-    │               │                │   email=?          │
-    │               │                │◄──user────────────│
-    │               │                │─bcrypt.compare()   │
-    │               │                │─jwt.sign(payload)  │
-    │               │◄──{token,user}─│                   │
-    │◄──Redirection─│                │                   │
-    │   Dashboard   │                │                   │
-Figure 11 : Diagramme de séquence « S'authentifier »
+Ce diagramme illustre le processus d'authentification d'un utilisateur dans le système : vérification des identifiants, comparaison bcrypt et génération du token JWT.
+
+Figure 10 : Diagramme de séquence « S'authentifier »
 
 2.2	Diagramme de séquence « S'inscrire »
 
-Ce diagramme décrit le processus d'inscription d'un nouveau utilisateur selon son rôle.
+Ce diagramme décrit le processus d'inscription d'un nouveau utilisateur selon son rôle (Candidat ISET ou Utilisateur externe), avec vérification de l'unicité de l'email et du CIN.
 
-Utilisateur     Page Inscription   Backend Express     Base de données
-    │               │                    │                   │
-    │─Choix rôle───►│                    │                   │
-    │─Formulaire────►│                    │                   │
-    │               │─POST /auth/register────────────────────►│
-    │               │                    │─bcrypt.hash(mdp)   │
-    │               │                    │─INSERT INTO users  ├─►│
-    │               │                    │─INSERT INTO        │
-    │               │                    │  [etudiants/       │
-    │               │                    │   formateurs/      │
-    │               │                    │   externes]────────►│
-    │               │◄──{token, user}────│                   │
-    │◄──Redirection─│                    │                   │
-Figure 12 : Diagramme de séquence « S'inscrire »
+Figure 11 : Diagramme de séquence « S'inscrire »
 
-3.	Diagramme d'activité
+3.	Diagrammes d'activité
 
-	Diagramme d'activité « Authentification et redirection »
+	Diagramme d'activité « Réinitialiser le mot de passe »
 
-[Utilisateur saisit email + mot de passe]
-              │
-    [Vérification email en BDD]
-         ┌────┴────┐
-      [Trouvé]  [Non trouvé]
-         │           │
-  [bcrypt.compare]  [Erreur: email incorrect]
-     ┌───┴───┐
-  [Valide] [Invalide]
-     │           │
-  [JWT signé] [Erreur: mot de passe incorrect]
-     │
-  [Vérification rôle]
-  ┌────┬────┬────┬────┐
-[admin][formateur][étudiant][externe]
-  │       │          │         │
-[Dashboard Admin][Dashboard Formateur]...
+Ce diagramme illustre le processus de réinitialisation du mot de passe par email, depuis la saisie de l'adresse email jusqu'à la génération du token sécurisé, l'envoi de l'email et la mise à jour du mot de passe après validation du lien.
 
-Figure 13 : Diagramme d'activité « Authentification et redirection »
+Figure 12 : Diagramme d'activité « Réinitialiser le mot de passe »
 
-1.	Diagramme de classes — Sprint 1
-2.	
-Le diagramme de classe de notre premier sprint est présenté par la figure ci-dessous :
-@startuml Sprint1_Classes
-class User {
-  +id: int
-  +nom: string
-  +email: string
-  +mot_de_passe: string
-  +role: enum
-  +login(): Token
-  +register(): void
-  +updateProfile(): void
-  +changePassword(): void
-}
-class Etudiant {
-  +id: int
-  +user_id: int
-  +specialite: string
-  +niveau: string
-  +cin: string
-  +telephone: string
-}
-class Formateur {
-  +id: int
-  +user_id: int
-  +specialite: string
-  +telephone: string
-}
-class Externe {
-  +id: int
-  +user_id: int
-  +specialite: string
-  +telephone: string
-}
-class Admin {
-  +id: int
-  +user_id: int
-  +manageUsers(): void
-  +manageFormateurs(): void
-  +getStats(): Stats
-}
-User "1" -- "1" Etudiant
-User "1" -- "1" Formateur
-User "1" -- "1" Externe
-User "1" -- "1" Admin
-@enduml
+	Diagramme d'activité « Gérer les formateurs »
+
+Ce diagramme présente le processus de gestion des comptes formateurs par l'administrateur : création, modification et suppression, avec vérification des contraintes métier (email unique, formations associées).
+
+Figure 13 : Diagramme d'activité « Gérer les formateurs »
+
+4.	Diagramme de classes — Sprint 1
+
+Ce diagramme présente la structure statique du système : la classe User comme classe mère et les quatre sous-classes spécialisées liées par héritage, ainsi que la classe PasswordReset.
+
 Figure 14 : Diagramme de classes — Sprint 1
 
 IV.	Réalisation
-Dans cette section, à l’aide des captures d’écran ci-dessous, nous allons montrer les résultats de notre premier sprint de notre projet.
+Dans cette section, à l'aide des captures d'écran ci-dessous, nous allons montrer les résultats de notre premier sprint de notre projet.
 
 1.	Interface d'accueil (Home)
 
@@ -617,7 +560,7 @@ La page d'accueil publique de FormaPro présente la plateforme, ses fonctionnali
 Figure 15 : Interface d'accueil FormaPro
 
 2.	Interface d'inscription
-Cette page permet à l'utilisateur de créer un compte en sélectionnant son rôle. Le formulaire s'adapte dynamiquement selon le rôle choisi (étudiant, formateur ou utilisateur externe) et inclut une validation en temps réel des champs obligatoires.
+Cette page permet à l'utilisateur de créer un compte en sélectionnant son rôle. Le formulaire s'adapte dynamiquement selon le rôle choisi (Candidat ISET ou Utilisateur externe) et inclut une validation en temps réel des champs obligatoires. Pour le rôle Candidat ISET, des champs supplémentaires apparaissent (CIN, niveau, spécialité, type_candidat).
 
 Figure 16 : Interface d'inscription
 
@@ -635,33 +578,33 @@ Figure 18 : Interface connexion administrateur
 
 5.	Interface Dashboard administrateur
 
-Lorsque l'administrateur se connecte, cette interface affiche un aperçu global du système : nombre total d'utilisateurs, de formateurs, de formations publiées et de formations en attente d'approbation. Des boutons d'actions rapides permettent de naviguer directement vers les sections clés.
+Lorsque l'administrateur se connecte, cette interface affiche un aperçu global du système : nombre total de Candidats ISET, de formateurs, de formations publiées, formations en attente d'approbation et inscriptions en attente de traitement. Des boutons d'actions rapides permettent de naviguer directement vers les sections clés.
 
 Figure 19 : Dashboard administrateur
 
 6.	Interface gestion des utilisateurs
-Cette interface permet à l'administrateur de consulter la liste complète des utilisateurs avec filtres par rôle (étudiant, formateur, externe, admin) et par spécialité. La spécialité est récupérée dynamiquement via une requête SQL avec JOIN sur les tables de profils.
+Cette interface permet à l'administrateur de consulter la liste complète des utilisateurs avec filtres par rôle (Candidat ISET, Formateur, Utilisateur externe, Administrateur) et par spécialité. La spécialité est récupérée dynamiquement via une requête SQL avec LEFT JOIN sur les tables de profils (candidats, formateurs, externes).
 
 Figure 20 : Gestion des utilisateurs
 
 7.	Interface gestion des formateurs
 
-Cette interface permet à l'administrateur de créer, modifier et supprimer des comptes formateurs. Elle inclut un système de tri (par nom, email ou spécialité) et de pagination.
+Cette interface permet à l'administrateur de créer, modifier et supprimer des comptes formateurs. Elle affiche également la disponibilité de chaque formateur (formation publiée active en cours) grâce à une requête SQL avec LEFT JOIN conditionnel. La suppression est bloquée si le formateur possède des formations.
 
 Figure 21 : Gestion des formateurs
 
-8.	Interface profil utilisateur
+8.	Interface réinitialisation du mot de passe
 
-Chaque utilisateur peut consulter et modifier ses informations personnelles depuis son espace profil, et changer son mot de passe en fournissant l'ancien mot de passe pour validation.
+L'utilisateur accède au formulaire de réinitialisation depuis la page de connexion. Il saisit son adresse email et reçoit un lien sécurisé valable 1 heure. En cliquant sur le lien, il peut définir un nouveau mot de passe. Le token est supprimé après utilisation pour garantir qu'il ne peut être utilisé qu'une seule fois.
 
-Figure 22 : Interface profil utilisateur
+Figure 22 : Interface réinitialisation du mot de passe
 
 
 V.	Tests
 
 1.	Test — Connexion avec des identifiants incorrects
 
-Lorsque l'utilisateur saisit un email inexistant ou un mot de passe incorrect, le système affiche un message d'erreur précis sans révéler si c'est l'email ou le mot de passe qui est incorrect, pour des raisons de sécurité.
+Lorsque l'utilisateur saisit un email inexistant ou un mot de passe incorrect, le système affiche un message d'erreur précis sans révéler si c'est l'email ou le mot de passe qui est incorrect. Le rate limiting bloque les tentatives après 5 échecs en 1 minute avec le message : « Trop de tentatives. Réessayez dans 1 minute. »
 
 Figure 23 : Test connexion — identifiants incorrects
 
@@ -674,16 +617,871 @@ Figure 24 : Test inscription — email déjà existant
 
 3.	Test — Validation des champs du formulaire
 
-Chaque champ obligatoire du formulaire est validé côté frontend (avec messages d'erreur inline) et côté backend (réponse 400 avec message précis). Les champs date et numériques (durée, places) sont aussi contraints via des attributs HTML (min, type).
+Chaque champ obligatoire du formulaire est validé côté frontend (avec messages d'erreur inline) et côté backend via des schémas Joi (réponse 400 avec message précis).
 
 Figure 25 : Test — validation formulaire
 
 Conclusion
 
-Ce chapitre a permis de mettre en lumière le travail accompli lors du premier sprint de FormaPro, en détaillant les tâches réalisées pour l'inscription, l'authentification et la gestion des utilisateurs. Ce sprint constitue le socle fondateur de la plateforme, sur lequel s'appuieront les fonctionnalités métiers des sprints suivants
+Ce chapitre a permis de mettre en lumière le travail accompli lors du premier sprint de FormaPro, en détaillant les tâches réalisées pour l'inscription, l'authentification et la gestion des utilisateurs. Ce sprint constitue le socle fondateur de la plateforme, sur lequel s'appuieront les fonctionnalités métiers des sprints suivants.
 
 
 
 
- 
+Chapitre 4
+  Sprint 2
 
+Introduction
+
+Ce chapitre présente le deuxième sprint de FormaPro, focalisé sur la création et la gestion des formations par les formateurs, ainsi que sur le processus d'approbation et de publication par les administrateurs. Il inclut la gestion des modules, du programme pédagogique, des séances et des supports pédagogiques. Il intègre également la consultation du catalogue des formations publiées et la soumission des demandes d'inscription par les utilisateurs.
+
+I.	Objectif du Sprint
+Les objectifs de ce sprint sont :
+•	Permettre aux formateurs de créer, modifier et supprimer des formations (statut brouillon) avec photo de couverture.
+•	Permettre la gestion des modules et du programme pédagogique (objectifs, prérequis, description).
+•	Permettre la création et la gestion des séances par formation (date, heure, salle, module associé).
+•	Permettre le dépôt de supports pédagogiques (PDF, vidéo, document, ZIP).
+•	Permettre la mise en place du processus d'approbation des formations (brouillon → en attente d'approbation → acceptée → publiée → archivée).
+•	Permettre à l'administrateur de gérer les formations (ajout, consultation, modification, suppression avec notifications automatiques).
+•	Permettre à l'administrateur de définir le nombre de places, le prix et les dates lors de la publication d'une formation acceptée.
+•	Permettre l'archivage automatique des formations expirées.
+•	Permettre aux formateurs de consulter la liste des Candidats ISET et Utilisateurs externes inscrits à leurs formations.
+•	Permettre aux utilisateurs de consulter le catalogue des formations publiées avec filtres par spécialité.
+•	Permettre aux Candidats ISET et Utilisateurs externes de soumettre une demande d'inscription à une formation publiée.
+•	Permettre aux utilisateurs de consulter leurs formations inscrites et leurs demandes en attente.
+
+II.	Backlog du sprint
+
+Thème	User Stories
+Créer une formation (Formateur)	En tant que formateur, je veux créer une formation avec titre, description, spécialité (récupérée automatiquement depuis mon profil), photo de couverture, modules, programme, supports pédagogiques (PDF, vidéo, document, ZIP, image ou lien URL) et quiz. La formation est enregistrée au statut brouillon.
+Modifier une formation (Formateur)	En tant que formateur, je veux modifier ma formation uniquement si son statut est brouillon. Toute tentative de modification d'une formation publiée est bloquée.
+Supprimer une formation (Formateur)	En tant que formateur, je veux supprimer ma formation uniquement si elle est au statut brouillon. Une fois soumise à l'administrateur, la suppression est bloquée.
+Gérer les modules et le programme	En tant que formateur, je veux ajouter, modifier et supprimer les modules et le programme pédagogique de ma formation tant qu'elle est au statut brouillon, avant de la soumettre à l'administrateur.
+Déposer des supports pédagogiques	En tant que formateur, je veux déposer des supports (PDF, vidéo, document, ZIP, image) ou saisir des liens URL, aussi bien lors de la création de la formation (statut brouillon) que lorsqu'elle est en cours (statut publiée), si de nouveaux supports sont nécessaires.
+Soumettre à l'approbation	En tant que formateur, je veux soumettre ma formation à l'approbation. Le statut passe à en attente d'approbation et une notification est envoyée à l'administrateur.
+Consulter la liste des inscrits (Formateur)	En tant que formateur, je veux consulter la liste des Candidats ISET et des Utilisateurs externes inscrits à mes formations, avec leur nom, leur rôle et leur statut d'inscription.
+Créer et assigner une formation (Admin)	En tant qu'administrateur, je veux créer une formation complète (titre, description, spécialité automatique depuis le formateur assigné, photo, modules, programme, supports pédagogiques, quiz, nombre de places, dates, séances) et l'assigner directement à un formateur.
+Modifier une formation (Admin)	L'administrateur peut modifier une formation quel que soit son statut, tant qu'elle n'est pas encore publiée.
+Supprimer une formation (Admin)	L'administrateur peut supprimer une formation tant qu'elle n'est pas encore publiée.
+Accepter une formation	En tant qu'administrateur, je veux accepter une formation en attente d'approbation. Le formateur reçoit une notification d'acceptation.
+Rejeter une formation	En tant qu'administrateur, je veux rejeter une formation en fournissant une raison obligatoire. La formation repasse au statut brouillon et le formateur reçoit une notification avec la raison du rejet.
+Publier une formation	En tant qu'administrateur, je veux publier une formation acceptée en définissant le nombre de places, les dates, les prix et les séances. La formation devient visible dans le catalogue.
+Planifier les séances	En tant qu'administrateur, je veux créer, modifier et supprimer les séances d'une formation (date, heure, salle, module associé).
+Consulter toutes les formations	En tant qu'administrateur, je veux voir toutes les formations (tous statuts). Les formations expirées sont archivées automatiquement.
+Consulter le catalogue des formations	En tant que Candidat ISET ou Utilisateur externe, je veux consulter le catalogue des formations publiées et filtrer par spécialité. Chaque formation affiche le titre, le formateur, la spécialité, le prix et la date de début.
+S'inscrire à une formation	En tant que Candidat ISET ou Utilisateur externe, je veux m'inscrire à une formation publiée. Le système vérifie la disponibilité des places. La demande est enregistrée au statut en attente d'approbation de l'administrateur.
+Consulter mes formations inscrites	En tant que Candidat ISET ou Utilisateur externe, je veux consulter mes formations confirmées et mes demandes en attente avec leur statut actuel.
+
+Tableau 18 : Backlog du sprint
+
+III.	Conception
+
+	Processus de cycle de vie des formations
+
+Le cycle de vie d'une formation suit les statuts suivants :
+•	Brouillon : Formation créée par le formateur ou l'admin, non encore soumise. Modifiable et supprimable uniquement à ce statut.
+•	En attente d'approbation : Formation soumise par le formateur, en attente de validation par l'admin.
+•	Acceptée : Formation acceptée par l'admin, en attente de publication avec définition des dates, prix, places et séances.
+•	Publiée : Formation publiée et visible dans le catalogue pour inscription.
+•	Archivée : Formation dont la date de fin est dépassée (archivage automatique côté)
+
+1.	Diagrammes de cas d'utilisation
+
+1.1	Diagramme de cas d'utilisation global — Sprint 2
+
+Ce diagramme présente les interactions entre les quatre acteurs (Formateur, Administrateur, Candidat ISET et Utilisateur externe) et les fonctionnalités principales du Sprint 2 : création et gestion des formations, processus d'approbation et de publication, consultation du catalogue et soumission des demandes d'inscription.
+
+Figure 26 : Diagramme de cas d'utilisation global — Sprint 2
+
+1.2	Diagramme de cas d'utilisation — Formateur
+
+Ce diagramme détaille les cas d'utilisation liés à la gestion des formations, aux modules, aux supports pédagogiques et à la soumission pour le formateur.
+
+Figure 27 : Diagramme de cas d'utilisation — Formateur
+
+1.3	Diagramme de cas d'utilisation — Administrateur
+
+Ce diagramme illustre les cas d'utilisation de gestion des formations et du processus d'approbation pour l'administrateur.
+
+Figure 28 : Diagramme de cas d'utilisation — Administrateur
+
+1.4	Diagramme de cas d'utilisation — Candidat ISET / Utilisateur externe
+
+Ce diagramme présente les cas d'utilisation liés à la consultation du catalogue des formations, à l'inscription et à la consultation des formations inscrites.
+
+Figure 29 : Diagramme de cas d'utilisation — Candidat ISET / Utilisateur externe
+
+	Scénario "Créer une formation" :
+
+Titre	Créer une formation
+Acteur	Formateur
+Objectif	Créer une nouvelle formation et l'enregistrer au statut brouillon
+Préconditions	Le formateur est authentifié. Il dispose d'un compte actif créé par l'administrateur.
+Scénario nominal	1. Le formateur accède à la section « Mes formations ».
+2. Il clique sur « Créer une formation ».
+3. Le système récupère automatiquement la spécialité depuis son profil.
+4. Le formateur renseigne le titre, la description et la photo de couverture.
+5. Il ajoute les modules et définit le programme pédagogique.
+6. Il dépose les supports pédagogiques (PDF, vidéo, document, ZIP, image ou lien URL).
+7. Il soumet le formulaire.
+8. Le système vérifie les données et enregistre la formation au statut brouillon.
+9. La formation apparaît dans la liste « Mes formations »
+Scénarios alternatifs	5a. Si un champ obligatoire est vide → message d'erreur
+5b. Si la photo dépasse la taille autorisée → message d'erreur
+Post-condition	La formation est créée au statut brouillon et visible dans l'espace formateur
+
+Tableau 19 : Scénario "Créer une formation"
+
+	Scénario "Soumettre à l'approbation" :
+
+Titre	Soumettre une formation à l'approbation
+Acteur	Formateur
+Objectif	Soumettre une formation complète à l'administrateur pour validation
+Préconditions	Le formateur est authentifié. La formation est au statut brouillon.
+Scénario nominal	1. Le formateur accède à sa formation.
+2. Il clique sur "Soumettre à l'approbation".
+3. Le système vérifie que la formation contient modules, programme, quiz et supports.
+4. Le statut passe à "en attente d'approbation".
+5. Une notification est envoyée à tous les admins.
+6. Un message de confirmation s'affiche.
+Scénarios alternatifs	3a. Si le contenu est incomplet → erreur 400, soumission bloquée, statut reste brouillon
+Post-condition	La formation est en attente d'approbation. Les admins sont notifiés.
+
+Tableau 20 : Scénario "Soumettre à l'approbation"
+
+2.	Diagrammes de séquence
+
+2.1	Diagramme de séquence « Créer une formation »
+
+Ce diagramme illustre les interactions entre le formateur, l'interface et le système lors de la création et de l'enregistrement d'une formation au statut brouillon.
+
+Figure 30 : Diagramme de séquence « Créer une formation »
+
+2.2	Diagramme de séquence « Processus d'approbation »
+
+Ce diagramme illustre le processus de soumission d'une formation par le formateur et son traitement par l'administrateur : acceptation ou rejet avec notification, puis publication avec définition des places, prix, dates, et séances.
+
+Figure 31 : Diagramme de séquence « Processus d'approbation »
+
+2.3	Diagramme de séquence « Soumettre une demande d'inscription »
+
+Ce diagramme illustre le processus de consultation du catalogue par le Candidat ISET ou l'Utilisateur externe, la sélection d'une formation, la vérification des places disponibles et l'enregistrement de la demande d'inscription au statut en attente d'approbation avec notification à l'administrateur.
+
+Figure 32 : Diagramme de séquence « Soumettre une demande d'inscription »
+
+3.	Diagramme d'activité
+
+Ce diagramme présente le processus de publication d'une formation acceptée : définition du nombre de places, des dates et des séances par l'administrateur, puis mise en ligne dans le catalogue avec notification au formateur.
+
+Figure 33 : Diagramme d'activité — Publier une formation
+
+4.	Diagramme de classes
+
+Ce diagramme présente la structure statique des entités du Sprint 2 : Formation, Module, Programme, Seance, Support, Quiz, Question, DemandeInscription et leurs relations. La classe Formation est au centre du modèle, liée aux modules, aux séances, aux supports pédagogiques et au quiz de validation.
+
+Figure 34 : Diagramme de classes Sprint 2
+
+IV.	Réalisation
+
+1.	Interface création de formation (formateur)
+
+La création d'une formation est organisée en quatre étapes successives :
+
+Étape 1 — Informations générales
+Le formateur renseigne le titre, la description et la photo de couverture. La spécialité est récupérée automatiquement depuis son profil.
+
+Figure 35 : Interface création de formation — Étape 1 : Informations générales
+
+Étape 2 — Modules et programme pédagogique
+Le formateur ajoute les modules (titre, description, durée, ordre) et définit le programme pédagogique (objectifs, prérequis, description globale).
+
+Figure 36 : Interface création de formation — Étape 2 : Modules et programme
+
+Étape 3 — Supports pédagogiques
+Le formateur dépose des fichiers (PDF, vidéo, document, ZIP, image) ou saisit des liens URL. Chaque support peut être supprimé individuellement.
+
+Figure 37 : Interface création de formation — Étape 3 : Supports pédagogiques
+
+Étape 4 — Quiz de validation
+Le formateur configure le quiz associé à la formation en définissant le seuil de réussite et le nombre maximum de tentatives. Une fois toutes les étapes complétées, la formation est enregistrée au statut brouillon.
+
+Figure 38 : Interface création de formation — Étape 4 : Quiz de validation
+
+2.	Interface soumission de formation
+
+Lorsque le formateur a terminé de configurer sa formation, il peut la soumettre à l'approbation depuis cette interface. Le système vérifie que la formation contient au moins un module avant d'autoriser la soumission. Le statut passe à en attente d'approbation et une notification est envoyée à l'administrateur.
+
+Figure 39 : Interface soumission de formation
+
+3.	Interface gestion des formations (admin)
+
+L'administrateur dispose d'une vue complète de toutes les formations, tous statuts confondus. Les formations archivées apparaissent en bas de liste avec un badge distinctif. Il peut créer, modifier, supprimer une formation et consulter ses détails complets (modules, programme, séances, supports).
+
+Figure 40 : Interface gestion des formations (admin)
+
+4.	Interface approbation des formations (admin)
+
+Cette interface affiche les formations en attente d'approbation. L'administrateur peut accepter une formation (statut → acceptée) ou la rejeter en saisissant une raison obligatoire (statut → brouillon). Une notification est envoyée au formateur dans les deux cas.
+
+Figure 41 : Interface approbation des formations (admin)
+
+5.	Interface publication des formations (admin)
+
+Pour les formations acceptées, l'administrateur peut les publier en définissant la date de début, la date de fin (optionnelle), le prix et le nombre de places disponibles. Il planifie également les séances (module, salle, date, durée). Une fois publiées, les formations sont visibles dans le catalogue. Le formateur reçoit une notification de publication.
+
+Figure 42 : Interface publication des formations (admin)
+
+V.	Tests
+
+1.	Test — Soumission sans module
+
+Si le formateur tente de soumettre une formation sans aucun module, le backend retourne une erreur 400 : « Vous devez ajouter au moins un module avant de soumettre la formation. »
+
+Figure 43 : Test — soumission sans module
+
+2.	Test — Modification formation publiée
+
+Si le formateur tente de modifier une formation publiée, le système retourne une erreur 403 : « Impossible de modifier une formation publiée. Contactez l'administrateur. »
+
+Figure 44 : Test — modification formation publiée
+
+3.	Test — Archivage automatique
+
+Les formations dont la date de fin est dépassée sont automatiquement basculées au statut archivée lors de chaque consultation de la liste admin. Elles apparaissent en bas de liste avec un badge « Archivée ».
+
+Figure 45 : Test — archivage automatique
+
+Conclusion
+
+Ce sprint a permis d'implémenter la gestion complète du cycle de vie des formations, depuis la création par le formateur (brouillon) jusqu'à la publication dans le catalogue par l'administrateur. Le workflow en cinq statuts (brouillon → en attente d'approbation → acceptée → publiée → archivée) assure un contrôle qualité rigoureux. Les notifications automatiques à chaque étape garantissent une communication fluide entre formateurs et administrateurs.
+
+
+
+
+Chapitre 5
+  Sprint 3
+
+Introduction
+
+Ce chapitre présente le troisième sprint de FormaPro, dédié au traitement des demandes d'inscription par l'administrateur, au paiement sécurisé via Stripe pour les Utilisateurs externes, à la gestion de la liste d'attente, à la validation des présences par le formateur et à la progression pédagogique automatique par module.
+
+I.	Objectif du Sprint
+Les objectifs de ce sprint sont :
+•	Permettre à l'administrateur d'approuver ou rejeter les demandes d'inscription des Candidats ISET et des Utilisateurs externes.
+•	Permettre aux Utilisateurs externes de payer via Stripe Checkout après approbation de l'administrateur.
+•	Mettre en place la liste d'attente pour les formations complètes avec notification automatique lors d'une libération de place.
+•	Permettre la validation des présences par séance par le formateur (présent / absent / excusé).
+•	Calculer automatiquement la progression par module en fonction des présences validées.
+•	Permettre l'accès aux supports pédagogiques au Candidat ISET dès approbation de son inscription, et à l'Utilisateur externe uniquement après paiement confirmé.
+
+II.	Backlog du sprint
+
+Thème	User Stories
+Liste d'attente (Candidat ISET / Utilisateur externe)	En tant que Candidat ISET ou Utilisateur externe, je veux rejoindre la liste d'attente d'une formation complète. Le système vérifie qu'il n'y a plus de place disponible avant l'ajout. Je peux consulter ma position dans la file et me désinscrire à tout moment.
+Désinscription liste d'attente	En tant que Candidat ISET ou Utilisateur externe, je veux me retirer de la liste d'attente. Quand une place se libère, la première personne de la file reçoit automatiquement une notification.
+Inscription Utilisateur externe	En tant qu'Utilisateur externe, je veux soumettre une demande d'inscription à une formation (statut en_attente). Le paiement n'est accessible qu'après approbation explicite par l'admin.
+Paiement Stripe (Utilisateur externe)	En tant qu'Utilisateur externe dont la demande est approuvée, je veux payer via Stripe Checkout Session. La confirmation est traitée par webhook (HMAC-SHA256) et par vérification de session de retour. Le statut passe à payé/confirmé et une notification est envoyée.
+Approbation des inscriptions (Admin)	En tant qu'Administrateur, je veux approuver ou rejeter les demandes d'inscription. Pour les Candidats ISET, l'approbation confirme directement l'inscription. Pour les Utilisateurs externes, l'approbation déclenche le paiement Stripe obligatoire. Une notification est envoyée dans tous les cas.
+Gestion liste d'attente (Admin)	En tant qu'Administrateur, je veux consulter la liste d'attente par formation (Candidats ISET et Utilisateurs externes confondus), inscrire manuellement un utilisateur depuis la file (avec notification) ou le retirer.
+Progression par module (Candidat ISET / Utilisateur externe)	En tant que Candidat ISET ou Utilisateur externe inscrit à une formation, je veux consulter ma progression par module (non_commencé / en_cours / terminé), calculée automatiquement selon mes présences validées par le formateur.
+Validation des présences (Formateur)	En tant que Formateur, je veux valider le statut de présence de chaque Candidat ISET par séance (présent/absent/excusé). Le système recalcule automatiquement la progression du module rattaché.
+Accès aux supports pédagogiques (Candidat ISET / Utilisateur externe)	En tant que Candidat ISET, j'accède aux supports dès que mon inscription est approuvée. En tant qu'Utilisateur externe, j'y accède uniquement après paiement confirmé (statut payé).
+Consultation des paiements (Admin)	En tant qu'Administrateur, je veux consulter la liste complète des transactions (nom, formation, montant, statut paiement, référence Stripe, date).
+
+Tableau 21 : Backlog du Sprint 3
+
+III.	Conception
+
+	Processus d'inscription et de paiement
+
+•	En attente : Demande soumise par le Candidat ISET ou l'Utilisateur externe, en attente de validation par l'administrateur.
+•	Approuvée : Pour les Candidats ISET, l'inscription est confirmée directement. Pour les Utilisateurs externes, le paiement Stripe est obligatoirement déclenché.
+•	Payée : Paiement Stripe confirmé par webhook et vérification de session.
+•	Rejetée : Demande refusée par l'administrateur avec notification au demandeur.
+•	Liste d'attente : Formation complète — le candidat (ISET ou externe) est mis en file d'attente et notifié dès qu'une place se libère.
+
+1.	Diagrammes de cas d'utilisation
+
+1.1	Diagramme de cas d'utilisation global — Sprint 3
+
+Ce diagramme présente les interactions entre les cinq acteurs (Administrateur, Formateur, Utilisateur, Candidat ISET et Utilisateur externe) et les fonctionnalités principales du Sprint 3 : inscription à une formation, rejoindre la liste d'attente, paiement Stripe, validation des présences, suivi de progression et gestion administrative des demandes et paiements.
+
+Figure 46 : Diagramme de cas d'utilisation global — Sprint 3
+
+1.2	Diagramme de cas d'utilisation — Administrateur
+
+Ce diagramme illustre les cas d'utilisation d'approbation des inscriptions, de gestion de la liste d'attente et de consultation des paiements pour l'administrateur.
+
+Figure 47 : Diagramme de cas d'utilisation — Administrateur
+
+1.3	Diagramme de cas d'utilisation — Formateur
+
+Ce diagramme présente les cas d'utilisation liés à la validation des présences par séance et au suivi de la progression pédagogique par module.
+
+Figure 48 : Diagramme de cas d'utilisation — Formateur
+
+1.4	Diagramme de cas d'utilisation — Candidat ISET / Externe
+
+Ce diagramme détaille les cas d'utilisation liés à l'inscription, la liste d'attente, le paiement Stripe, l'accès aux supports pédagogiques et la consultation des présences.
+
+Figure 49 : Diagramme de cas d'utilisation — Candidat ISET / Externe
+
+	Scénario "Approbation d'une demande d'inscription" :
+
+Titre	Approbation d'une demande d'inscription
+Acteur	Administrateur
+Objectif	Traiter une demande d'inscription en attente et notifier le candidat
+Préconditions	L'administrateur est authentifié. Une demande d'inscription est au statut en attente.
+Scénario nominal	1. L'administrateur accède à la liste des demandes en attente.
+2. Il sélectionne une demande et consulte les détails (candidat, formation, statut).
+3. Il clique sur « Approuver ».
+4. Pour un Candidat ISET → statut passe à approuvée, inscription confirmée directement.
+5. Pour un Utilisateur externe → statut passe à approuvée, paiement Stripe obligatoire débloqué.
+6. Une notification est envoyée au candidat.
+Scénarios alternatifs	3a. L'administrateur rejette la demande → statut passe à rejetée, notification envoyée avec la raison.
+Post-condition	La demande est traitée. Le candidat est notifié du résultat.
+
+Tableau 22 : Scénario "Approbation d'une demande d'inscription"
+
+	Scénario "Paiement Stripe" :
+
+Titre	Paiement Stripe
+Acteur	Utilisateur externe
+Objectif	Procéder au paiement Stripe après approbation de l'administrateur
+Préconditions	L'Utilisateur externe est authentifié. Sa demande d'inscription est au statut approuvée.
+Scénario nominal	1. L'Utilisateur externe accède à ses demandes et voit le bouton « Payer maintenant ».
+2. Il clique sur le bouton — le système crée une session Stripe Checkout.
+3. Il est redirigé vers la page de paiement Stripe et saisit ses informations bancaires.
+4. Stripe confirme le paiement par webhook .
+5. Le backend vérifie également la session de retour.
+6. Le statut passe à payé/confirmé et une notification de confirmation est envoyée.
+7. L'accès aux supports pédagogiques est débloqué.
+Scénarios alternatifs	4a. Si le paiement échoue → statut reste approuvée, notification d'échec envoyée.
+Post-condition	L'inscription est confirmée et payée. L'Utilisateur externe accède aux supports pédagogiques.
+
+Tableau 23 : Scénario "Paiement Stripe"
+
+2.	Diagramme de séquence
+
+2.1	Diagramme de séquence « Inscription et paiement Stripe »
+
+Ce diagramme illustre le processus complet de demande d'inscription, d'approbation par l'administrateur, de lancement de la session Stripe Checkout et de double confirmation du paiement (webhook + vérification de session de retour).
+
+Figure 50 : Diagramme de séquence « Inscription et paiement Stripe »
+
+2.2	Diagramme de séquence « Validation des présences »
+
+Ce diagramme illustre le processus de validation de présence par le formateur pour chaque séance et le recalcul automatique de la progression par module.
+
+Figure 51 : Diagramme de séquence « Validation des présences »
+
+3.	Diagramme d'activité
+
+Ce diagramme illustre le processus de calcul automatique de la progression par module : après validation des présences par le formateur, le système détermine le statut de chaque module (non_commencé / en_cours / terminé) que le candidat peut ensuite consulter.
+
+Figure 52 : Diagramme d'activité — Suivre la progression par module
+
+4.	Diagramme de classes
+
+Ce diagramme présente la structure statique des entités essentielles du Sprint 3 : DemandeInscription (statuts : en_attente / approuvée / rejetée / liste_attente / payée), ListeAttente, Paiement (intégration Stripe), Presence (statut : présent / absent / excusé) et Progression (statut_module : non_commencé / en_cours / terminé), liées aux acteurs Candidat, CandidatISET, Externe, Formateur et Admin.
+
+Figure 53 : Diagramme de classes Sprint 3
+
+IV.	Réalisation
+
+1.	Interface catalogue des formations (candidat / externe)
+
+Le candidat ISET et l'Utilisateur externe consultent la liste des formations publiées. Chaque formation affiche le titre, la description, le prix, le nombre de places disponibles et les dates. Un bouton « S'inscrire » ou « Rejoindre la liste d'attente » s'affiche selon la disponibilité des places.
+
+Figure 54 : Interface catalogue des formations (candidat / externe)
+
+2.	Interface demande d'inscription (candidat)
+
+Le candidat soumet une demande d'inscription à une formation depuis le catalogue. La demande est enregistrée au statut en_attente et une notification est envoyée à l'administrateur. Le candidat peut suivre l'état de sa demande depuis son espace personnel.
+
+Figure 55 : Interface demande d'inscription (candidat)
+
+3.	Interface liste d'attente (candidat)
+
+Lorsqu'une formation est complète, le candidat peut rejoindre la liste d'attente. Il consulte sa position dans la file et peut se désinscrire à tout moment. Il reçoit une notification automatique dès qu'une place se libère.
+
+Figure 56 : Interface liste d'attente (candidat)
+
+4.	Interface paiement Stripe (utilisateur externe)
+
+Après approbation de sa demande par l'administrateur, l'Utilisateur externe voit apparaître un bouton « Payer maintenant ». Ce bouton lance une session Stripe Checkout. Après paiement réussi confirmé par webhook, le statut passe à payé et l'accès aux supports pédagogiques est débloqué.
+
+Figure 57 : Interface paiement Stripe (utilisateur externe)
+
+5.	Interface approbation des inscriptions (admin)
+
+L'administrateur consulte toutes les demandes d'inscription en attente. Il peut approuver ou rejeter chaque demande. Pour les Candidats ISET, l'approbation confirme directement l'inscription. Pour les Utilisateurs externes, l'approbation déclenche le paiement Stripe obligatoire. Une notification est envoyée au candidat dans les deux cas.
+
+Figure 58 : Interface approbation des inscriptions (admin)
+
+6.	Interface validation des présences (formateur)
+
+Pour chaque séance, le formateur sélectionne le statut de présence (présent / absent / excusé) pour chaque Candidat ISET inscrit. Une fois les présences validées, le système recalcule automatiquement la progression par module.
+
+Figure 59 : Interface validation des présences (formateur)
+
+7.	Interface présences (candidat)
+
+Le candidat consulte son historique de présence par séance pour chaque formation inscrite, son taux de présence global et sa progression par module (non_commencé / en_cours / terminé).
+
+Figure 60 : Interface présences (candidat)
+
+8.	Interface liste d'attente et paiements (admin)
+
+L'administrateur consulte la liste d'attente globale par formation. Il peut inscrire manuellement un candidat depuis la file (avec notification automatique) ou le retirer. Il accède également à la liste complète des transactions Stripe avec statut, montant, référence et date de paiement.
+
+Figure 61 : Interface liste d'attente et paiements (admin)
+
+V.	Tests
+
+1.	Test — Inscription double formation
+
+Si un Candidat ISET est déjà inscrit à une formation en cours, le système refuse toute nouvelle inscription : « Vous êtes déjà inscrit à une formation en cours. Attendez sa fin pour vous inscrire à une autre. »
+
+Figure 62 : Test — inscription double
+
+2.	Test — Formation complète → liste d'attente
+
+Quand une formation est complète, le bouton d'inscription est remplacé par « Rejoindre la liste d'attente ». Le candidat est informé de sa position dans la file.
+
+Figure 63 : Test — liste d'attente automatique
+
+3.	Test — Confirmation paiement Stripe
+
+Après un paiement réussi, le backend vérifie la session Stripe et le statut passe à payé. L'utilisateur reçoit une notification de confirmation avec le montant.
+
+Figure 64 : Test — confirmation paiement Stripe
+
+4.	Test — Accès supports sans paiement
+
+Si un Utilisateur externe tente d'accéder aux supports sans paiement confirmé, le backend retourne une erreur 403 : « Accès refusé : paiement requis. »
+
+Figure 65 : Test — accès refusé supports
+
+Conclusion
+
+Ce sprint a permis d'implémenter les fonctionnalités d'inscription avec approbation admin, de paiement sécurisé Stripe et de gestion des présences. Le système de liste d'attente automatique garantit un remplissage optimal des formations. La progression par module est calculée automatiquement à partir des présences, offrant un suivi pédagogique transparent et en temps réel.
+
+
+
+
+Chapitre
+  Sprint 4
+
+Introduction
+Ce dernier sprint de développement finalise la plateforme FormaPro avec les fonctionnalités avancées : quiz de validation des formations, système d'attestation numérique, modification du profil et photo de profil, messagerie interne, système de notifications enrichi et assistant IA.
+
+I.	Objectif du Sprint
+Les objectifs de ce sprint sont :
+•	Implémenter un système de quiz de validation (QCM) avec seuil de réussite et nombre de tentatives configurables.
+•	Vérifier l'éligibilité à l'attestation (progression 100% + quiz réussi) et permettre son téléchargement.
+•	Permettre aux utilisateurs de modifier leurs informations personnelles et déposer une photo de profil.
+•	Implémenter la messagerie interne entre tous les acteurs.
+•	Enrichir le système de notifications automatiques couvrant tous les événements de la plateforme.
+•	Intégrer l'assistant IA pour des réponses contextualisées sur les formations et la progression.
+
+II.	Backlog du sprint
+
+PBI	Thème	User Stories
+PBI 11	Gérer les quiz des formations	En tant que formateur ou administrateur, je veux créer un quiz QCM pour une formation (titre, seuil de réussite, nombre de tentatives maximum, questions avec 4 réponses dont une correcte). Je peux modifier ou supprimer le quiz existant.
+PBI 31	Passer le quiz de validation	En tant qu'apprenant, je veux soumettre mes réponses au quiz. Le système calcule mon score (correct/total × 100), vérifie le seuil de réussite, enregistre ma tentative et m'informe du nombre de tentatives restantes.
+PBI 31	Consulter les résultats du quiz	En tant qu'apprenant, je veux consulter mon meilleur score, le seuil de réussite, le nombre de tentatives utilisées et restantes, ainsi que mon état de réussite.
+PBI 32	Télécharger l'attestation de formation	En tant qu'apprenant, je veux vérifier mon éligibilité à l'attestation (progression 100% ET quiz réussi) et la télécharger en PDF avec mon nom, le titre de la formation, mon taux de présence et la date de génération.
+PBI 33	Modifier le profil et photo de profil	En tant qu'utilisateur connecté, je veux modifier mes informations personnelles (nom, email, téléphone, spécialité), changer mon mot de passe en fournissant l'ancien, et déposer une photo de profil. L'ancienne photo est supprimée automatiquement avant l'enregistrement de la nouvelle.
+PBI 17, 27	Messagerie interne	En tant qu'utilisateur connecté (formateur, candidat ISET ou utilisateur externe), je veux envoyer et recevoir des messages avec les autres utilisateurs de la plateforme. Un badge indique le nombre de messages non lus par conversation.
+PBI 25	Recevoir des notifications automatiques	Le système envoie automatiquement des notifications pour tous les événements de la plateforme : inscription, approbation, rejet, publication, alerte présence < 75%, progression 100%, paiement Stripe confirmé, place libérée en liste d'attente.
+PBI 26	Assistant IA	En tant qu'apprenant, je veux interroger un assistant IA pour obtenir des réponses contextualisées sur mes formations, mes présences et ma progression.
+Tableau 25 : Backlog du Sprint 4
+
+III.	Conception
+
+
+1.	Diagrammes de cas d'utilisation
+
+1.1	Diagramme de cas d'utilisation global — Sprint 4
+
+Ce diagramme présente les interactions entre les cinq acteurs (Utilisateur, Candidat ISET, Utilisateur externe, Formateur et Administrateur) et les fonctionnalités du Sprint 4 : quiz de validation, attestation numérique, modification du profil, messagerie interne, notifications et assistant IA.
+
+Figure 66 : Diagramme de cas d'utilisation global — Sprint 4
+
+1.2	Diagramme de cas d'utilisation — Candidat ISET / Utilisateur externe
+
+Ce diagramme détaille les cas d'utilisation liés au passage du quiz, à la vérification de l'éligibilité, au téléchargement de l'attestation, à la modification du profil, à la messagerie, aux notifications et à l'assistant IA.
+
+Figure 67 : Diagramme de cas d'utilisation — Candidat ISET / Utilisateur externe
+
+1.3	Diagramme de cas d'utilisation — Formateur
+
+Ce diagramme présente les cas d'utilisation du formateur : création d'un quiz (configuration des paramètres et ajout de questions), modification du profil, messagerie interne et consultation des notifications.
+
+Figure 68 : Diagramme de cas d'utilisation — Formateur
+
+1.4	Diagramme de cas d'utilisation — Administrateur
+
+Ce diagramme illustre les cas d'utilisation de l'administrateur : gestion des quiz (créer, modifier, supprimer), messagerie interne et consultation des notifications.
+
+Figure 69 : Diagramme de cas d'utilisation — Administrateur
+
+	Scénario "Passer le quiz" :
+
+Titre	Passer le quiz de validation
+Acteur	Candidat ISET / Utilisateur externe
+Objectif	Soumettre ses réponses au quiz et consulter le résultat
+Préconditions	L'apprenant est inscrit et authentifié. Un quiz est configuré pour la formation.
+Scénario nominal	1. L'apprenant accède au quiz depuis son espace formation.
+2. Le système affiche les questions sans indication de la bonne réponse.
+3. L'apprenant sélectionne ses réponses et soumet.
+4. Le backend calcule le score (correct/total × 100).
+5. La tentative est enregistrée. Le score, le seuil et les tentatives restantes sont affichés.
+Scénarios alternatifs	3a. Si les tentatives sont épuisées → erreur 400, le bouton de passage est désactivé.
+Post-condition	La tentative est enregistrée. L'apprenant consulte son résultat.
+
+Tableau 26 : Scénario "Passer le quiz"
+
+	Scénario "Télécharger l'attestation" :
+
+Titre	Télécharger l'attestation de formation
+Acteur	Candidat ISET / Utilisateur externe
+Objectif	Obtenir l'attestation PDF après validation complète
+Préconditions	L'apprenant est authentifié. Sa progression est à 100% et le quiz est réussi.
+Scénario nominal	1. L'apprenant accède à la page d'éligibilité.
+2. Le système vérifie la progression (100%) et le résultat du quiz (réussi).
+3. Le bouton « Télécharger mon attestation » est affiché.
+4. L'apprenant clique sur le bouton.
+5. Le backend génère le PDF (nom, formation, taux de présence, date).
+6. Le fichier PDF est téléchargé.
+Scénarios alternatifs	2a. Progression < 100% → message d'indication conditions manquantes.
+2b. Quiz non réussi → message d'indication conditions manquantes.
+Post-condition	L'attestation PDF est téléchargée par l'apprenant.
+
+Tableau 27 : Scénario "Télécharger l'attestation"
+
+2.	Diagrammes de séquence
+
+2.1	Diagramme de séquence « Quiz et Attestation »
+
+Ce diagramme illustre le processus de passage du quiz, le calcul automatique du score, la vérification de l'éligibilité à l'attestation (progression 100% + quiz réussi) et la génération du PDF.
+
+Figure 70 : Diagramme de séquence « Quiz et Attestation »
+
+2.2	Diagramme de séquence « Messagerie interne »
+
+Ce diagramme illustre le processus d'envoi et de réception de messages entre utilisateurs : création de la conversation, envoi du message, notification au destinataire et mise à jour du badge de messages non lus.
+
+Figure 71 : Diagramme de séquence « Messagerie interne »
+
+3.	Diagrammes d'activité
+
+3.1	Diagramme d'activité — Modifier le profil
+
+Ce diagramme illustre le processus de modification du profil utilisateur : mise à jour des informations personnelles, changement optionnel du mot de passe (avec vérification de l'ancien) et dépôt optionnel d'une photo de profil (suppression de l'ancienne avant enregistrement de la nouvelle).
+
+Figure 72 : Diagramme d'activité — Modifier le profil
+
+3.2	Diagramme d'activité — Créer un quiz
+
+Ce diagramme illustre le processus de création d'un quiz par le formateur ou l'administrateur : vérification de l'existence d'un quiz, configuration des paramètres (titre, seuil de réussite, tentatives maximum), ajout des questions avec leurs choix de réponse, puis sauvegarde et association à la formation.
+
+Figure 73 : Diagramme d'activité — Créer un quiz
+
+4.	Diagramme de classes
+
+Ce diagramme présente les nouvelles entités du Sprint 4 : Quiz, Question, TentativeQuiz, Attestation, Message, Notification et Profil, liées à la classe Utilisateur.
+
+Figure 74 : Diagramme de classes Sprint 4
+
+IV.	Réalisation
+
+1.	Interface quiz de validation (formateur / admin)
+
+Le formateur (et l'admin) peut créer un quiz complet pour une formation : titre, seuil de réussite (%), nombre de tentatives autorisées, et une liste de questions QCM avec indication de la bonne réponse parmi les choix proposés. La sauvegarde remplace entièrement l'ancien quiz.
+
+Figure 75 : Interface création de quiz
+
+2.	Interface passage du quiz (Candidat ISET / Externe)
+
+L'apprenant peut passer le quiz depuis son espace formation. Les questions sont affichées sans indication de la bonne réponse. Après soumission, le score obtenu, le seuil de réussite et le nombre de tentatives restantes sont affichés immédiatement.
+
+Figure 76 : Interface passage du quiz
+
+3.	Interface éligibilité et attestation
+
+Cette interface affiche l'état d'éligibilité de l'apprenant :
+•	Progression globale en % (modules terminés / modules totaux)
+•	Résultat du quiz : score, tentatives utilisées, éligibilité (réussi/non réussi)
+•	Bouton « Télécharger mon attestation » (visible uniquement si éligible)
+L'attestation générée contient : nom de l'apprenant, titre de la formation, dates, formateur, spécialité, taux de présence.
+
+Figure 77 : Interface attestation de formation
+
+4.	Interface modification du profil et photo
+
+Chaque utilisateur peut modifier ses informations personnelles (nom, email, téléphone, spécialité) et changer son mot de passe en fournissant l'ancien. Il peut également uploader une photo de profil (JPG/PNG/WEBP/GIF, max 2 MB). L'ancienne photo est automatiquement supprimée du serveur lors de la mise à jour.
+
+Figure 78 : Interface modification du profil et photo
+
+5.	Interface messagerie interne
+
+La messagerie permet aux utilisateurs d'envoyer des messages aux autres utilisateurs de la plateforme. Les conversations sont organisées par correspondant. Les messages non lus sont signalés par un badge numérique.
+
+Figure 79 : Interface messagerie interne
+
+6.	Interface notifications
+
+Le panneau de notifications liste toutes les alertes de l'utilisateur connecté : inscription approuvée/rejetée, publication de formation, présence validée, progression 100% terminée, place libérée en liste d'attente, paiement confirmé. Les notifications non lues sont mises en évidence visuellement.
+
+Figure 80 : Interface notifications
+
+7.	Interface assistant IA
+
+L'apprenant peut interroger l'assistant IA pour obtenir des réponses contextualisées sur ses formations, ses présences et sa progression. L'interface affiche un historique de la conversation avec l'assistant.
+
+Figure 81 : Interface assistant IA
+
+V.	Tests
+
+1.	Test — Tentatives quiz épuisées
+
+Si un apprenant a utilisé toutes ses tentatives autorisées, le backend retourne une erreur 400 : « Nombre maximum de tentatives atteint. » Le bouton de passage du quiz est désactivé côté frontend avec le nombre de tentatives restantes affiché.
+
+Figure 82 : Test — tentatives quiz épuisées
+
+2.	Test — Attestation non disponible
+
+Si l'apprenant n'a pas atteint 100% de progression ou n'a pas réussi le quiz, le bouton de téléchargement de l'attestation n'est pas affiché. Un message indique les conditions manquantes (progression insuffisante / quiz non réussi).
+
+Figure 83 : Test — attestation non éligible
+
+3.	Test — Message non lu
+
+Lorsqu'un utilisateur reçoit un nouveau message, un badge numérique s'affiche sur l'icône de messagerie indiquant le nombre de messages non lus. Le badge disparaît après lecture de la conversation.
+
+Figure 84 : Test — badge message non lu
+
+4.	Test — Réponse assistant IA
+
+L'assistant IA répond aux questions contextualisées de l'apprenant sur ses formations et sa progression. Si la question est hors contexte, l'assistant indique qu'il ne peut répondre qu'aux questions relatives à la plateforme FormaPro.
+
+Figure 85 : Test — réponse assistant IA
+
+Conclusion
+
+Ce dernier sprint a permis de finaliser la plateforme FormaPro avec les fonctionnalités les plus avancées. Le système de quiz de validation avec attestation numérique offre un parcours de formation complet et certifiant. La messagerie interne et les notifications enrichies assurent une communication fluide entre tous les acteurs de la plateforme. L'assistant IA apporte une dimension innovante en offrant des réponses contextualisées sur les formations et la progression de chaque apprenant.
+
+
+
+
+Conclusion Générale
+
+Dans le cadre de ce projet de fin d'études, j'ai conçu et développé la plateforme web « FormaPro », une solution complète de gestion des formations professionnelles pour l'ISET Tozeur.
+
+La plateforme a été développée en utilisant une architecture découplée (Angular 20 pour le frontend, Node.js/Express pour le backend et MySQL comme système de gestion de base de données), garantissant la maintenabilité, la scalabilité et la sécurité du système.
+
+Les principales fonctionnalités réalisées sont :
+•	Un système d'authentification sécurisé (JWT, bcrypt, rate limiting) avec gestion de 4 rôles (Candidat ISET, Formateur, Administrateur, Externe), réinitialisation du mot de passe par email (Nodemailer/Gmail SMTP) et upload de photo de profil.
+•	Un workflow complet de gestion des formations en 5 états (draft → pending_approval → accepted → published → archivée) avec archivage automatique des formations expirées.
+•	Un système d'inscription avec approbation par l'administrateur et liste d'attente automatique avec notifications.
+•	Un module de paiement sécurisé via Stripe Checkout Sessions avec webhook (signature HMAC-SHA256 vérifiée) pour la confirmation automatique, réservé aux utilisateurs externes.
+•	Un suivi pédagogique avancé : gestion des présences par séance (présent/absent/excusé), calcul automatique de la progression par module, alertes automatiques si taux de présence insuffisant (< 75%).
+•	Un système de quiz de validation configurable (seuil de réussite, nombre de tentatives) et délivrance d'attestations numériques pour les apprenants éligibles (progression 100% + quiz réussi).
+•	Une messagerie interne et un système de notifications enrichies couvrant l'ensemble des événements de la plateforme.
+•	Un tableau de bord statistique pour l'administrateur et des espaces personnalisés pour chaque rôle.
+
+Ce projet m'a permis d'acquérir et de consolider de nombreuses compétences techniques (développement full-stack Angular/Node.js, intégration de passerelles de paiement Stripe, envoi d'emails transactionnels, sécurité applicative JWT/bcrypt/HMAC) ainsi que des compétences méthodologiques à travers l'application de la méthode SCRUM sur 4 sprints.
+
+Comme perspectives d'amélioration, on peut envisager :
+•	L'intégration d'un système de visioconférence pour les formations en ligne.
+•	La mise en place d'un tableau de bord analytique avancé avec export de rapports PDF.
+•	Le déploiement de la plateforme sur un serveur cloud (AWS, Heroku, OVH).
+•	Le développement d'une application mobile (iOS/Android) via Ionic ou React Native.
+•	L'amélioration de l'assistant IA intégré avec un modèle de langage plus performant.
+
+
+
+
+Bibliographie
+
+[1]  : https://www.iset.rnu.tn
+[2]  : https://scrumguides.org/
+[3]  : https://fr.wikipedia.org/wiki/Unified_Modeling_Language
+[4]  : https://plantuml.com/
+[5]  : https://fr.wikipedia.org/wiki/Visual_Studio_Code
+[6]  : https://fr.wikipedia.org/wiki/GitHub
+[7]  : https://fr.wikipedia.org/wiki/Postman_(logiciel)
+[8]  : https://fr.wikipedia.org/wiki/MySQL
+[9]  : https://fr.wikipedia.org/wiki/Node.js
+[10]  : https://kinsta.com/fr/base-de-connaissances/qu-est-express-js/
+[11]  : https://fr.wikipedia.org/wiki/Angular
+[12]  : https://fr.wikipedia.org/wiki/TypeScript
+[13]  : https://fr.wikipedia.org/wiki/JavaScript
+[14]  : https://fr.wikipedia.org/wiki/Hypertext_Markup_Language
+[15]  : https://developer.mozilla.org/fr/docs/Web/CSS
+[16]  : https://jwt.io/introduction
+[17]  : https://stripe.com/fr/payments/checkout
+[18]  : https://nodemailer.com/about/
+[19]  : https://fr.wikipedia.org/wiki/JSON_Web_Token
+
+
+
+
+Annexe A
+Assistant Intelligent Intégré (IA)
+
+Définition :
+Un assistant intelligent est un système logiciel basé sur l'intelligence artificielle capable de comprendre les questions posées en langage naturel et d'y répondre de manière contextuelle et pertinente. Il repose sur des modèles de traitement du langage naturel (NLP) permettant d'analyser le contenu d'une question et de générer une réponse adaptée.
+Dans le cadre de la plateforme FormaPro, l'assistant IA a été intégré pour offrir aux apprenants un support automatisé, disponible à tout moment, capable de répondre aux questions relatives aux formations, à la progression pédagogique et aux démarches administratives.
+
+Utilité de l'intégration dans notre projet :
+L'intégration de l'assistant IA dans FormaPro permet d'automatiser le support aux utilisateurs sans intervention humaine. Il offre des réponses instantanées sur les formations disponibles, les modules, les séances, les présences et la progression de l'apprenant. Ce système améliore l'expérience utilisateur, réduit la charge de travail de l'administrateur et apporte une valeur ajoutée innovante à la plateforme.
+
+Les démarches d'intégration de l'assistant IA dans le projet :
+
+Réception de la question utilisateur
+L'utilisateur saisit sa question via l'interface de l'assistant IA dans son tableau de bord. La question est transmise au backend via une requête HTTP POST vers l'endpoint dédié /api/candidat/assistant ou /api/externe/assistant.
+
+Récupération du contexte de l'utilisateur
+Avant d'interroger le modèle IA, le backend récupère depuis la base de données MySQL les informations contextuelles de l'utilisateur connecté : ses formations inscrites, ses modules, son taux de présence et sa progression pédagogique. Ce contexte est injecté dans le prompt envoyé au modèle.
+
+Construction du prompt intelligent
+Un prompt structuré est construit dynamiquement en combinant le contexte de l'utilisateur et sa question. Ce prompt guide le modèle IA pour produire une réponse cohérente, personnalisée et adaptée à la situation de l'apprenant.
+
+Interrogation du modèle IA (Ollama)
+Le frontend envoie le prompt au serveur Ollama local (http://localhost:11434) avec le modèle gemma3:1b. Le modèle analyse le contenu, comprend la question et génère une réponse en langage naturel.
+
+Sauvegarde de la conversation
+Chaque échange (question + réponse) est sauvegardé dans la table conversations_ia de la base de données, permettant à l'utilisateur de consulter l'historique de ses interactions avec l'assistant.
+
+Affichage de la réponse
+La réponse générée est renvoyée au frontend Angular et affichée dans l'interface de l'assistant sous forme de conversation, avec horodatage et mise en forme claire.
+
+Extrait du code backend (Node.js/Express) :
+
+router.post('/assistant', authenticateToken, async (req, res) => {
+  const { question } = req.body;
+  const userId = req.user.id;
+
+  // Récupération du contexte utilisateur
+  const [inscriptions] = await db.query(
+    `SELECT f.titre, i.statut, i.progression
+     FROM inscriptions i
+     JOIN formations f ON i.formation_id = f.id
+     WHERE i.utilisateur_id = ?`, [userId]
+  );
+
+  const contexte = inscriptions.map(i =>
+    `Formation: ${i.titre}, Statut: ${i.statut}, Progression: ${i.progression}%`
+  ).join('\n');
+
+  const messages = [
+    {
+      role: 'system',
+      content: `Tu es un assistant pédagogique pour la plateforme FormaPro.\nContexte de l'apprenant :\n${contexte}`
+    },
+    { role: 'user', content: question }
+  ];
+
+  // Appel Ollama (modèle local gemma3:1b)
+  const response = await axios.post('http://localhost:11434/api/chat', {
+    model: 'gemma3:1b',
+    messages,
+    stream: false
+  });
+
+  const reponse = response.data.message.content;
+
+  // Sauvegarde en base de données
+  await db.query(
+    `INSERT INTO conversations_ia (utilisateur_id, question, reponse)
+     VALUES (?, ?, ?)`, [userId, question, reponse]
+  );
+
+  res.json({ reponse });
+});
+
+
+
+
+Annexe B
+Génération des Attestations PDF
+
+Définition :
+Une attestation de formation est un document officiel délivré à un apprenant ayant satisfait aux conditions d'éligibilité définies par la plateforme : un taux de présence de 100% et un quiz de validation réussi. Ce document est généré automatiquement au format PDF et mis à disposition de l'apprenant pour téléchargement.
+
+Utilité de l'intégration dans notre projet :
+La génération automatique d'attestations numériques dans FormaPro permet de certifier la réussite d'un apprenant sans intervention manuelle de l'administrateur. Elle garantit l'authenticité des informations (nom, formation, date, taux de présence, score du quiz) et offre un parcours de formation complet et certifiant.
+
+Les démarches de génération de l'attestation PDF :
+
+Vérification de l'éligibilité
+Avant toute génération, le système vérifie automatiquement que l'apprenant remplit les deux conditions requises : progression pédagogique à 100% (calculée via les présences par module) et quiz de validation réussi (score supérieur au seuil configuré).
+
+Récupération des données de l'attestation
+Le backend récupère depuis la base de données les informations nécessaires : nom et prénom de l'apprenant, titre de la formation, date de début et de fin, taux de présence global et score obtenu au quiz.
+
+Génération du document PDF
+Le PDF est généré dynamiquement côté backend à l'aide de la bibliothèque pdfkit. Il contient le logo de la plateforme, les informations de l'apprenant, les détails de la formation et la date de génération.
+
+Sauvegarde de l'attestation
+Une fois générée, l'attestation est enregistrée dans la table attestations de la base de données avec la date de génération et le taux de présence. Un lien de téléchargement est créé et transmis au frontend.
+
+Téléchargement par l'apprenant
+L'apprenant accède à son attestation depuis son tableau de bord et peut la télécharger en un clic au format PDF.
+
+Extrait du code backend (Node.js/Express) :
+
+router.post('/attestation/generer', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const { formation_id } = req.body;
+
+  // Vérification de l'éligibilité
+  const [inscription] = await db.query(
+    `SELECT progression, quiz_reussi, taux_presence
+     FROM inscriptions
+     WHERE utilisateur_id = ? AND formation_id = ?`,
+    [userId, formation_id]
+  );
+
+  if (!inscription[0] || inscription[0].progression < 100
+      || !inscription[0].quiz_reussi) {
+    return res.status(403).json({ message: 'Conditions non remplies' });
+  }
+
+  // Récupération des données
+  const [user] = await db.query(
+    `SELECT nom, prenom FROM utilisateurs WHERE id = ?`, [userId]
+  );
+  const [formation] = await db.query(
+    `SELECT titre, date_debut, date_fin FROM formations WHERE id = ?`,
+    [formation_id]
+  );
+
+  // Génération du PDF avec pdfkit
+  const doc = new PDFDocument();
+  const filePath = `attestations/attestation_${userId}_${formation_id}.pdf`;
+  doc.pipe(fs.createWriteStream(filePath));
+
+  doc.fontSize(20).text('Attestation de Formation', { align: 'center' });
+  doc.moveDown();
+  doc.fontSize(14).text(
+    `Nous attestons que ${user[0].prenom} ${user[0].nom} a suivi
+     et validé la formation "${formation[0].titre}"
+     avec un taux de présence de ${inscription[0].taux_presence}%.`
+  );
+  doc.text(`Date de génération : ${new Date().toLocaleDateString('fr-FR')}`);
+  doc.end();
+
+  // Sauvegarde en base de données
+  await db.query(
+    `INSERT INTO attestations
+     (utilisateur_id, formation_id, taux_presence, date_generation)
+     VALUES (?, ?, ?, NOW())`,
+    [userId, formation_id, inscription[0].taux_presence]
+  );
+
+  res.json({ message: 'Attestation générée', path: filePath });
+});

@@ -19,7 +19,11 @@
       "Bash(Format-Table FullName)",
       "PowerShell(if \\(!\\(Test-Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\\\\backend\\\\uploads\"\\)\\) { New-Item -ItemType Directory -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\\\\backend\\\\uploads\" | Out-Null; Write-Host \"Dossier uploads créé\" } else { Write-Host \"Dossier uploads existe déjà\" })",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(node -e \"const bcrypt = require\\('bcrypt'\\); bcrypt.hash\\('sabeh123', 10\\).then\\(h => console.log\\(h\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(ls \"C:\\\\Users\\\\User\\\\Desktop\\\\projet_pfe\\\\\" | Select-String \"rapport\")",
+      "Read(//c/Users/User/Desktop/**)"
     ]
   }
 }

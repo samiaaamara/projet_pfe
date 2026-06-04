@@ -2,34 +2,77 @@
 title Diagramme de Cas d'Utilisation Global — Sprint 1 FormaPro
 
 left to right direction
-skinparam packageStyle rectangle
 
-actor Utilisateur
-actor Admin
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
 
-rectangle FormaPro {
-    usecase "S'inscrire" as UC1
-    usecase "S'authentifier" as UC2
-    usecase "Gérer profil" as UC3
-    usecase "Changer mot de passe" as UC4
-    usecase "Consulter tableau de bord" as UC5
-    usecase "Gérer utilisateurs" as UC6
-    usecase "Gérer formateurs" as UC7
-    usecase "Consulter statistiques" as UC8
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
 }
 
-Utilisateur --> UC1
-Utilisateur --> UC2
-Utilisateur --> UC3
-Utilisateur --> UC4
-Admin --> UC2
-Admin --> UC5
-Admin --> UC6
-Admin --> UC7
-Admin --> UC8
+actor "Utilisateur" as USER
+actor "Candidat ISET" as CISET
+actor "Utilisateur externe" as EXT
+actor "Formateur" as F
+actor "Administrateur" as ADMIN
 
-UC1 .> UC2 : <<include>>
-UC6 .> UC1 : <<extend>>
-UC7 .> UC1 : <<extend>>
+CISET --|> USER
+EXT   --|> USER
+
+usecase "S'authentifier" as AUTH
+usecase "S'inscrire" as UC1
+usecase "Réinitialiser le mot de passe par email" as UC3
+usecase "Gérer les utilisateurs" as UC4
+usecase "Gérer les formateurs" as UC5
+usecase "Consulter le tableau de bord statistique" as UC6
+
+usecase "S'inscrire (Candidat ISET)" as UC1_1
+usecase "S'inscrire (Utilisateur externe)" as UC1_2
+usecase "Consulter la liste des utilisateurs" as UC4_1
+usecase "Supprimer un utilisateur" as UC4_2
+usecase "Créer un compte formateur" as UC5_1
+usecase "Modifier un compte formateur" as UC5_2
+usecase "Supprimer un formateur" as UC5_3
+usecase "Consulter la disponibilité des formateurs" as UC5_4
+usecase "Consulter le nombre de candidats et formateurs" as UC6_1
+usecase "Consulter le nombre de formations publiées" as UC6_2
+usecase "Consulter les inscriptions en attente" as UC6_3
+
+USER  -- UC1
+USER  -- UC3
+F     -- UC3
+ADMIN -- UC4
+ADMIN -- UC5
+ADMIN -- UC6
+
+UC1 ..> AUTH : <<include>>
+UC3 ..> AUTH : <<include>>
+UC4 ..> AUTH : <<include>>
+UC5 ..> AUTH : <<include>>
+UC6 ..> AUTH : <<include>>
+
+UC1_1 ..> UC1 : <<extend>>
+UC1_2 ..> UC1 : <<extend>>
+UC4_1 ..> UC4 : <<extend>>
+UC4_2 ..> UC4 : <<extend>>
+UC5_1 ..> UC5 : <<extend>>
+UC5_2 ..> UC5 : <<extend>>
+UC5_3 ..> UC5 : <<extend>>
+UC5_4 ..> UC5 : <<extend>>
+UC6_1 ..> UC6 : <<extend>>
+UC6_2 ..> UC6 : <<extend>>
+UC6_3 ..> UC6 : <<extend>>
 
 @enduml

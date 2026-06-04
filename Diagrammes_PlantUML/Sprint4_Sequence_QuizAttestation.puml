@@ -1,0 +1,54 @@
+@startuml Sprint4_Sequence_QuizAttestation
+title Diagramme de Séquence — Quiz et Attestation
+
+scale 0.8
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor Black
+skinparam sequenceParticipantBackgroundColor White
+
+actor "Candidat ISET /\nUtilisateur externe" as A
+participant "Frontend" as FE
+participant "Backend" as BE
+database "Base de données" as DB
+
+A -> FE : Accéder au quiz de la formation
+FE -> BE : GET /quiz/:formation_id
+BE -> DB : Récupérer quiz + questions
+DB --> BE : Quiz, questions, seuil, tentatives max
+BE --> FE : Quiz disponible
+FE --> A : Afficher les questions
+
+A -> FE : Soumettre les réponses
+FE -> BE : POST /quiz/:id/passer
+BE -> DB : Vérifier nombre de tentatives utilisées
+DB --> BE : Tentatives restantes
+
+BE -> BE : Calculer score (correct/total × 100)
+BE -> DB : Enregistrer tentative (score, date)
+DB --> BE : OK
+BE --> FE : Score, seuil, tentatives restantes
+FE --> A : Afficher résultat
+
+alt Score ≥ seuil de réussite
+    FE --> A : Quiz réussi ✓
+    BE -> DB : Vérifier progression = 100%
+    DB --> BE : Statut progression
+    alt Progression = 100%
+        FE --> A : Éligible à l'attestation
+        A -> FE : Télécharger l'attestation
+        FE -> BE : GET /attestation/:formation_id
+        BE -> BE : Générer attestation (nom, formation, taux présence)
+        BE --> FE : Fichier PDF attestation
+        FE --> A : Téléchargement PDF
+    else Progression < 100%
+        FE --> A : Progression insuffisante
+    end
+else Score < seuil
+    FE --> A : Quiz non réussi
+end
+
+@enduml

@@ -3,40 +3,78 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-profile">
-      <div class="avatar">A</div>
-      <div class="sidebar-username">Administrateur</div>
-      <div class="sidebar-role">Admin</div>
+      <div class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() || 'A' }}</div>
+      <div class="sidebar-username">{{ user?.nom || 'Administrateur' }}</div>
+      <div class="sidebar-email">{{ user?.email || '' }}</div>
+      <div class="sidebar-role">Administrateur</div>
     </div>
- 
+
     <nav class="sidebar-nav">
+      <span class="nav-group-label">Mon espace</span>
       <a class="nav-item" [class.active]="activeSection==='accueil'" (click)="setSection('accueil')">
-        <span class="nav-icon">🏠</span> Dashboard
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        Dashboard
       </a>
+
+      <span class="nav-group-label">Gestion</span>
+
       <a class="nav-item" [class.active]="activeSection==='utilisateurs'" (click)="setSection('utilisateurs')">
-        <span class="nav-icon">👥</span> Utilisateurs
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Utilisateurs
         <span class="nav-badge" *ngIf="users.length">{{ users.length }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection==='formations'" (click)="setSection('formations')">
-        <span class="nav-icon">📚</span> Formations
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+        Formations
         <span class="nav-badge" *ngIf="formations.length">{{ formations.length }}</span>
       </a>
-      <a class="nav-item" [class.active]="activeSection==='approvals'" (click)="setSection('approvals')">
-        <span class="nav-icon">🔔</span> Approbations
-       <span class="nav-badge alert-badge" *ngIf="formationsPending.length + formationsAccepted.length + inscriptionsPending.length > 0">
-  {{ formationsPending.length + formationsAccepted.length + inscriptionsPending.length }}
-</span>
-     </a>
+      <a class="nav-item" [class.active]="activeSection==='creer-formation'" (click)="setSection('creer-formation')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></span>
+        Créer formation
+      </a>
       <a class="nav-item" [class.active]="activeSection==='formateurs'" (click)="setSection('formateurs')">
-        <span class="nav-icon">👨‍🏫</span> Formateurs
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        Formateurs
         <span class="nav-badge" *ngIf="formateurs.length">{{ formateurs.length }}</span>
       </a>
+      <a class="nav-item" [class.active]="activeSection==='approvals'" (click)="setSection('approvals')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        Approbations
+        <span class="nav-badge alert-badge" *ngIf="formationsPending.length + formationsAccepted.length + inscriptionsPending.length + listeAttenteGlobale.length > 0">
+          {{ formationsPending.length + formationsAccepted.length + inscriptionsPending.length + listeAttenteGlobale.length }}
+        </span>
+      </a>
+
+      <span class="nav-group-label">Statistiques</span>
+
+      <a class="nav-item" [class.active]="activeSection==='paiements'" (click)="setSection('paiements')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+        Paiements
+      </a>
+      <a class="nav-item" [class.active]="activeSection==='quiz'" (click)="setSection('quiz')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+        Quiz
+        <span class="nav-badge" *ngIf="quizAvecQuiz > 0">{{ quizAvecQuiz }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeSection==='attestation'" (click)="setSection('attestation')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span>
+        Attestations
+        <span class="nav-badge" *ngIf="attesTotalEligibles > 0">{{ attesTotalEligibles }}</span>
+      </a>
+
+      <span class="nav-group-label">Communication</span>
+
       <a class="nav-item" [class.active]="activeSection==='messages'" (click)="setSection('messages')">
-        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        Messagerie
         <span class="nav-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
       </a>
     </nav>
- 
-    <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+
+    <button class="logout-btn" (click)="logout()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </button>
   </aside>
  
   <!-- CONTENU -->
@@ -54,30 +92,46 @@
     <!-- ===== DASHBOARD ===== -->
     <section *ngIf="activeSection==='accueil'">
 
-      <!-- Welcome Banner -->
-      <div class="welcome-banner">
-        <div class="welcome-left">
-          <div class="welcome-role-tag">⚙️ Administrateur · ISET Tozeur</div>
-          <div class="welcome-greeting">Tableau de bord 👋</div>
-          <div class="welcome-sub">Vue d'ensemble de la plateforme — gérez les utilisateurs, les formations et les approbations.</div>
-          <a class="btn-action-banner" (click)="setSection('approvals')" style="cursor:pointer;">
-            ✅ Voir les approbations →
-          </a>
+      <div class="page-title">
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Tableau de bord</h2>
+        <p>Vue d'ensemble de la plateforme FormaPro — ISET Tozeur</p>
+      </div>
+
+      <!-- KPI -->
+      <div class="pay-stats-row">
+        <div class="pay-stat-card">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ users.length }}</div>
+            <div class="pay-stat-label">Utilisateurs</div>
+          </div>
         </div>
-        <div class="welcome-stats-mini">
-          <div class="wsm-item">
-            <span class="wsm-val">{{ (stats.candidats || 0) + (stats.formateurs || 0) }}</span>
-            <span class="wsm-lbl">👤 Utilisateurs</span>
+        <div class="pay-stat-card blue">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ stats.formations || 0 }}</div>
+            <div class="pay-stat-label">Formations totales</div>
           </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ stats.formations || 0 }}</span>
-            <span class="wsm-lbl">📚 Formations</span>
+        </div>
+        <div class="pay-stat-card green">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ stats.published || 0 }}</div>
+            <div class="pay-stat-label">Formations publiées</div>
           </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ formationsPending.length }}</span>
-            <span class="wsm-lbl">⚠️ En attente</span>
+        </div>
+        <div class="pay-stat-card orange">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formationsPending.length + inscriptionsPending.length }}</div>
+            <div class="pay-stat-label">En attente d'approbation</div>
+          </div>
+        </div>
+        <div class="pay-stat-card" style="border-color:#6a1b9a">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ stats.formateurs || 0 }}</div>
+            <div class="pay-stat-label">Formateurs</div>
           </div>
         </div>
       </div>
@@ -85,7 +139,7 @@
       <!-- Accès rapide -->
       <div class="feature-cards-row">
         <a class="feature-card-quick" (click)="setSection('formations'); openAddForm()" style="cursor:pointer;">
-          <div class="fcq-icon">➕</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Nouvelle formation</div>
             <div class="fcq-desc">Créez et publiez une nouvelle formation sur la plateforme</div>
@@ -93,7 +147,7 @@
           <span class="fcq-arrow">›</span>
         </a>
         <a class="feature-card-quick" (click)="setSection('formateurs'); openAddFormateur()" style="cursor:pointer;">
-          <div class="fcq-icon">👨‍🏫</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Nouveau formateur</div>
             <div class="fcq-desc">{{ stats.formateurs || 0 }} formateur(s) actif(s) — ajouter un compte</div>
@@ -101,7 +155,7 @@
           <span class="fcq-arrow">›</span>
         </a>
         <a class="feature-card-quick" (click)="setSection('approvals')" style="cursor:pointer;">
-          <div class="fcq-icon">✅</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Approuver formations</div>
             <div class="fcq-desc">{{ formationsPending.length }} formation(s) en attente d'approbation</div>
@@ -111,203 +165,692 @@
       </div>
 
       <!-- Progression formations publiées -->
-      <div class="card-section">
-        <h5 class="section-title">📊 Formations publiées vs total</h5>
-        <div class="progress-track">
-          <div class="progress-fill green"
-               [style.width.%]="stats.formations ? (stats.published / stats.formations * 100) : 0">
-            {{ stats.published || 0 }} / {{ stats.formations || 0 }}
+      <div class="pay-table-wrap" style="margin-top:8px">
+        <div style="padding:16px 20px">
+          <div style="font-weight:600;color:#001d4a;margin-bottom:12px;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Formations publiées vs total</div>
+          <div class="progress-track">
+            <div class="progress-fill green"
+                 [style.width.%]="stats.formations ? (stats.published / stats.formations * 100) : 0">
+              {{ stats.published || 0 }} / {{ stats.formations || 0 }}
+            </div>
           </div>
+          <div style="font-size:13px;color:#666;margin-top:6px">{{ stats.published || 0 }} publiée(s) sur {{ stats.formations || 0 }}</div>
         </div>
-        <div class="progress-legend">{{ stats.published || 0 }} publiée(s) sur {{ stats.formations || 0 }}</div>
       </div>
 
     </section>
  
     <!-- ===== UTILISATEURS ===== -->
     <section *ngIf="activeSection==='utilisateurs'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>👥 Utilisateurs</h2>
-        <p>{{ filteredUsers.length }} / {{ users.length }} compte(s)</p>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Utilisateurs</h2>
+        <p>Gestion de tous les comptes de la plateforme</p>
       </div>
-  <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="userSearch"
-               placeholder="🔍 Rechercher par nom ou email...">
-        <select class="filter-select" [(ngModel)]="userRoleFilter">
-          <option value="">Tous les rôles</option>
-          <option value="candidat">Candidat</option>
-          <option value="formateur">Formateur</option>
-          <option value="externe">Externe</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input class="search-input" type="text" [(ngModel)]="userSpecialiteFilter"
-               placeholder="💡 Filtrer par spécialité...">
-        <button class="btn-reset" *ngIf="userSearch || userRoleFilter || userSpecialiteFilter"
-                (click)="userSearch=''; userRoleFilter=''; userSpecialiteFilter=''">✕ Réinitialiser</button>
-      </div>
- <div class="card-section">
-        <div class="data-table-wrapper">
-          <table class="data-table" *ngIf="filteredUsers.length > 0">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Nom</th>
-      <th>Email</th>
-      <th>Rôle</th>
-      <th>Spécialité</th>
-      <th>Action</th>
-    </tr>
-  </thead>
 
-  <tbody>
-    <tr *ngFor="let u of filteredUsers; let i = index">
-      <td class="text-muted">{{ i + 1 }}</td>
-      <td><strong>{{ u.nom }}</strong></td>
-      <td>{{ u.email }}</td>
-      <td>
-        <span class="role-badge" [ngClass]="'role-' + u.role">
-          {{ u.role }}
-        </span>
-      </td>
-      <td class="text-muted">{{ u.specialite || '—' }}</td>
-      <td>
-        <button class="btn-action red" (click)="deleteUser(u.id)">
-          🗑️ Supprimer
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-          <div *ngIf="filteredUsers.length === 0" class="empty-state"><span>👥</span><p>Aucun utilisateur trouvé.</p></div>
+      <div class="pay-stats-row">
+        <div class="pay-stat-card">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ users.length }}</div>
+            <div class="pay-stat-label">Total utilisateurs</div>
+          </div>
         </div>
+        <div class="pay-stat-card blue">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ stats.candidats || 0 }}</div>
+            <div class="pay-stat-label">Candidats</div>
+          </div>
         </div>
+        <div class="pay-stat-card green">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ stats.formateurs || 0 }}</div>
+            <div class="pay-stat-label">Formateurs</div>
+          </div>
+        </div>
+        <div class="pay-stat-card orange">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ usersExternes }}</div>
+            <div class="pay-stat-label">Externes</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-filters">
+        <input class="pay-search" type="text" [(ngModel)]="userSearch" placeholder="Rechercher par nom ou email...">
+        <select class="pay-search pay-select" [(ngModel)]="userSpecialiteFilter">
+          <option value="">Toutes les spécialités</option>
+          <option *ngFor="let s of uniqueSpecialites" [value]="s">{{ s }}</option>
+        </select>
+        <div class="pay-tabs">
+          <button class="pay-tab" [class.active]="userRoleFilter===''" (click)="userRoleFilter=''">Tous</button>
+          <button class="pay-tab" [class.active]="userRoleFilter==='candidat'" (click)="userRoleFilter='candidat'">Candidat</button>
+          <button class="pay-tab" [class.active]="userRoleFilter==='formateur'" (click)="userRoleFilter='formateur'">Formateur</button>
+          <button class="pay-tab" [class.active]="userRoleFilter==='externe'" (click)="userRoleFilter='externe'">Externe</button>
+        </div>
+      </div>
+
+      <div class="pay-table-wrap">
+        <div *ngIf="filteredUsers.length === 0" class="pay-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p>Aucun utilisateur trouvé.</p>
+        </div>
+        <table class="pay-table" *ngIf="filteredUsers.length > 0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Spécialité</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of filteredUsers; let i = index">
+              <td style="color:#aaa">{{ i + 1 }}</td>
+              <td><strong>{{ u.nom }}</strong></td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span class="pay-statut-badge"
+                  [style.background]="u.role==='candidat'?'#e3f2fd':u.role==='formateur'?'#e8f5e9':u.role==='externe'?'#fff3e0':'#fce4ec'"
+                  [style.color]="u.role==='candidat'?'#1565c0':u.role==='formateur'?'#2e7d32':u.role==='externe'?'#e65100':'#c62828'">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td>{{ u.specialite || '—' }}</td>
+              <td>
+                <button class="btn-action btn-danger-sm" (click)="deleteUser(u.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Supprimer</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- ===== FORMATIONS ===== -->
     <section *ngIf="activeSection==='formations'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title-row">
         <div class="page-title">
-          <h2>📚 Formations</h2>
+          <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Formations</h2>
           <p>{{ filteredFormations.length }} résultat(s)</p>
         </div>
-        <button class="btn-primary" (click)="openAddForm()">➕ Ajouter</button>
+        <button class="btn-primary" (click)="openAddForm()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter</button>
       </div>
-  <!-- Filtres -->
-      <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="searchTerm" placeholder="🔍 Rechercher un titre...">
-        <select class="filter-select" [(ngModel)]="statusFilter">
-          <option value="">Tous les statuts</option>
-          <option value="draft">Brouillon</option>
-          <option value="pending_approval">En attente</option>
-          <option value="accepted">Acceptée</option>
-          <option value="published">Publié</option>
-          <option value="archivée">Archivée</option>
-        </select>
-        <select class="filter-select" [(ngModel)]="specialiteFilter">
+
+      <div class="pay-stats-row">
+        <div class="pay-stat-card">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formations.length }}</div>
+            <div class="pay-stat-label">Total formations</div>
+          </div>
+        </div>
+        <div class="pay-stat-card green">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formationsPubliees }}</div>
+            <div class="pay-stat-label">Publiées</div>
+          </div>
+        </div>
+        <div class="pay-stat-card orange">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formationsPending.length }}</div>
+            <div class="pay-stat-label">En attente</div>
+          </div>
+        </div>
+        <div class="pay-stat-card blue">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formationsAccepted.length }}</div>
+            <div class="pay-stat-label">Acceptées à publier</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-filters">
+        <input class="pay-search" type="text" [(ngModel)]="searchTerm" placeholder="Rechercher un titre...">
+        <div class="pay-tabs">
+          <button class="pay-tab" [class.active]="statusFilter===''" (click)="statusFilter=''">Toutes</button>
+          <button class="pay-tab" [class.active]="statusFilter==='published'" (click)="statusFilter='published'">Publiées</button>
+          <button class="pay-tab" [class.active]="statusFilter==='pending_approval'" (click)="statusFilter='pending_approval'">En attente</button>
+          <button class="pay-tab" [class.active]="statusFilter==='draft'" (click)="statusFilter='draft'">Brouillon</button>
+          <button class="pay-tab" [class.active]="statusFilter==='archivée'" (click)="statusFilter='archivée'">Archivées</button>
+          <button class="pay-tab" [class.active]="statusFilter==='en_cours'" (click)="statusFilter='en_cours'">En cours</button>
+          <button class="pay-tab" [class.active]="statusFilter==='terminée'" (click)="statusFilter='terminée'">Terminées</button>
+        </div>
+        <select class="pay-search" style="max-width:210px" [(ngModel)]="specialiteFilter">
           <option value="">Toutes les spécialités</option>
           <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
         </select>
       </div>
-      <div class="card-section">
-        <div class="data-table-wrapper">
-          <table class="data-table" *ngIf="filteredFormations.length > 0">
-            <thead>
-              <tr><th>Titre</th><th>Formateur</th><th>Spécialité</th><th>Date</th><th>Prix</th><th>Statut</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let f of paginatedFormations">
-                <td>
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" style="width:48px;height:36px;object-fit:cover;border-radius:6px;" [alt]="f.titre">
-                    <strong>{{ f.titre }}</strong>
-                  </div>
-                </td>
-                <td>{{ f.formateur || '-' }}</td>
-                <td>{{ f.specialite || '-' }}</td>
-                <td>{{ f.date_debut | date:'dd/MM/yyyy' }}</td>
-                <td>{{ f.prix || 0 }} EUR</td>
-                <td>
-                  <span class="status-badge status-draft"     *ngIf="f.status==='draft'">Brouillon</span>
-                  <span class="status-badge status-pending"   *ngIf="f.status==='pending_approval'">En attente</span>
-                  <span class="status-badge status-accepted"  *ngIf="f.status==='accepted'">Acceptée</span>
-                  <span class="status-badge status-published" *ngIf="f.status==='published'">Publié</span>
-                  <span class="status-badge status-archived"  *ngIf="f.status==='archivée'">📦 Archivée</span>
-                </td>
-                <td class="actions-cell">
-                  <ng-container *ngIf="f.status !== 'archivée'">
-                    <button class="btn-action orange"
-                          [disabled]="f.status === 'pending_approval' || f.status === 'accepted'"
-                          [title]="(f.status === 'pending_approval' || f.status === 'accepted') ? 'Gérer via Approbations' : 'Modifier'"
-                          (click)="editFormation(f)">✏️</button>
-                    <button class="btn-action blue-prog" (click)="ouvrirProgramme(f)" title="Gérer le programme">📋</button>
-                    <button class="btn-action purple" (click)="ouvrirGererQuiz(f)" title="Gérer le quiz">🧩</button>
-                    <button class="btn-action green" *ngIf="f.status === 'draft'" (click)="publishFormation(f.id)" title="Publier directement">🚀</button>
-                  </ng-container>
-                  <button class="btn-action red" (click)="deleteFormation(f.id)" title="Supprimer">🗑️</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div *ngIf="filteredFormations.length === 0" class="empty-state"><span>📚</span><p>Aucune formation.</p></div>
+
+      <div class="pay-table-wrap">
+        <div *ngIf="filteredFormations.length === 0" class="pay-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <p>Aucune formation trouvée.</p>
+        </div>
+        <div class="formations-scroll" *ngIf="filteredFormations.length > 0">
+        <table class="pay-table formations-table">
+          <colgroup>
+            <col style="min-width:200px">
+            <col style="min-width:120px">
+            <col style="min-width:110px">
+            <col style="width:100px">
+            <col style="width:105px">
+            <col style="width:85px">
+            <col style="width:110px">
+            <col style="width:160px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Formateur</th>
+              <th>Spécialité</th>
+              <th>Date début</th>
+              <th>Publiée le</th>
+              <th>Prix</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of paginatedFormations">
+              <td>
+                <div class="ftable-titre">
+                  <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="ftable-thumb" [alt]="f.titre">
+                  <span class="ftable-nom">{{ f.titre }}</span>
+                </div>
+              </td>
+              <td class="ftable-text">{{ f.formateur || '—' }}</td>
+              <td><span class="ftable-spec-badge">{{ f.specialite || '—' }}</span></td>
+              <td class="ftable-date">{{ f.date_debut ? (f.date_debut | date:'dd/MM/yyyy') : '—' }}</td>
+              <td class="ftable-date">
+                <span *ngIf="f.date_publication">{{ f.date_publication | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="!f.date_publication" class="ftable-null">—</span>
+              </td>
+              <td class="ftable-prix">{{ f.prix ? (f.prix + ' €') : '—' }}</td>
+              <td>
+                <span class="pay-statut-badge" *ngIf="f.status==='draft'"            style="background:#f5f5f5;color:#666">Brouillon</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='pending_approval'" style="background:#fff3e0;color:#e65100">En attente</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='accepted'"         style="background:#e3f2fd;color:#1565c0">Acceptée</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='published'"        style="background:#e8f5e9;color:#2e7d32">Publiée</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='archivée'"         style="background:#fce4ec;color:#c62828">Archivée</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='en_cours'"         style="background:#e8f5e9;color:#1b5e20">En cours</span>
+                <span class="pay-statut-badge" *ngIf="f.status==='terminée'"         style="background:#ede7f6;color:#4527a0">Terminée</span>
+              </td>
+              <td class="ftable-actions">
+                <button class="btn-action blue" (click)="voirInscritsFormation(f)" title="Voir les inscrits"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+                <!-- Brouillon / En attente / Acceptée : boutons de gestion -->
+                <ng-container *ngIf="f.status !== 'archivée' && f.status !== 'published' && f.status !== 'en_cours' && f.status !== 'terminée'">
+                  <button class="btn-action orange"
+                        [disabled]="f.status === 'pending_approval' || f.status === 'accepted'"
+                        [title]="(f.status === 'pending_approval' || f.status === 'accepted') ? 'Gérer via Approbations' : 'Modifier'"
+                        (click)="editFormation(f)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="btn-action blue-prog" (click)="ouvrirProgramme(f)" title="Programme"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></button>
+                  <button class="btn-action purple"    (click)="ouvrirGererQuiz(f)"  title="Quiz"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+                  <button class="btn-action green" *ngIf="f.status === 'draft'" (click)="publishFormation(f.id)" title="Publier"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></button>
+                </ng-container>
+                <button class="btn-action red" (click)="deleteFormation(f.id)" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
         </div>
 
-       <!-- Pagination -->
         <div class="pagination" *ngIf="pageCount > 1">
           <button class="page-btn" (click)="changePage(currentPage-1)" [disabled]="currentPage===1">‹</button>
           <button class="page-btn" *ngFor="let p of paginationPages" [class.active]="p===currentPage" (click)="changePage(p)">{{ p }}</button>
           <button class="page-btn" (click)="changePage(currentPage+1)" [disabled]="currentPage===pageCount">›</button>
         </div>
-         </div>
-
+      </div>
     </section>
 
 
-    <!-- ===== FORMATEURS ===== -->
-    <section *ngIf="activeSection==='formateurs'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title-row">
+    <!-- ===== CRÉER FORMATION (PAGE COMPLÈTE) ===== -->
+    <section *ngIf="activeSection === 'creer-formation'">
+      <button class="btn-back-dash" (click)="closeForm()">&#8592; Retour aux formations</button>
+      <div class="page-title-row" style="margin-top:16px">
         <div class="page-title">
-          <h2>👨‍🏫 Formateurs</h2>
-          <p>{{ filteredFormateurs.length }} formateur(s)</p>
+          <h2>Nouvelle formation</h2>
+          <p>Suivez les étapes pour créer et configurer votre formation</p>
         </div>
-        <button class="btn-primary" (click)="openAddFormateur()">➕ Ajouter</button>
       </div>
 
-       <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="formateurSearch" (ngModelChange)="resetFormateurPage()" placeholder="🔍 Rechercher...">
-        <select class="filter-select" [(ngModel)]="formateurSpecialiteFilter" (ngModelChange)="resetFormateurPage()">
+      <!-- Stepper -->
+      <div class="admin-stepper">
+        <div class="admin-step" [class.active]="adminStep === 1" [class.done]="adminStep > 1">
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 1">1</ng-container>
+          </div>
+          <div class="admin-step-label">Informations</div>
+        </div>
+        <div class="admin-step-line" [class.done]="adminStep > 1"></div>
+        <div class="admin-step" [class.active]="adminStep === 2" [class.done]="adminStep > 2">
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 2">2</ng-container>
+          </div>
+          <div class="admin-step-label">Programme</div>
+        </div>
+        <div class="admin-step-line" [class.done]="adminStep > 2"></div>
+        <div class="admin-step" [class.active]="adminStep === 3" [class.done]="adminStep > 3">
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 3"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 3">3</ng-container>
+          </div>
+          <div class="admin-step-label">Supports &amp; Séances</div>
+        </div>
+        <div class="admin-step-line" [class.done]="adminStep > 3"></div>
+        <div class="admin-step" [class.active]="adminStep === 4">
+          <div class="admin-step-circle">4</div>
+          <div class="admin-step-label">Quiz</div>
+        </div>
+      </div>
+
+      <!-- ÉTAPE 1 -->
+      <ng-container *ngIf="adminStep === 1">
+        <div class="card-section">
+          <h5 class="section-title">Informations générales</h5>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Titre *</label>
+              <input class="form-input" [(ngModel)]="formData.titre" placeholder="Titre de la formation">
+              <small class="error-msg" *ngIf="formDataErrors.titre">{{ formDataErrors.titre }}</small>
+            </div>
+            <div class="form-group full">
+              <label>Description</label>
+              <textarea class="form-input" rows="3" [(ngModel)]="formData.description" placeholder="Description détaillée..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Spécialité *</label>
+              <select class="form-input" [(ngModel)]="formData.specialite" (ngModelChange)="onSpecialiteFormChange()">
+                <option value="">-- Sélectionnez --</option>
+                <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
+              </select>
+              <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
+            </div>
+            <div class="form-group full">
+              <label>Formateur *</label>
+              <div *ngIf="!formData.specialite" class="formateur-hint">Choisissez d'abord une spécialité</div>
+              <ng-container *ngIf="formData.specialite">
+                <div *ngIf="formateursAvecDispo.length === 0" class="formateur-hint">Aucun formateur pour cette spécialité</div>
+                <div class="formateurs-dispo-list" *ngIf="formateursAvecDispo.length > 0">
+                  <div *ngFor="let f of formateursAvecDispo"
+                       class="formateur-dispo-card"
+                       [class.selected]="formData.formateur_id === f.id"
+                       [class.en-cours]="isFormateurEnCours(f)"
+                       (click)="!isFormateurEnCours(f) && (formData.formateur_id = f.id)">
+                    <div class="fdc-left"><div class="fdc-avatar">{{ f.nom?.charAt(0)?.toUpperCase() }}</div></div>
+                    <div class="fdc-info">
+                      <div class="fdc-nom">{{ f.nom }}</div>
+                      <div class="fdc-spec">{{ f.specialite }}</div>
+                      <div *ngIf="isFormateurEnCours(f)" class="fdc-formation-active">
+                        {{ f.formation_active_titre }}
+                        <span *ngIf="f.formation_active_fin"> — jusqu'au {{ f.formation_active_fin | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                    </div>
+                    <div class="fdc-badge" [class.badge-dispo]="!isFormateurEnCours(f)" [class.badge-encours]="isFormateurEnCours(f)">
+                      {{ isFormateurEnCours(f) ? 'En cours' : 'Disponible' }}
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              <small class="error-msg" *ngIf="formDataErrors.formateur_id">{{ formDataErrors.formateur_id }}</small>
+            </div>
+            <div class="form-group">
+              <label>Date début *</label>
+              <input class="form-input" type="date" [(ngModel)]="formData.date_debut">
+              <small class="error-msg" *ngIf="formDataErrors.date_debut">{{ formDataErrors.date_debut }}</small>
+            </div>
+            <div class="form-group">
+              <label>Date fin <span class="opt">(optionnelle)</span></label>
+              <input class="form-input" type="date" [(ngModel)]="formData.date_fin">
+              <small class="error-msg" *ngIf="formDataErrors.date_fin">{{ formDataErrors.date_fin }}</small>
+            </div>
+            <div class="form-group">
+              <label>Places *</label>
+              <input class="form-input" type="number" [(ngModel)]="formData.nb_places" placeholder="Ex: 30">
+              <small class="error-msg" *ngIf="formDataErrors.nb_places">{{ formDataErrors.nb_places }}</small>
+            </div>
+            <div class="form-group">
+              <label>Prix (EUR) *</label>
+              <input class="form-input" type="number" min="0.01" step="0.01" [(ngModel)]="formData.prix" placeholder="ex: 150.00">
+              <small class="field-hint">Prix pour les participants externes</small>
+            </div>
+            <div class="form-group full">
+              <label>Photo de la formation</label>
+              <div class="photo-upload-area">
+                <div *ngIf="photoPreview" class="photo-preview-container">
+                  <img [src]="photoPreview" class="photo-preview-img" alt="Aperçu">
+                  <button type="button" class="btn-remove-photo" (click)="supprimerAdminPhoto()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Supprimer</button>
+                </div>
+                <div *ngIf="!photoPreview" class="photo-placeholder"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>Aucune photo</p></div>
+                <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" (change)="onAdminPhotoSelected($event)" class="form-input photo-input">
+                <small class="help-text">PNG, JPG, GIF, WEBP — max 5 Mo</small>
+              </div>
+            </div>
+          </div>
+          <div class="creation-step-footer">
+            <button class="btn-cancel" (click)="closeForm()">Annuler</button>
+            <button class="btn-save" (click)="saveFormation()" [disabled]="loading">
+              <span *ngIf="loading" class="spinner"></span>
+              Suivant — Programme ›
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ÉTAPE 2 -->
+      <ng-container *ngIf="adminStep === 2">
+        <div class="card-section">
+          <h5 class="section-title">Programme pédagogique</h5>
+          <div class="admin-step-section">
+            <h6 class="admin-step-section-title">Description du programme</h6>
+            <div class="form-group full" style="margin-bottom:12px">
+              <label>Description générale</label>
+              <textarea class="form-input" rows="3" [(ngModel)]="programmeData.description_globale" placeholder="Contenu global de la formation..."></textarea>
+            </div>
+            <div class="form-group full" style="margin-bottom:12px">
+              <label>Objectifs pédagogiques</label>
+              <textarea class="form-input" rows="2" [(ngModel)]="programmeData.objectifs" placeholder="À la fin, les apprenants seront capables de..."></textarea>
+            </div>
+            <div class="form-group full" style="margin-bottom:0">
+              <label>Prérequis</label>
+              <textarea class="form-input" rows="2" [(ngModel)]="programmeData.prerequis" placeholder="Connaissances requises..."></textarea>
+            </div>
+          </div>
+          <hr class="modal-divider" style="margin:20px 0">
+          <div class="admin-step-section">
+            <h6 class="admin-step-section-title">Modules <span class="badge-count">{{ programmeModules.length }}</span></h6>
+            <div class="admin-modules-list" *ngIf="programmeModules.length > 0">
+              <div class="admin-module-row" *ngFor="let m of programmeModules; let i = index">
+                <div class="amr-num">{{ m.ordre || (i + 1) }}</div>
+                <div class="amr-info">
+                  <div class="amr-titre">{{ m.titre }}</div>
+                  <div class="amr-desc" *ngIf="m.description">{{ m.description }}</div>
+                </div>
+                <div class="amr-actions">
+                  <button class="btn-csr-edit" (click)="editerModule(m)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="btn-csr-del" (click)="supprimerModule(m.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="programmeModules.length === 0" class="admin-modules-empty">Aucun module — ajoutez-en ci-dessous.</div>
+            <div class="admin-module-form">
+              <h6>{{ editModuleMode ? 'Modifier le module' : 'Ajouter un module' }}</h6>
+              <div class="amf-grid">
+                <input class="form-input" [(ngModel)]="moduleForm.titre" placeholder="Titre du module *">
+                <input class="form-input" type="number" [(ngModel)]="moduleForm.ordre" placeholder="Ordre" min="1" style="max-width:90px">
+                <input class="form-input" [(ngModel)]="moduleForm.description" placeholder="Description (optionnel)">
+              </div>
+              <div class="amf-actions">
+                <button class="btn-add-seance" (click)="soumettreModule()">{{ editModuleMode ? 'Modifier' : 'Ajouter' }}</button>
+                <button *ngIf="editModuleMode" class="btn-cancel-seance" (click)="annulerEditModule()">Annuler</button>
+              </div>
+            </div>
+          </div>
+          <div class="creation-step-footer">
+            <button class="btn-back-step" (click)="adminStep = 1">‹ Retour</button>
+            <button class="btn-cancel" (click)="closeForm()">Annuler</button>
+            <button class="btn-save" (click)="passerStep3Admin()">Suivant — Supports &amp; Séances ›</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ÉTAPE 3 -->
+      <ng-container *ngIf="adminStep === 3">
+        <div class="card-section">
+          <h5 class="section-title">Supports &amp; Séances</h5>
+          <div class="admin-step-section">
+            <h6 class="admin-step-section-title">Supports pédagogiques</h6>
+            <div class="admin-support-form">
+              <div class="asf-grid">
+                <select class="form-input" [(ngModel)]="adminSupportType">
+                  <option value="pdf">PDF</option>
+                  <option value="video">Vidéo</option>
+                  <option value="lien">Lien URL</option>
+                  <option value="image">Image</option>
+                  <option value="autre">Autre</option>
+                </select>
+                <input class="form-input" [(ngModel)]="adminSupportNom" placeholder="Nom du support (optionnel)">
+              </div>
+              <div *ngIf="adminSupportType !== 'lien'" class="form-group" style="margin-top:8px">
+                <input type="file" class="form-input" (change)="onAdminSupportFileSelected($event)">
+              </div>
+              <div *ngIf="adminSupportType === 'lien'" class="form-group" style="margin-top:8px">
+                <input class="form-input" type="url" [(ngModel)]="adminSupportUrl" placeholder="https://...">
+              </div>
+              <button class="btn-add-seance" (click)="ajouterSupportAdmin()" [disabled]="adminSupportLoading">
+                <span *ngIf="adminSupportLoading" class="spinner"></span> Ajouter le support
+              </button>
+            </div>
+            <div *ngIf="adminSupports.length === 0" class="config-empty-seances" style="margin-top:10px">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><p>Aucun support. Vous pouvez continuer sans support.</p>
+            </div>
+            <div class="admin-supports-list" *ngIf="adminSupports.length > 0">
+              <div class="admin-support-chip" *ngFor="let s of adminSupports">
+                <span>{{ getSupportIcon(s.type) }}</span>
+                <span class="asc-nom">{{ s.nom }}</span>
+                <button class="btn-csr-del" (click)="supprimerSupportAdmin(s.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              </div>
+            </div>
+          </div>
+          <hr class="modal-divider" style="margin:20px 0">
+          <div class="admin-step-section">
+            <h6 class="admin-step-section-title">Séances</h6>
+            <div class="config-seance-form">
+              <div class="csf-grid">
+                <div class="config-field"><label>Date <span class="req">*</span></label><input type="date" class="config-input" [(ngModel)]="adminStepSeanceForm.date_seance"></div>
+                <div class="config-field"><label>Heure début <span class="req">*</span></label><input type="time" class="config-input" [(ngModel)]="adminStepSeanceForm.heure_debut"></div>
+                <div class="config-field"><label>Heure fin <span class="req">*</span></label><input type="time" class="config-input" [(ngModel)]="adminStepSeanceForm.heure_fin"></div>
+                <div class="config-field"><label>Salle / Lien</label><input type="text" class="config-input" [(ngModel)]="adminStepSeanceForm.salle" placeholder="Salle 101 ou lien Teams"></div>
+                <div class="config-field csf-module">
+                  <label>Modules couverts</label>
+                  <div class="csf-checkboxes">
+                    <label *ngFor="let m of programmeModules" class="csf-checkbox-item">
+                      <input type="checkbox"
+                             [checked]="adminStepSeanceForm.module_ids.includes(m.id)"
+                             (change)="toggleModuleSeanceAdmin(m.id)">
+                      <span>{{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}</span>
+                    </label>
+                    <span *ngIf="programmeModules.length === 0" class="csf-no-modules">Aucun module disponible</span>
+                  </div>
+                </div>
+              </div>
+              <div class="csf-actions">
+                <button class="btn-add-seance" (click)="ajouterSeanceAdmin()">{{ adminStepEditSeanceMode ? 'Modifier' : 'Ajouter la séance' }}</button>
+                <button *ngIf="adminStepEditSeanceMode" class="btn-cancel-seance" (click)="annulerEditSeanceAdmin()">Annuler</button>
+              </div>
+            </div>
+            <div *ngIf="adminStepSeances.length === 0" class="config-empty-seances" style="margin-top:8px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><p>Aucune séance. Vous pouvez continuer sans séance.</p></div>
+            <div class="config-seances-list" *ngIf="adminStepSeances.length > 0">
+              <div class="config-seance-row" *ngFor="let s of adminStepSeances; let i = index">
+                <div class="csr-num">{{ i + 1 }}</div>
+                <div class="csr-info">
+                  <div class="csr-date">{{ s.date_seance | date:'dd/MM/yyyy' }}</div>
+                  <div class="csr-time">{{ s.heure_debut }} — {{ s.heure_fin }}</div>
+                  <div *ngIf="s.salle" class="csr-salle">{{ s.salle }}</div>
+                  <div class="csr-modules-chips" *ngIf="s.modules?.length > 0">
+                    <span class="csr-module-chip" *ngFor="let m of s.modules">{{ m.titre }}</span>
+                  </div>
+                </div>
+                <div class="csr-actions">
+                  <button class="btn-csr-edit" (click)="editerSeanceAdmin(s)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="btn-csr-del" (click)="supprimerSeanceAdmin(s.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="creation-step-footer">
+            <button class="btn-back-step" (click)="adminStep = 2">‹ Retour</button>
+            <button class="btn-cancel" (click)="closeForm()">Annuler</button>
+            <button class="btn-finish-creation" (click)="passerStep4Admin()">Quiz ›</button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ÉTAPE 4 -->
+      <ng-container *ngIf="adminStep === 4">
+        <div class="card-section">
+          <h5 class="section-title">Quiz de validation</h5>
+          <p class="quiz-intro-text">
+            Créez le quiz de validation que les apprenants devront réussir pour obtenir leur attestation.
+            <strong class="quiz-intro-required">Au moins 1 question requise.</strong>
+          </p>
+          <div class="quiz-params-grid">
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Titre du quiz</label>
+              <input class="form-input" type="text" [(ngModel)]="adminQuizTitre" placeholder="Ex : Quiz de validation">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Seuil de réussite (%) <span class="quiz-seuil-val">{{ adminQuizSeuil }}%</span></label>
+              <input class="form-input quiz-range" type="range" [(ngModel)]="adminQuizSeuil" min="50" max="100" step="5">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Nombre de tentatives max</label>
+              <input class="form-input" type="number" [(ngModel)]="adminQuizNbTentatives" min="1" max="10" style="max-width:100px">
+            </div>
+          </div>
+          <hr class="modal-divider">
+          <div class="quiz-questions-editor">
+            <div class="quiz-q-header">
+              <h6 class="programme-section-title">Questions <span class="module-count-chip">{{ adminQuizQuestions.length }}</span></h6>
+              <button class="btn-add-question" (click)="ajouterQuestionAdmin4()" [disabled]="adminQuizQuestions.length >= 20">+ Ajouter une question</button>
+            </div>
+            <div *ngIf="adminQuizQuestions.length === 0" class="module-empty quiz-empty-warn">
+              Ajoutez au moins 1 question pour pouvoir terminer la création.
+            </div>
+            <div class="quiz-question-block" *ngFor="let q of adminQuizQuestions; let qi = index">
+              <div class="quiz-q-top">
+                <span class="quiz-q-num">Q{{ qi + 1 }}</span>
+                <input class="form-input quiz-q-input" type="text" [(ngModel)]="q.question" placeholder="Saisir le texte de la question...">
+                <button class="btn-action red" (click)="supprimerQuestionAdmin4(qi)" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              </div>
+              <div class="quiz-reponses-list">
+                <div class="quiz-rep-row" *ngFor="let r of q.reponses; let ri = index">
+                  <label class="quiz-correct-radio" title="Bonne réponse">
+                    <input type="radio" [name]="'admin4-correct-' + qi" [checked]="r.est_correcte" (change)="marquerCorrecteAdmin4(qi, ri)">
+                    <span class="quiz-radio-dot" [class.correct]="r.est_correcte">
+                      <ng-container *ngIf="r.est_correcte"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                    </span>
+                  </label>
+                  <input class="form-input quiz-rep-input" type="text" [(ngModel)]="r.reponse"
+                         [placeholder]="'Réponse ' + (ri + 1)" [class.quiz-rep-correct]="r.est_correcte">
+                  <button class="btn-action red btn-xs" (click)="supprimerReponseAdmin4(qi, ri)"
+                          [disabled]="q.reponses.length <= 2" title="Supprimer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </div>
+                <button class="btn-add-rep" (click)="ajouterReponseAdmin4(qi)" [disabled]="q.reponses.length >= 4">+ Ajouter une réponse</button>
+              </div>
+            </div>
+          </div>
+          <div class="creation-step-footer">
+            <button class="btn-cancel" (click)="adminStep = 3">‹ Retour</button>
+            <button class="btn-finish-creation" (click)="terminerCreationAdmin()"
+                    [disabled]="adminQuizSaving || adminQuizQuestions.length === 0">
+              <span *ngIf="adminQuizSaving">Enregistrement...</span>
+              <span *ngIf="!adminQuizSaving">Terminer la création</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+    </section>
+
+    <!-- ===== FORMATEURS ===== -->
+    <section *ngIf="activeSection==='formateurs'">
+      <div class="page-title-row">
+        <div class="page-title">
+          <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Formateurs</h2>
+          <p>{{ filteredFormateurs.length }} formateur(s)</p>
+        </div>
+        <button class="btn-primary" (click)="openAddFormateur()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter</button>
+      </div>
+
+      <div class="pay-stats-row">
+        <div class="pay-stat-card">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formateurs.length }}</div>
+            <div class="pay-stat-label">Total formateurs</div>
+          </div>
+        </div>
+        <div class="pay-stat-card blue">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formateursAvecFormation }}</div>
+            <div class="pay-stat-label">Avec formation active</div>
+          </div>
+        </div>
+        <div class="pay-stat-card green">
+          <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="pay-stat-body">
+            <div class="pay-stat-value">{{ formateurs.length - formateursAvecFormation }}</div>
+            <div class="pay-stat-label">Disponibles</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-filters">
+        <input class="pay-search" type="text" [(ngModel)]="formateurSearch" (ngModelChange)="resetFormateurPage()" placeholder="Rechercher...">
+        <select class="pay-search" style="max-width:220px" [(ngModel)]="formateurSpecialiteFilter" (ngModelChange)="resetFormateurPage()">
           <option value="">Toutes spécialités</option>
           <option *ngFor="let s of formateurSpecialiteOptions" [value]="s">{{ s }}</option>
         </select>
-        <select class="filter-select" [(ngModel)]="formateurSort">
-          <option value="nom">Trier par nom</option>
-          <option value="email">Trier par email</option>
-          <option value="specialite">Trier par spécialité</option>
-        </select>
+        <div class="pay-tabs">
+          <button class="pay-tab" [class.active]="formateurSort==='nom'" (click)="formateurSort='nom'">Nom</button>
+          <button class="pay-tab" [class.active]="formateurSort==='specialite'" (click)="formateurSort='specialite'">Spécialité</button>
+        </div>
       </div>
 
-      <div class="card-section">
-        <div class="data-table-wrapper">
-          <table class="data-table" *ngIf="paginatedFormateurs.length > 0">
-            <thead>
-              <tr><th>Nom</th><th>Email</th><th>Spécialité</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let f of paginatedFormateurs">
-                <td><strong>{{ f.nom }}</strong></td>
-                <td>{{ f.email }}</td>
-                <td>{{ f.specialite || '—' }}</td>
-                <td class="actions-cell">
-                  <button class="btn-action orange" (click)="editFormateur(f)">✏️ Modifier</button>
-                  <button class="btn-action red" (click)="deleteFormateur(f.id)">🗑️ Supprimer</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div *ngIf="filteredFormateurs.length === 0" class="empty-state"><span>👨‍🏫</span><p>Aucun formateur.</p></div>
+      <div class="pay-table-wrap">
+        <div *ngIf="filteredFormateurs.length === 0" class="pay-empty">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <p>Aucun formateur trouvé.</p>
         </div>
+        <table class="pay-table" *ngIf="filteredFormateurs.length > 0">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Spécialité</th>
+              <th>Disponibilité</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of paginatedFormateurs">
+              <td><strong>{{ f.nom }}</strong></td>
+              <td>{{ f.email }}</td>
+              <td>
+                <span class="pay-statut-badge" style="background:#e3f2fd;color:#1565c0">{{ f.specialite || '—' }}</span>
+              </td>
+              <td>
+                <span *ngIf="!isFormateurEnCours(f)" class="pay-statut-badge" style="background:#e8f5e9;color:#2e7d32">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Disponible
+                </span>
+                <span *ngIf="isFormateurEnCours(f)" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
+                  <span class="pay-statut-badge" style="background:#fff3e0;color:#e65100;font-weight:700;">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Occupé
+                  </span>
+                  <span style="font-size:11px;font-weight:600;color:#b45309;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ f.formation_active_titre }}</span>
+                  <span *ngIf="f.formation_active_debut" style="font-size:10.5px;color:#92400e;">
+                    {{ f.formation_active_debut | date:'dd/MM/yyyy' }}<ng-container *ngIf="f.formation_active_fin"> → {{ f.formation_active_fin | date:'dd/MM/yyyy' }}</ng-container>
+                  </span>
+                </span>
+              </td>
+              <td>
+                <button class="btn-action orange" (click)="editFormateur(f)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Modifier</button>
+                <button class="btn-action red" (click)="deleteFormateur(f.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Supprimer</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <div class="pagination" *ngIf="formateurPageCount > 1">
           <button class="page-btn" (click)="changeFormateurPage(formateurCurrentPage-1)" [disabled]="formateurCurrentPage===1">‹</button>
@@ -315,122 +858,297 @@
           <button class="page-btn" (click)="changeFormateurPage(formateurCurrentPage+1)" [disabled]="formateurCurrentPage===formateurPageCount">›</button>
         </div>
       </div>
- 
     </section>
  
-   <!-- ===== APPROBATIONS ===== -->
-    <section *ngIf="activeSection==='approvals'">
-      <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
-      <div class="page-title">
-        <h2>🔔 Approbations</h2>
-        <p>{{ formationsPending.length }} formation(s) en attente · {{ formationsAccepted.length }} acceptée(s) · {{ inscriptionsPending.length }} inscription(s) à approuver</p>
-      </div>
+  <!-- ===== APPROBATIONS ===== -->
+  <section *ngIf="activeSection==='approvals'">
 
-  <!-- DEMANDES D'INSCRIPTION EN ATTENTE -->
-  <div class="approvals-sub-title">
-    <h4>👤 Demandes d'inscription en attente</h4>
-  </div>
+    <div class="page-title">
+      <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Approbations</h2>
+      <p>Gérez les demandes en attente — inscriptions et formations</p>
+    </div>
 
-  <div *ngIf="inscriptionsPending.length === 0" class="empty-state" style="margin-bottom:24px">
-    <span>✅</span>
-    <p>Aucune demande d'inscription en attente.</p>
-  </div>
-
-  <div class="inscriptions-pending-list" *ngIf="inscriptionsPending.length > 0">
-    <div class="insc-pending-card" *ngFor="let i of inscriptionsPending">
-      <div class="insc-pending-user">
-        <span class="insc-avatar">{{ i.user_nom?.charAt(0)?.toUpperCase() }}</span>
-        <div class="insc-user-info">
-          <strong>{{ i.user_nom }}</strong>
-          <span class="insc-user-email">{{ i.user_email }}</span>
-          <span class="insc-user-type">{{ i.type_utilisateur === 'candidat' ? '🎓 Candidat' : '📘 Étudiant' }}</span>
+    <!-- KPI -->
+    <div class="pay-stats-row">
+      <div class="pay-stat-card orange">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ inscriptionsPending.length }}</div>
+          <div class="pay-stat-label">Inscriptions en attente</div>
         </div>
       </div>
-      <div class="insc-pending-formation">
-        <span class="insc-formation-titre">📚 {{ i.formation_titre }}</span>
-        <span class="insc-formation-date" *ngIf="i.date_debut">📅 Début : {{ i.date_debut | date:'dd/MM/yyyy' }}</span>
-        <ng-container *ngIf="i.nb_places !== null">
-          <span class="insc-formation-places" [class.insc-places-full]="i.inscrits_actifs >= i.nb_places">
-            👥 {{ i.inscrits_actifs }}/{{ i.nb_places }} place(s)
-            <span *ngIf="i.inscrits_actifs >= i.nb_places" class="insc-full-tag">COMPLET</span>
-          </span>
-        </ng-container>
-        <span class="insc-formation-places" *ngIf="i.nb_places === null">👥 Places illimitées</span>
+      <div class="pay-stat-card" style="border-color:#6a1b9a">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ listeAttenteGlobale.length }}</div>
+          <div class="pay-stat-label">Liste d'attente</div>
+        </div>
       </div>
-      <div class="insc-pending-date">
-        Demandé le {{ i.date_inscription | date:'dd/MM/yyyy HH:mm' }}
+      <div class="pay-stat-card" style="border-color:#f9a825">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ formationsPending.length }}</div>
+          <div class="pay-stat-label">Formations en attente</div>
+        </div>
       </div>
-      <div class="insc-pending-actions">
-        <button class="btn-approve"
-                [disabled]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places"
-                [title]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places ? 'Formation complète — impossible d\'approuver' : 'Approuver la demande'"
-                (click)="approuverInscription(i.id)">✅ Approuver</button>
-        <button class="btn-reject" (click)="rejeterInscription(i.id)">❌ Refuser</button>
-      </div>
-    </div>
-  </div>
-
-   <!-- EN ATTENTE D'ACCEPTATION -->
-      <div class="approvals-sub-title" style="margin-top:32px">
-        <h4>📥 En attente d'acceptation (formations)</h4>
-      </div>
-
-    <div *ngIf="formationsPending.length === 0" class="empty-state" style="margin-bottom:24px">
-        <span>✅</span>
-        <p>Aucune formation en attente d'acceptation.</p>
-      </div>
-
-  <div class="approvals-grid" *ngIf="formationsPending.length > 0">
-    <div class="approval-card" *ngFor="let f of formationsPending">
-      <div class="approval-header">
-        <span class="status-badge status-pending">En attente</span>
-        <span class="approval-date" *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-      </div>
-      <h5 class="approval-title">{{ f.titre }}</h5>
-      <p class="approval-desc">{{ f.description }}</p>
-      <div class="approval-meta">
-        <span>👨‍🏫 {{ f.formateur }}</span>
-        <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
-      </div>
-      <div class="approval-actions">
-        <button class="btn-details" (click)="voirDetails(f)">👁 Voir détails</button>
-        <button class="btn-approve" (click)="acceptFormation(f.id)">✅ Accepter</button>
-        <button class="btn-reject" (click)="rejectFormation(f.id)">❌ Rejeter</button>
+      <div class="pay-stat-card blue">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ formationsAccepted.length }}</div>
+          <div class="pay-stat-label">Formations à publier</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ACCEPTÉES — EN ATTENTE DE PUBLICATION -->
-  <div class="approvals-sub-title" style="margin-top:32px">
-    <h4>📋 Acceptées — en attente de publication</h4>
-  </div>
-
-  <div *ngIf="formationsAccepted.length === 0" class="empty-state">
-    <span>📭</span>
-    <p>Aucune formation acceptée en attente de publication.</p>
-  </div>
-
-  <div class="approvals-grid" *ngIf="formationsAccepted.length > 0">
-    <div class="approval-card approval-card-accepted" *ngFor="let f of formationsAccepted">
-      <div class="approval-header">
-        <span class="status-badge status-accepted">Acceptée</span>
-        <span class="approval-date" *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+    <!-- Filtres -->
+    <div class="pay-filters" style="flex-wrap:wrap;gap:10px">
+      <input class="pay-search" type="text" [(ngModel)]="apprRecherche"
+             placeholder="Rechercher par nom, email, formation...">
+      <div class="pay-tabs">
+        <button class="pay-tab" [class.active]="apprFiltreCategorie==='tous'" (click)="apprFiltreCategorie='tous'">
+          Tout <span class="nav-badge" style="position:static;transform:none;margin-left:4px">{{ inscriptionsPending.length + formationsPending.length + formationsAccepted.length + listeAttenteGlobale.length }}</span>
+        </button>
+        <button class="pay-tab" [class.active]="apprFiltreCategorie==='inscriptions'" (click)="apprFiltreCategorie='inscriptions'">
+          Inscriptions <span class="nav-badge" style="position:static;transform:none;margin-left:4px">{{ inscriptionsPending.length }}</span>
+        </button>
+        <button class="pay-tab" [class.active]="apprFiltreCategorie==='formations-pending'" (click)="apprFiltreCategorie='formations-pending'">
+          Formations <span class="nav-badge" style="position:static;transform:none;margin-left:4px">{{ formationsPending.length }}</span>
+        </button>
+        <button class="pay-tab" [class.active]="apprFiltreCategorie==='formations-accepted'" (click)="apprFiltreCategorie='formations-accepted'">
+          À publier <span class="nav-badge" style="position:static;transform:none;margin-left:4px">{{ formationsAccepted.length }}</span>
+        </button>
+        <button class="pay-tab" [class.active]="apprFiltreCategorie==='liste-attente'" (click)="apprFiltreCategorie='liste-attente'">
+          Liste d'attente <span class="nav-badge" style="position:static;transform:none;margin-left:4px">{{ listeAttenteGlobale.length }}</span>
+        </button>
       </div>
-      <h5 class="approval-title">{{ f.titre }}</h5>
-      <p class="approval-desc">{{ f.description }}</p>
-      <div class="approval-meta">
-        <span>👨‍🏫 {{ f.formateur }}</span>
-        <span *ngIf="f.specialite">🏢 {{ f.specialite }}</span>
-        <span class="approval-modules-count">
-          📚 {{ f.module_count || 0 }} module(s)
-        </span>
-      </div>
-      <div class="approval-actions">
-        <button class="btn-config-publish" (click)="ouvrirConfig(f)">⚙️ Configurer &amp; Publier</button>
+      <div class="pay-tabs" *ngIf="apprFiltreCategorie==='inscriptions' || apprFiltreCategorie==='tous'">
+        <button class="pay-tab" [class.active]="apprFiltreType==='tous'" (click)="apprFiltreType='tous'">Tous</button>
+        <button class="pay-tab" [class.active]="apprFiltreType==='candidat'" (click)="apprFiltreType='candidat'">Candidat</button>
+        <button class="pay-tab" [class.active]="apprFiltreType==='externe'" (click)="apprFiltreType='externe'">Externe</button>
       </div>
     </div>
-  </div>
-</section>
+
+    <!-- TOUT À JOUR / AUCUN RÉSULTAT -->
+    <div *ngIf="apprAucunResultat" class="approvals-all-clear">
+      <div class="all-clear-icon">
+        <ng-container *ngIf="apprRecherche"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></ng-container>
+        <ng-container *ngIf="!apprRecherche"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+      </div>
+      <div class="all-clear-title">{{ apprRecherche ? 'Aucun résultat' : 'Tout est à jour !' }}</div>
+      <div class="all-clear-sub">
+        {{ apprRecherche ? 'Aucune demande ne correspond à "' + apprRecherche + '".' : 'Aucune demande en attente pour le moment.' }}
+      </div>
+      <button *ngIf="apprRecherche || apprFiltreCategorie !== 'tous' || apprFiltreType !== 'tous'"
+              class="appr-reset-btn"
+              (click)="apprRecherche = ''; apprFiltreCategorie = 'tous'; apprFiltreType = 'tous'">
+        Réinitialiser les filtres
+      </button>
+    </div>
+
+    <!-- ── DEMANDES D'INSCRIPTION ── -->
+    <ng-container *ngIf="apprShowInscriptions">
+      <div class="appr-section-header appr-section-orange">
+        <div class="appr-section-header-left">
+          <span class="appr-section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <div>
+            <div class="appr-section-title">Demandes d'inscription</div>
+            <div class="appr-section-hint">Approbation requise avant inscription définitive</div>
+          </div>
+        </div>
+        <span class="appr-section-badge appr-badge-orange">{{ inscriptionsFiltrees.length }}</span>
+      </div>
+
+      <div class="inscriptions-pending-list">
+        <div class="insc-pending-card" *ngFor="let i of inscriptionsFiltrees">
+
+          <div class="insc-pending-header">
+            <div class="insc-pending-user">
+              <span class="insc-avatar">{{ i.user_nom?.charAt(0)?.toUpperCase() }}</span>
+              <div class="insc-user-info">
+                <strong>{{ i.user_nom }}</strong>
+                <span class="insc-user-email">{{ i.user_email }}</span>
+                <span class="insc-user-type" [class.badge-externe]="i.type_utilisateur === 'externe'">
+                  <ng-container *ngIf="i.type_utilisateur === 'candidat'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Candidat ISET</ng-container>
+                  <ng-container *ngIf="i.type_utilisateur !== 'candidat'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Externe</ng-container>
+                </span>
+              </div>
+            </div>
+            <span class="insc-pending-date-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ i.date_inscription | date:'dd/MM/yyyy · HH:mm' }}</span>
+          </div>
+
+          <div class="insc-pending-formation">
+            <span class="insc-formation-titre">{{ i.formation_titre }}</span>
+            <div class="insc-formation-meta">
+              <span class="insc-meta-pill" *ngIf="i.date_debut"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ i.date_debut | date:'dd/MM/yyyy' }}</span>
+              <ng-container *ngIf="i.nb_places !== null">
+                <span class="insc-meta-pill"
+                      [class.insc-pill-full]="i.inscrits_actifs >= i.nb_places"
+                      [class.insc-pill-warn]="i.inscrits_actifs >= (i.nb_places * 0.8) && i.inscrits_actifs < i.nb_places">
+                  {{ i.inscrits_actifs }}/{{ i.nb_places }} places
+                  <span *ngIf="i.inscrits_actifs >= i.nb_places"> · COMPLET</span>
+                  <span *ngIf="i.inscrits_actifs >= (i.nb_places * 0.8) && i.inscrits_actifs < i.nb_places"> · QUASI COMPLET</span>
+                </span>
+              </ng-container>
+              <span class="insc-meta-pill" *ngIf="i.nb_places === null">Places illimitées</span>
+            </div>
+          </div>
+
+          <div class="insc-pending-meta" *ngIf="i.type_utilisateur === 'externe' && i.montant > 0">
+            <span class="insc-meta-pill insc-pill-paid">{{ i.montant }} EUR — Payant</span>
+          </div>
+          <div class="insc-pending-meta" *ngIf="i.type_utilisateur === 'externe' && (!i.montant || i.montant == 0)">
+            <span class="insc-meta-pill">Gratuit</span>
+          </div>
+
+          <div class="insc-pending-actions">
+            <button class="btn-insc-approve"
+                    [disabled]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places"
+                    [title]="i.nb_places !== null && i.inscrits_actifs >= i.nb_places ? 'Formation complète' : 'Approuver'"
+                    (click)="approuverDemandeInscription(i)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Approuver
+            </button>
+            <button class="btn-insc-reject" (click)="rejeterDemandeInscription(i)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Refuser
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── LISTE D'ATTENTE GLOBALE ── -->
+    <ng-container *ngIf="apprShowListeAttente">
+      <div class="appr-section-header appr-section-purple">
+        <div class="appr-section-header-left">
+          <span class="appr-section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+          <div>
+            <div class="appr-section-title">Liste d'attente</div>
+            <div class="appr-section-hint">Ces personnes attendent une place disponible — elles seront notifiées automatiquement</div>
+          </div>
+        </div>
+        <span class="appr-section-badge appr-badge-purple">{{ listeAttenteFiltree.length }}</span>
+      </div>
+
+      <div class="inscriptions-pending-list">
+        <div class="insc-pending-card" *ngFor="let a of listeAttenteFiltree">
+          <div class="insc-pending-header">
+            <div class="insc-pending-user">
+              <span class="insc-avatar">{{ a.user_nom?.charAt(0)?.toUpperCase() }}</span>
+              <div class="insc-user-info">
+                <strong>{{ a.user_nom }}</strong>
+                <span class="insc-user-email">{{ a.user_email }}</span>
+                <span class="insc-user-type"
+                      [class.type-badge-externe]="a.type_utilisateur === 'externe'"
+                      [class.type-badge-candidat]="a.type_utilisateur !== 'externe'">
+                  <ng-container *ngIf="a.type_utilisateur === 'externe'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Externe</ng-container>
+                  <ng-container *ngIf="a.type_utilisateur !== 'externe'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Candidat ISET</ng-container>
+                </span>
+              </div>
+            </div>
+            <span class="attente-position-badge">#{{ a.position }}</span>
+            <span class="insc-pending-date-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>{{ a.date_ajout | date:'dd/MM/yyyy · HH:mm' }}</span>
+          </div>
+
+          <div class="insc-pending-formation">
+            <span class="insc-formation-titre">{{ a.formation_titre }}</span>
+            <div class="insc-formation-meta">
+              <ng-container *ngIf="a.nb_places !== null">
+                <span class="insc-meta-pill"
+                      [class.insc-pill-full]="a.inscrits_actifs >= a.nb_places"
+                      [class.insc-pill-dispo]="a.inscrits_actifs < a.nb_places">
+                  {{ a.inscrits_actifs }}/{{ a.nb_places }} places ·
+                  <ng-container *ngIf="a.inscrits_actifs >= a.nb_places">COMPLET</ng-container>
+                  <ng-container *ngIf="a.inscrits_actifs < a.nb_places">{{ a.nb_places - a.inscrits_actifs }} place(s) disponible(s)</ng-container>
+                </span>
+              </ng-container>
+            </div>
+          </div>
+
+          <div class="insc-attente-footer">
+            <div class="insc-attente-note">
+              <span class="attente-badge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente de place</span>
+              <span class="attente-info">Sera notifié automatiquement quand une place se libère</span>
+            </div>
+            <div class="attente-action-btns">
+              <button class="btn-attente-inscrire" (click)="inscrireDepuisAttente(a)" title="Inscrire directement">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Inscrire
+              </button>
+              <button class="btn-attente-retirer" (click)="retirerDeListeAttente(a)" title="Retirer de la liste">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Retirer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── FORMATIONS EN ATTENTE D'ACCEPTATION ── -->
+    <ng-container *ngIf="apprShowFormationsPending">
+      <div class="appr-section-header appr-section-yellow">
+        <div class="appr-section-header-left">
+          <span class="appr-section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+          <div>
+            <div class="appr-section-title">Formations soumises par les formateurs</div>
+            <div class="appr-section-hint">Acceptez ou rejetez avant publication</div>
+          </div>
+        </div>
+        <span class="appr-section-badge appr-badge-yellow">{{ formationsPendingFiltrees.length }}</span>
+      </div>
+
+      <div class="approvals-grid">
+        <div class="approval-card" *ngFor="let f of formationsPendingFiltrees">
+          <div class="approval-card-top">
+            <span class="appr-card-status appr-status-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente</span>
+            <span class="appr-card-date" *ngIf="f.date_debut">{{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <h5 class="appr-card-title">{{ f.titre }}</h5>
+          <p class="appr-card-desc">{{ f.description }}</p>
+          <div class="appr-card-meta">
+            <span class="appr-meta-item">{{ f.formateur }}</span>
+            <span class="appr-meta-item" *ngIf="f.specialite">{{ f.specialite }}</span>
+          </div>
+          <div class="appr-card-actions">
+            <button class="btn-card-details" (click)="voirDetails(f)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Détails</button>
+            <button class="btn-card-accept" (click)="acceptFormation(f.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Accepter</button>
+            <button class="btn-card-reject" (click)="rejectFormation(f.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Rejeter</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── FORMATIONS ACCEPTÉES À PUBLIER ── -->
+    <ng-container *ngIf="apprShowFormationsAccepted">
+      <div class="appr-section-header appr-section-blue">
+        <div class="appr-section-header-left">
+          <span class="appr-section-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span>
+          <div>
+            <div class="appr-section-title">Formations acceptées — prêtes à publier</div>
+            <div class="appr-section-hint">Configurez dates et prix avant publication</div>
+          </div>
+        </div>
+        <span class="appr-section-badge appr-badge-blue">{{ formationsAcceptedFiltrees.length }}</span>
+      </div>
+
+      <div class="approvals-grid">
+        <div class="approval-card approval-card-accepted" *ngFor="let f of formationsAcceptedFiltrees">
+          <div class="approval-card-top">
+            <span class="appr-card-status appr-status-accepted"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Acceptée</span>
+            <span class="appr-card-modules">{{ f.module_count || 0 }} module(s)</span>
+          </div>
+          <h5 class="appr-card-title">{{ f.titre }}</h5>
+          <p class="appr-card-desc">{{ f.description }}</p>
+          <div class="appr-card-meta">
+            <span class="appr-meta-item">{{ f.formateur }}</span>
+            <span class="appr-meta-item" *ngIf="f.specialite">{{ f.specialite }}</span>
+          </div>
+          <div class="appr-card-actions">
+            <button class="btn-card-publish" (click)="ouvrirConfig(f)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurer &amp; Publier</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+  </section>
 
 <!-- ===== MODAL CONFIG & PUBLICATION ===== -->
 <div class="modal-overlay config-overlay" *ngIf="showConfigModal" (click)="fermerConfig()">
@@ -439,14 +1157,14 @@
     <!-- HEADER -->
     <div class="config-header">
       <div class="config-header-left">
-        <span class="config-status-chip">⚙️ Configuration &amp; Publication</span>
+        <span class="config-status-chip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configuration &amp; Publication</span>
         <h3 class="config-title">{{ configFormation?.titre }}</h3>
         <div class="config-meta-line">
-          <span>👨‍🏫 {{ configFormation?.formateur }}</span>
+          <span>{{ configFormation?.formateur }}</span>
           <span *ngIf="configFormation?.specialite" class="config-spec-chip">{{ configFormation?.specialite }}</span>
         </div>
       </div>
-      <button class="config-close" (click)="fermerConfig()">✕</button>
+      <button class="config-close" (click)="fermerConfig()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
     <!-- LOADING -->
@@ -457,9 +1175,9 @@
 
     <div *ngIf="!configLoading" class="config-body">
 
-      <!-- SECTION 1 : DATES + PRIX -->
+      <!-- SECTION 1 : DATES + PLACES + PRIX -->
       <div class="config-section">
-        <h6 class="config-section-title">📅 Dates &amp; Prix</h6>
+        <h6 class="config-section-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Dates, Places &amp; Prix</h6>
         <div class="config-dates-grid">
           <div class="config-field">
             <label>Date de début <span class="req">*</span></label>
@@ -470,18 +1188,40 @@
             <input type="date" class="config-input" [(ngModel)]="configDateFin" [min]="configDateDebut || configToday">
           </div>
           <div class="config-field">
+            <label>Nombre de places <span class="req">*</span></label>
+            <input type="number" min="1" step="1" class="config-input" [(ngModel)]="configNbPlaces" placeholder="ex: 25">
+          </div>
+          <div class="config-field">
             <label>Prix pour les externes (EUR) <span class="req">*</span></label>
             <div class="config-prix-row">
-              <input type="number" min="0.01" step="0.01" class="config-input" [(ngModel)]="configPrix" placeholder="ex: 150.00">
+              <input type="number" min="1" step="0.01" class="config-input" [(ngModel)]="configPrix" placeholder="ex: 49.99">
               <span class="config-prix-label">EUR</span>
             </div>
           </div>
         </div>
       </div>
 
+      <!-- SECTION QUIZ -->
+      <div class="config-section">
+        <h6 class="config-section-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Quiz de validation</h6>
+        <div *ngIf="configQuiz; else noQuiz" class="config-quiz-ok">
+          <span class="config-quiz-badge ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Quiz configuré</span>
+          <div class="config-quiz-info">
+            <span>{{ configQuiz.questions?.length || 0 }} question(s)</span>
+            <span>Seuil : {{ configQuiz.seuil_reussite }}%</span>
+            <span>Tentatives max : {{ configQuiz.nb_tentatives }}</span>
+          </div>
+        </div>
+        <ng-template #noQuiz>
+          <div class="config-quiz-warn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aucun quiz configuré — le formateur doit en créer un avant la publication.
+          </div>
+        </ng-template>
+      </div>
+
       <!-- SECTION 2 : SÉANCES -->
       <div class="config-section">
-        <h6 class="config-section-title">🗓️ Séances</h6>
+        <h6 class="config-section-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Séances</h6>
 
         <!-- Formulaire ajout/édition séance -->
         <div class="config-seance-form">
@@ -503,18 +1243,22 @@
               <input type="text" class="config-input" [(ngModel)]="configSeanceForm.salle" placeholder="ex: Salle 101 ou lien Teams">
             </div>
             <div class="config-field csf-module">
-              <label>Module associé</label>
-              <select class="config-input" [(ngModel)]="configSeanceForm.module_id">
-                <option [ngValue]="null">— Aucun module —</option>
-                <option *ngFor="let m of configModules" [ngValue]="m.id">
-                  {{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}
-                </option>
-              </select>
+              <label>Modules couverts</label>
+              <div class="csf-checkboxes">
+                <label *ngFor="let m of configModules" class="csf-checkbox-item">
+                  <input type="checkbox"
+                         [checked]="configSeanceForm.module_ids.includes(m.id)"
+                         (change)="toggleModuleSeanceConfig(m.id)">
+                  <span>{{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}</span>
+                </label>
+                <span *ngIf="configModules.length === 0" class="csf-no-modules">Aucun module disponible</span>
+              </div>
             </div>
           </div>
           <div class="csf-actions">
             <button class="btn-add-seance" (click)="ajouterSeanceConfig()">
-              {{ configEditSeanceMode ? '💾 Modifier la séance' : '➕ Ajouter la séance' }}
+              <ng-container *ngIf="configEditSeanceMode"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Modifier la séance</ng-container>
+              <ng-container *ngIf="!configEditSeanceMode"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter la séance</ng-container>
             </button>
             <button *ngIf="configEditSeanceMode" class="btn-cancel-seance" (click)="annulerEditSeanceConfig()">Annuler</button>
           </div>
@@ -522,7 +1266,7 @@
 
         <!-- Liste des séances -->
         <div *ngIf="configSeances.length === 0" class="config-empty-seances">
-          <span>📭</span>
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>
           <p>Aucune séance ajoutée. Vous pouvez publier sans séances et les ajouter plus tard.</p>
         </div>
 
@@ -531,13 +1275,15 @@
             <div class="csr-num">{{ i + 1 }}</div>
             <div class="csr-info">
               <div class="csr-date">{{ s.date_seance | date:'dd/MM/yyyy' }}</div>
-              <div class="csr-time">🕐 {{ s.heure_debut }} — {{ s.heure_fin }}</div>
-              <div *ngIf="s.salle" class="csr-salle">📍 {{ s.salle }}</div>
-              <div *ngIf="s.module_titre" class="csr-module-chip">📚 {{ s.module_titre }}</div>
+              <div class="csr-time">{{ s.heure_debut }} — {{ s.heure_fin }}</div>
+              <div *ngIf="s.salle" class="csr-salle">{{ s.salle }}</div>
+              <div class="csr-modules-chips" *ngIf="s.modules?.length > 0">
+                <span class="csr-module-chip" *ngFor="let m of s.modules">{{ m.titre }}</span>
+              </div>
             </div>
             <div class="csr-actions">
-              <button class="btn-csr-edit" (click)="editerSeanceConfig(s)" title="Modifier">✏️</button>
-              <button class="btn-csr-del" (click)="supprimerSeanceConfig(s.id)" title="Supprimer">🗑️</button>
+              <button class="btn-csr-edit" (click)="editerSeanceConfig(s)" title="Modifier"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-csr-del" (click)="supprimerSeanceConfig(s.id)" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
         </div>
@@ -548,21 +1294,138 @@
     <!-- FOOTER -->
     <div class="config-footer">
       <button class="btn-config-cancel" (click)="fermerConfig()">Annuler</button>
-      <button class="btn-config-publish-final" (click)="publierFormation()" [disabled]="configPublishing || !configDateDebut || !configPrix">
+      <button class="btn-config-publish-final" (click)="publierFormation()" [disabled]="configPublishing || !configDateDebut || !configNbPlaces || configPrix === null">
         <span *ngIf="configPublishing" class="spinner"></span>
-        🚀 Publier la formation
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Publier la formation
       </button>
     </div>
 
   </div>
 </div>
 
+<!-- ===== PAIEMENTS EXTERNES ===== -->
+<section *ngIf="activeSection === 'paiements'">
+  <div class="page-title">
+    <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements externes</h2>
+    <p>Suivi des paiements des participants externes</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="pay-stats-row">
+    <div class="pay-stat-card green">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ paiementsTotalEncaisse | number:'1.2-2' }} EUR</div>
+        <div class="pay-stat-label">Total encaissé</div>
+      </div>
+    </div>
+    <div class="pay-stat-card orange">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ paiementsEnAttenteCount }}</div>
+        <div class="pay-stat-label">En attente de paiement</div>
+      </div>
+    </div>
+    <div class="pay-stat-card blue">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ paiementsExternes.length }}</div>
+        <div class="pay-stat-label">Total inscriptions externes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="pay-filters">
+    <input class="pay-search" type="text" [(ngModel)]="paiementsRecherche" placeholder="Rechercher par nom, email ou formation...">
+    <div class="pay-tabs">
+      <button class="pay-tab" [class.active]="paiementsFiltreStatut === 'tous'"       (click)="paiementsFiltreStatut = 'tous'">Tous</button>
+      <button class="pay-tab" [class.active]="paiementsFiltreStatut === 'payé'"       (click)="paiementsFiltreStatut = 'payé'">Payé</button>
+      <button class="pay-tab" [class.active]="paiementsFiltreStatut === 'en_attente'" (click)="paiementsFiltreStatut = 'en_attente'">En attente</button>
+    </div>
+  </div>
+
+  <!-- Tableau -->
+  <div class="pay-table-wrap">
+    <div *ngIf="paiementsFiltres.length === 0" class="pay-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      <p>Aucun paiement trouvé.</p>
+    </div>
+
+    <table class="pay-table" *ngIf="paiementsFiltres.length > 0">
+      <thead>
+        <tr>
+          <th>Externe</th>
+          <th>Formation</th>
+          <th>Montant</th>
+          <th>Statut paiement</th>
+          <th>Statut inscription</th>
+          <th>Date inscription</th>
+          <th>Date paiement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of paiementsFiltres">
+          <td>
+            <div class="pay-user-name">{{ p.externe_nom }}</div>
+            <div class="pay-user-email">{{ p.externe_email }}</div>
+          </td>
+          <td class="pay-formation">{{ p.formation_titre }}</td>
+          <td class="pay-montant">
+            <span *ngIf="p.montant > 0">{{ p.montant | number:'1.2-2' }} EUR</span>
+            <span *ngIf="p.montant == 0" class="pay-gratuit-badge">Gratuit</span>
+          </td>
+          <td>
+            <span class="pay-statut-badge"
+                  [class.pay-badge-paye]="p.statut_paiement === 'payé'"
+                  [class.pay-badge-attente]="p.statut_paiement === 'en_attente'">
+              <ng-container *ngIf="p.statut_paiement === 'payé'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Payé</ng-container>
+              <ng-container *ngIf="p.statut_paiement !== 'payé'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente</ng-container>
+            </span>
+          </td>
+          <td>
+            <span class="pay-insc-badge"
+                  [class.pay-insc-confirme]="p.statut_inscription === 'confirmé'"
+                  [class.pay-insc-attente]="p.statut_inscription === 'en_attente'">
+              {{ p.statut_inscription === 'confirmé' ? 'Confirmé' : 'En attente' }}
+            </span>
+          </td>
+          <td class="pay-date">{{ p.date_inscription | date:'dd/MM/yyyy' }}</td>
+          <td class="pay-date">{{ p.date_paiement ? (p.date_paiement | date:'dd/MM/yyyy') : '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
 <!-- ===== MESSAGERIE ===== -->
 <section *ngIf="activeSection === 'messages'">
-  <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
   <div class="page-title">
-    <h2>💬 Messagerie</h2>
+    <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messagerie</h2>
     <p>Échangez des messages avec vos formateurs</p>
+  </div>
+  <div class="pay-stats-row">
+    <div class="pay-stat-card">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ contacts.length }}</div>
+        <div class="pay-stat-label">Formateurs disponibles</div>
+      </div>
+    </div>
+    <div class="pay-stat-card orange">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ unreadMessages }}</div>
+        <div class="pay-stat-label">Messages non lus</div>
+      </div>
+    </div>
+    <div class="pay-stat-card blue">
+      <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div class="pay-stat-body">
+        <div class="pay-stat-value">{{ contactSelectionne ? contactSelectionne.nom : '—' }}</div>
+        <div class="pay-stat-label">Conversation active</div>
+      </div>
+    </div>
   </div>
   <div class="chat-container">
     <!-- Contacts -->
@@ -571,7 +1434,7 @@
         <span class="contacts-count">{{ filteredAdminContacts.length }}</span>
       </div>
       <div class="contacts-search-wrap">
-        <input class="contacts-search" type="text" [(ngModel)]="adminContactSearch" placeholder="🔍 Rechercher un formateur…">
+        <input class="contacts-search" type="text" [(ngModel)]="adminContactSearch" placeholder="Rechercher un formateur…">
       </div>
       <div class="contacts-list">
         <div *ngFor="let c of filteredAdminContacts"
@@ -620,18 +1483,251 @@
                   rows="2"
                   (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
         <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
-          Envoyer ✉️
+          Envoyer <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-left:4px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
     </div>
     <ng-template #noConvAdmin>
       <div class="no-conv-placeholder">
-        <div class="no-conv-icon">💬</div>
+        <div class="no-conv-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <p>Sélectionnez un formateur pour démarrer une conversation</p>
       </div>
     </ng-template>
   </div>
 </section>
+
+  <!-- ===== SECTION QUIZ ===== -->
+  <section *ngIf="activeSection === 'quiz'">
+    <div class="page-title">
+      <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Quiz — Surveillance &amp; Statistiques</h2>
+      <p>Vue globale des quiz par formation</p>
+    </div>
+
+    <!-- KPI -->
+    <div class="pay-stats-row">
+      <div class="pay-stat-card">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ quizTotalFormations }}</div>
+          <div class="pay-stat-label">Formations totales</div>
+        </div>
+      </div>
+      <div class="pay-stat-card green">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ quizAvecQuiz }}</div>
+          <div class="pay-stat-label">Avec quiz</div>
+        </div>
+      </div>
+      <div class="pay-stat-card orange">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ quizTotalFormations - quizAvecQuiz }}</div>
+          <div class="pay-stat-label">Sans quiz</div>
+        </div>
+      </div>
+      <div class="pay-stat-card blue">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ quizTotalTentatives }}</div>
+          <div class="pay-stat-label">Tentatives totales</div>
+        </div>
+      </div>
+      <div class="pay-stat-card" style="border-color:#6a1b9a">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ quizTauxReussiteGlobal }}%</div>
+          <div class="pay-stat-label">Taux de réussite global</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="pay-filters">
+      <input class="pay-search" type="text" [(ngModel)]="quizSearch" placeholder="Rechercher une formation ou formateur...">
+      <div class="pay-tabs">
+        <button class="pay-tab" [class.active]="quizFiltreStatut==='tous'" (click)="quizFiltreStatut='tous'">Toutes</button>
+        <button class="pay-tab" [class.active]="quizFiltreStatut==='avec'" (click)="quizFiltreStatut='avec'">Avec quiz</button>
+        <button class="pay-tab" [class.active]="quizFiltreStatut==='sans'" (click)="quizFiltreStatut='sans'">Sans quiz</button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="pay-table-wrap">
+      <div *ngIf="quizStatsFiltres.length === 0" class="pay-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <p>Aucune formation trouvée.</p>
+      </div>
+      <table class="pay-table" *ngIf="quizStatsFiltres.length > 0">
+        <thead>
+          <tr>
+            <th>Formation</th>
+            <th>Formateur</th>
+            <th>Spécialité</th>
+            <th>Quiz</th>
+            <th>Questions</th>
+            <th>Tentatives</th>
+            <th>Réussites</th>
+            <th>Score moyen</th>
+            <th>Seuil requis</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let q of quizStatsFiltres">
+            <td><strong>{{ q.formation_titre }}</strong></td>
+            <td>{{ q.formateur_nom || '—' }}</td>
+            <td>
+              <span class="pay-statut-badge" style="background:#e3f2fd;color:#1565c0">{{ q.specialite || '—' }}</span>
+            </td>
+            <td>
+              <span *ngIf="q.quiz_id"  class="pay-statut-badge" style="background:#e8f5e9;color:#2e7d32">Oui</span>
+              <span *ngIf="!q.quiz_id" class="pay-statut-badge" style="background:#fff3e0;color:#e65100">Non</span>
+            </td>
+            <td>{{ q.quiz_id ? q.nb_questions : '—' }}</td>
+            <td>{{ q.quiz_id ? (q.total_tentatives || 0) : '—' }}</td>
+            <td>
+              <span *ngIf="q.quiz_id">
+                {{ q.tentatives_reussies || 0 }}
+                <span style="color:#999;font-size:12px" *ngIf="q.total_tentatives > 0">
+                  ({{ (q.tentatives_reussies / q.total_tentatives * 100) | number:'1.0-0' }}%)
+                </span>
+              </span>
+              <span *ngIf="!q.quiz_id">—</span>
+            </td>
+            <td>{{ q.quiz_id && q.score_moyen != null ? q.score_moyen : '—' }}</td>
+            <td>{{ q.quiz_id ? q.seuil_reussite + '%' : '—' }}</td>
+            <td>
+              <button *ngIf="q.quiz_id" class="btn-action btn-danger-sm"
+                (click)="supprimerQuiz(q.formation_id, q.formation_titre)" title="Supprimer le quiz">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Supprimer
+              </button>
+              <span *ngIf="!q.quiz_id" style="color:#ccc">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== SECTION ATTESTATIONS ===== -->
+  <section *ngIf="activeSection === 'attestation'">
+    <div class="page-title">
+      <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Attestations — Suivi &amp; Statistiques</h2>
+      <p>Vue globale des participants éligibles à l'attestation par formation</p>
+    </div>
+
+    <!-- KPI -->
+    <div class="pay-stats-row">
+      <div class="pay-stat-card">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ attesTotalFormations }}</div>
+          <div class="pay-stat-label">Formations totales</div>
+        </div>
+      </div>
+      <div class="pay-stat-card blue">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ attesTotalInscrits }}</div>
+          <div class="pay-stat-label">Inscrits confirmés</div>
+        </div>
+      </div>
+      <div class="pay-stat-card green">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ attesTotalEligibles }}</div>
+          <div class="pay-stat-label">Éligibles attestation</div>
+        </div>
+      </div>
+      <div class="pay-stat-card orange">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ attesTotalInscrits - attesTotalEligibles }}</div>
+          <div class="pay-stat-label">En cours / non éligibles</div>
+        </div>
+      </div>
+      <div class="pay-stat-card" style="border-color:#6a1b9a">
+        <div class="pay-stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        <div class="pay-stat-body">
+          <div class="pay-stat-value">{{ attesTauxGlobal }}%</div>
+          <div class="pay-stat-label">Taux de réussite global</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="pay-filters">
+      <input class="pay-search" type="text" [(ngModel)]="attestationSearch"
+        placeholder="Rechercher une formation ou formateur...">
+      <div class="pay-tabs">
+        <button class="pay-tab" [class.active]="attestationFiltre==='tous'" (click)="attestationFiltre='tous'">Toutes</button>
+        <button class="pay-tab" [class.active]="attestationFiltre==='avec_eligibles'" (click)="attestationFiltre='avec_eligibles'">Avec éligibles</button>
+        <button class="pay-tab" [class.active]="attestationFiltre==='sans_eligibles'" (click)="attestationFiltre='sans_eligibles'">Sans éligibles</button>
+      </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="pay-table-wrap">
+      <div *ngIf="attestationStatsFiltres.length === 0" class="pay-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        <p>Aucune formation trouvée.</p>
+      </div>
+      <table class="pay-table" *ngIf="attestationStatsFiltres.length > 0">
+        <thead>
+          <tr>
+            <th>Formation</th>
+            <th>Formateur</th>
+            <th>Spécialité</th>
+            <th>Modules</th>
+            <th>Inscrits</th>
+            <th>Éligibles</th>
+            <th>Taux</th>
+            <th>Quiz requis</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of attestationStatsFiltres">
+            <td><strong>{{ a.formation_titre }}</strong></td>
+            <td>{{ a.formateur_nom || '—' }}</td>
+            <td>
+              <span class="pay-statut-badge" style="background:#e3f2fd;color:#1565c0">{{ a.specialite || '—' }}</span>
+            </td>
+            <td>{{ a.total_modules }}</td>
+            <td>
+              {{ (a.candidats_inscrits || 0) + (a.externes_inscrits || 0) }}
+              <span style="color:#999;font-size:12px">
+                ({{ a.candidats_inscrits || 0 }} can. / {{ a.externes_inscrits || 0 }} ext.)
+              </span>
+            </td>
+            <td>
+              <span [style.color]="(a.candidats_eligibles + a.externes_eligibles) > 0 ? '#2e7d32' : '#999'" style="font-weight:600">
+                {{ (a.candidats_eligibles || 0) + (a.externes_eligibles || 0) }}
+              </span>
+              <span style="color:#999;font-size:12px">
+                / {{ (a.candidats_inscrits || 0) + (a.externes_inscrits || 0) }}
+              </span>
+            </td>
+            <td>
+              <ng-container *ngIf="(a.candidats_inscrits + a.externes_inscrits) > 0">
+                <span [style.color]="
+                  (((a.candidats_eligibles + a.externes_eligibles) / (a.candidats_inscrits + a.externes_inscrits)) * 100) >= 70 ? '#2e7d32' :
+                  (((a.candidats_eligibles + a.externes_eligibles) / (a.candidats_inscrits + a.externes_inscrits)) * 100) >= 40 ? '#f57c00' : '#c62828'"
+                  style="font-weight:600">
+                  {{ ((a.candidats_eligibles + a.externes_eligibles) / (a.candidats_inscrits + a.externes_inscrits) * 100) | number:'1.0-0' }}%
+                </span>
+              </ng-container>
+              <span *ngIf="(a.candidats_inscrits + a.externes_inscrits) === 0" style="color:#ccc">—</span>
+            </td>
+            <td>
+              <span *ngIf="a.has_quiz"  class="pay-statut-badge" style="background:#e8f5e9;color:#2e7d32">Oui</span>
+              <span *ngIf="!a.has_quiz" class="pay-statut-badge" style="background:#fff3e0;color:#e65100">Non</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   </main>
 
@@ -639,8 +1735,8 @@
   <div class="modal-overlay" *ngIf="showProgrammeEditor && programmeFormation" (click)="fermerProgrammeEditor()">
     <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h4 class="modal-title">📋 Programme — <em>{{ programmeFormation.titre }}</em></h4>
-        <button class="modal-close" (click)="fermerProgrammeEditor()">✕</button>
+        <h4 class="modal-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Programme — <em>{{ programmeFormation.titre }}</em></h4>
+        <button class="modal-close" (click)="fermerProgrammeEditor()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <!-- Description globale -->
@@ -660,7 +1756,7 @@
             <textarea class="form-input" rows="2" [(ngModel)]="programmeData.prerequis" placeholder="Connaissances requises avant la formation..."></textarea>
           </div>
         </div>
-        <button class="btn-save" (click)="sauvegarderProgramme()">💾 Sauvegarder la description</button>
+        <button class="btn-save" (click)="sauvegarderProgramme()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Sauvegarder la description</button>
       </div>
 
       <!-- Modules -->
@@ -674,14 +1770,14 @@
               <p class="module-desc" *ngIf="m.description">{{ m.description }}</p>
             </div>
             <div class="module-actions">
-              <button class="btn-mod-edit" (click)="editerModule(m)">✏️</button>
-              <button class="btn-mod-del" (click)="supprimerModule(m.id)">🗑️</button>
+              <button class="btn-mod-edit" (click)="editerModule(m)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn-mod-del" (click)="supprimerModule(m.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
         </div>
         <p class="empty-modules" *ngIf="programmeModules.length === 0">Aucun module pour l'instant.</p>
         <div class="module-form">
-          <h6>{{ editModuleMode ? '✏️ Modifier le module' : '➕ Ajouter un module' }}</h6>
+          <h6>{{ editModuleMode ? 'Modifier le module' : 'Ajouter un module' }}</h6>
           <div class="form-grid">
             <div class="form-group">
               <label>Titre *</label>
@@ -697,7 +1793,7 @@
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn-save" (click)="soumettrModule()">{{ editModuleMode ? '💾 Mettre à jour' : '➕ Ajouter le module' }}</button>
+            <button class="btn-save" (click)="soumettreModule()">{{ editModuleMode ? 'Mettre à jour' : 'Ajouter le module' }}</button>
             <button class="btn-cancel" *ngIf="editModuleMode" (click)="annulerEditModule()">Annuler</button>
           </div>
         </div>
@@ -710,30 +1806,47 @@
   </div>
 
   <!-- ===== MODAL FORMATION (création stepper / édition simple) ===== -->
-  <div class="modal-overlay" *ngIf="showFormationForm" (click)="closeForm()">
+  <div class="modal-overlay" *ngIf="showFormationForm && editFormationMode" (click)="closeForm()">
     <div class="modal-box modal-box-creation" (click)="$event.stopPropagation()">
 
       <!-- HEADER -->
       <div class="modal-header">
-        <h4 class="modal-title">{{ editFormationMode ? '✏️ Modifier la formation' : '➕ Nouvelle formation complète' }}</h4>
-        <button class="modal-close" (click)="closeForm()">✕</button>
+        <h4 class="modal-title">
+          <ng-container *ngIf="editFormationMode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Modifier la formation</ng-container>
+          <ng-container *ngIf="!editFormationMode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nouvelle formation complète</ng-container>
+        </h4>
+        <button class="modal-close" (click)="closeForm()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <!-- STEPPER INDICATOR (création uniquement) -->
       <div class="admin-stepper" *ngIf="!editFormationMode">
         <div class="admin-step" [class.active]="adminStep === 1" [class.done]="adminStep > 1">
-          <div class="admin-step-circle">{{ adminStep > 1 ? '✓' : '1' }}</div>
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 1">1</ng-container>
+          </div>
           <div class="admin-step-label">Informations</div>
         </div>
         <div class="admin-step-line" [class.done]="adminStep > 1"></div>
         <div class="admin-step" [class.active]="adminStep === 2" [class.done]="adminStep > 2">
-          <div class="admin-step-circle">{{ adminStep > 2 ? '✓' : '2' }}</div>
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 2">2</ng-container>
+          </div>
           <div class="admin-step-label">Programme</div>
         </div>
         <div class="admin-step-line" [class.done]="adminStep > 2"></div>
-        <div class="admin-step" [class.active]="adminStep === 3">
-          <div class="admin-step-circle">3</div>
+        <div class="admin-step" [class.active]="adminStep === 3" [class.done]="adminStep > 3">
+          <div class="admin-step-circle">
+            <ng-container *ngIf="adminStep > 3"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+            <ng-container *ngIf="adminStep <= 3">3</ng-container>
+          </div>
           <div class="admin-step-label">Supports &amp; Séances</div>
+        </div>
+        <div class="admin-step-line" [class.done]="adminStep > 3"></div>
+        <div class="admin-step" [class.active]="adminStep === 4">
+          <div class="admin-step-circle">4</div>
+          <div class="admin-step-label">Quiz</div>
         </div>
       </div>
 
@@ -757,17 +1870,34 @@
             </select>
             <small class="error-msg" *ngIf="formDataErrors.specialite">{{ formDataErrors.specialite }}</small>
           </div>
-          <div class="form-group">
+          <div class="form-group full">
             <label>Formateur *</label>
-            <ng-container *ngIf="!formData.specialite">
-              <div class="formateur-hint">⬆️ Choisissez d'abord une spécialité</div>
-            </ng-container>
+            <div *ngIf="!formData.specialite" class="formateur-hint">Choisissez d'abord une spécialité</div>
             <ng-container *ngIf="formData.specialite">
-              <select class="form-input" [(ngModel)]="formData.formateur_id">
-                <option value="">-- Choisir un formateur --</option>
-                <option *ngFor="let f of formateursFiltresParSpecialite" [value]="f.id">{{ f.nom }}</option>
-              </select>
-              <small class="field-hint" *ngIf="formateursFiltresParSpecialite.length === 0">⚠️ Aucun formateur pour cette spécialité</small>
+              <div *ngIf="formateursAvecDispo.length === 0" class="formateur-hint">Aucun formateur pour cette spécialité</div>
+              <div class="formateurs-dispo-list" *ngIf="formateursAvecDispo.length > 0">
+                <div *ngFor="let f of formateursAvecDispo"
+                     class="formateur-dispo-card"
+                     [class.selected]="formData.formateur_id === f.id"
+                     [class.en-cours]="isFormateurEnCours(f)"
+                     (click)="!isFormateurEnCours(f) && (formData.formateur_id = f.id)">
+                  <div class="fdc-left">
+                    <div class="fdc-avatar">{{ f.nom?.charAt(0)?.toUpperCase() }}</div>
+                  </div>
+                  <div class="fdc-info">
+                    <div class="fdc-nom">{{ f.nom }}</div>
+                    <div class="fdc-spec">{{ f.specialite }}</div>
+                    <div *ngIf="isFormateurEnCours(f)" class="fdc-formation-active">
+                      {{ f.formation_active_titre }}
+                      <span *ngIf="f.formation_active_fin"> — jusqu'au {{ f.formation_active_fin | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  </div>
+                  <div class="fdc-badge" [class.badge-dispo]="!isFormateurEnCours(f)" [class.badge-encours]="isFormateurEnCours(f)">
+                    <ng-container *ngIf="isFormateurEnCours(f)">En cours</ng-container>
+                    <ng-container *ngIf="!isFormateurEnCours(f)">Disponible</ng-container>
+                  </div>
+                </div>
+              </div>
             </ng-container>
             <small class="error-msg" *ngIf="formDataErrors.formateur_id">{{ formDataErrors.formateur_id }}</small>
           </div>
@@ -804,9 +1934,9 @@
             <div class="photo-upload-area">
               <div *ngIf="photoPreview" class="photo-preview-container">
                 <img [src]="photoPreview" class="photo-preview-img" alt="Aperçu">
-                <button type="button" class="btn-remove-photo" (click)="supprimerAdminPhoto()">✕ Supprimer</button>
+                <button type="button" class="btn-remove-photo" (click)="supprimerAdminPhoto()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Supprimer</button>
               </div>
-              <div *ngIf="!photoPreview" class="photo-placeholder"><span>🖼️</span><p>Aucune photo</p></div>
+              <div *ngIf="!photoPreview" class="photo-placeholder"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>Aucune photo</p></div>
               <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" (change)="onAdminPhotoSelected($event)" class="form-input photo-input">
               <small class="help-text">PNG, JPG, GIF, WEBP — max 5 Mo</small>
             </div>
@@ -816,7 +1946,8 @@
           <button class="btn-cancel" (click)="closeForm()">Annuler</button>
           <button class="btn-save" (click)="saveFormation()" [disabled]="loading">
             <span *ngIf="loading" class="spinner"></span>
-            {{ editFormationMode ? '💾 Enregistrer' : 'Suivant — Programme ›' }}
+            <ng-container *ngIf="editFormationMode"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Enregistrer</ng-container>
+            <ng-container *ngIf="!editFormationMode">Suivant — Programme ›</ng-container>
           </button>
         </div>
       </ng-container>
@@ -826,7 +1957,7 @@
         <div class="admin-step-body">
 
           <div class="admin-step-section">
-            <h6 class="admin-step-section-title">📝 Description du programme</h6>
+            <h6 class="admin-step-section-title">Description du programme</h6>
             <div class="form-group full">
               <label>Description générale</label>
               <textarea class="form-input" rows="3" [(ngModel)]="programmeData.description_globale" placeholder="Contenu global de la formation..."></textarea>
@@ -842,7 +1973,7 @@
           </div>
 
           <div class="admin-step-section">
-            <h6 class="admin-step-section-title">📚 Modules <span class="badge-count">{{ programmeModules.length }}</span></h6>
+            <h6 class="admin-step-section-title">Modules <span class="badge-count">{{ programmeModules.length }}</span></h6>
 
             <div class="admin-modules-list" *ngIf="programmeModules.length > 0">
               <div class="admin-module-row" *ngFor="let m of programmeModules; let i = index">
@@ -852,22 +1983,22 @@
                   <div class="amr-desc" *ngIf="m.description">{{ m.description }}</div>
                 </div>
                 <div class="amr-actions">
-                  <button class="btn-csr-edit" (click)="editerModule(m)">✏️</button>
-                  <button class="btn-csr-del" (click)="supprimerModule(m.id)">🗑️</button>
+                  <button class="btn-csr-edit" (click)="editerModule(m)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="btn-csr-del" (click)="supprimerModule(m.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
                 </div>
               </div>
             </div>
             <div *ngIf="programmeModules.length === 0" class="admin-modules-empty">Aucun module — ajoutez-en ci-dessous.</div>
 
             <div class="admin-module-form">
-              <h6>{{ editModuleMode ? '✏️ Modifier' : '➕ Ajouter un module' }}</h6>
+              <h6>{{ editModuleMode ? 'Modifier' : 'Ajouter un module' }}</h6>
               <div class="amf-grid">
                 <input class="form-input" [(ngModel)]="moduleForm.titre" placeholder="Titre du module *">
                 <input class="form-input" type="number" [(ngModel)]="moduleForm.ordre" placeholder="Ordre" min="1" style="max-width:90px">
                 <input class="form-input" [(ngModel)]="moduleForm.description" placeholder="Description (optionnel)">
               </div>
               <div class="amf-actions">
-                <button class="btn-add-seance" (click)="soumettrModule()">{{ editModuleMode ? '💾 Modifier' : '➕ Ajouter' }}</button>
+                <button class="btn-add-seance" (click)="soumettreModule()">{{ editModuleMode ? 'Modifier' : 'Ajouter' }}</button>
                 <button *ngIf="editModuleMode" class="btn-cancel-seance" (click)="annulerEditModule()">Annuler</button>
               </div>
             </div>
@@ -875,6 +2006,7 @@
 
         </div>
         <div class="modal-footer">
+          <button class="btn-back-step" (click)="adminStep = 1">‹ Retour</button>
           <button class="btn-cancel" (click)="closeForm()">Annuler</button>
           <button class="btn-save" (click)="passerStep3Admin()">Suivant — Supports &amp; Séances ›</button>
         </div>
@@ -886,16 +2018,16 @@
 
           <!-- SUPPORTS -->
           <div class="admin-step-section">
-            <h6 class="admin-step-section-title">📎 Supports pédagogiques</h6>
+            <h6 class="admin-step-section-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Supports pédagogiques</h6>
 
             <div class="admin-support-form">
               <div class="asf-grid">
                 <select class="form-input" [(ngModel)]="adminSupportType">
-                  <option value="pdf">📄 PDF</option>
-                  <option value="video">🎥 Vidéo</option>
-                  <option value="lien">🔗 Lien URL</option>
-                  <option value="image">🖼️ Image</option>
-                  <option value="autre">📎 Autre</option>
+                  <option value="pdf">PDF</option>
+                  <option value="video">Vidéo</option>
+                  <option value="lien">Lien URL</option>
+                  <option value="image">Image</option>
+                  <option value="autre">Autre</option>
                 </select>
                 <input class="form-input" [(ngModel)]="adminSupportNom" placeholder="Nom du support (optionnel)">
               </div>
@@ -906,25 +2038,25 @@
                 <input class="form-input" type="url" [(ngModel)]="adminSupportUrl" placeholder="https://...">
               </div>
               <button class="btn-add-seance" (click)="ajouterSupportAdmin()" [disabled]="adminSupportLoading">
-                <span *ngIf="adminSupportLoading" class="spinner"></span> ➕ Ajouter le support
+                <span *ngIf="adminSupportLoading" class="spinner"></span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter le support
               </button>
             </div>
 
             <div *ngIf="adminSupports.length === 0" class="config-empty-seances" style="margin-top:10px">
-              <span>📭</span><p>Aucun support ajouté. Vous pouvez terminer sans support.</p>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><p>Aucun support ajouté. Vous pouvez terminer sans support.</p>
             </div>
             <div class="admin-supports-list" *ngIf="adminSupports.length > 0">
               <div class="admin-support-chip" *ngFor="let s of adminSupports">
                 <span>{{ getSupportIcon(s.type) }}</span>
                 <span class="asc-nom">{{ s.nom }}</span>
-                <button class="btn-csr-del" (click)="supprimerSupportAdmin(s.id)">🗑️</button>
+                <button class="btn-csr-del" (click)="supprimerSupportAdmin(s.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
               </div>
             </div>
           </div>
 
           <!-- SÉANCES -->
           <div class="admin-step-section">
-            <h6 class="admin-step-section-title">🗓️ Séances</h6>
+            <h6 class="admin-step-section-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Séances</h6>
 
             <div class="config-seance-form">
               <div class="csf-grid">
@@ -945,34 +2077,41 @@
                   <input type="text" class="config-input" [(ngModel)]="adminStepSeanceForm.salle" placeholder="Salle 101 ou lien Teams">
                 </div>
                 <div class="config-field csf-module">
-                  <label>Module associé</label>
-                  <select class="config-input" [(ngModel)]="adminStepSeanceForm.module_id">
-                    <option [ngValue]="null">— Aucun —</option>
-                    <option *ngFor="let m of programmeModules" [ngValue]="m.id">{{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}</option>
-                  </select>
+                  <label>Modules couverts</label>
+                  <div class="csf-checkboxes">
+                    <label *ngFor="let m of programmeModules" class="csf-checkbox-item">
+                      <input type="checkbox"
+                             [checked]="adminStepSeanceForm.module_ids.includes(m.id)"
+                             (change)="toggleModuleSeanceAdmin(m.id)">
+                      <span>{{ m.ordre ? m.ordre + '. ' : '' }}{{ m.titre }}</span>
+                    </label>
+                    <span *ngIf="programmeModules.length === 0" class="csf-no-modules">Aucun module disponible</span>
+                  </div>
                 </div>
               </div>
               <div class="csf-actions">
-                <button class="btn-add-seance" (click)="ajouterSeanceAdmin()">{{ adminStepEditSeanceMode ? '💾 Modifier' : '➕ Ajouter la séance' }}</button>
+                <button class="btn-add-seance" (click)="ajouterSeanceAdmin()">{{ adminStepEditSeanceMode ? 'Modifier' : 'Ajouter la séance' }}</button>
                 <button *ngIf="adminStepEditSeanceMode" class="btn-cancel-seance" (click)="annulerEditSeanceAdmin()">Annuler</button>
               </div>
             </div>
 
             <div *ngIf="adminStepSeances.length === 0" class="config-empty-seances" style="margin-top:8px">
-              <span>📭</span><p>Aucune séance. Vous pouvez terminer sans séance.</p>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg><p>Aucune séance. Vous pouvez terminer sans séance.</p>
             </div>
             <div class="config-seances-list" *ngIf="adminStepSeances.length > 0">
               <div class="config-seance-row" *ngFor="let s of adminStepSeances; let i = index">
                 <div class="csr-num">{{ i + 1 }}</div>
                 <div class="csr-info">
                   <div class="csr-date">{{ s.date_seance | date:'dd/MM/yyyy' }}</div>
-                  <div class="csr-time">🕐 {{ s.heure_debut }} — {{ s.heure_fin }}</div>
-                  <div *ngIf="s.salle" class="csr-salle">📍 {{ s.salle }}</div>
-                  <div *ngIf="s.module_titre" class="csr-module-chip">📚 {{ s.module_titre }}</div>
+                  <div class="csr-time">{{ s.heure_debut }} — {{ s.heure_fin }}</div>
+                  <div *ngIf="s.salle" class="csr-salle">{{ s.salle }}</div>
+                  <div class="csr-modules-chips" *ngIf="s.modules?.length > 0">
+                    <span class="csr-module-chip" *ngFor="let m of s.modules">{{ m.titre }}</span>
+                  </div>
                 </div>
                 <div class="csr-actions">
-                  <button class="btn-csr-edit" (click)="editerSeanceAdmin(s)">✏️</button>
-                  <button class="btn-csr-del" (click)="supprimerSeanceAdmin(s.id)">🗑️</button>
+                  <button class="btn-csr-edit" (click)="editerSeanceAdmin(s)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                  <button class="btn-csr-del" (click)="supprimerSeanceAdmin(s.id)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
                 </div>
               </div>
             </div>
@@ -980,8 +2119,88 @@
 
         </div>
         <div class="modal-footer">
+          <button class="btn-back-step" (click)="adminStep = 2">‹ Retour</button>
           <button class="btn-cancel" (click)="closeForm()">Annuler</button>
-          <button class="btn-finish-creation" (click)="terminerCreationAdmin()">✅ Terminer la création</button>
+          <button class="btn-finish-creation" (click)="passerStep4Admin()">Quiz ›</button>
+        </div>
+      </ng-container>
+
+      <!-- ======== ÉTAPE 4 : QUIZ ======== -->
+      <ng-container *ngIf="!editFormationMode && adminStep === 4">
+        <div class="programme-section">
+          <p class="quiz-intro-text">
+            Créez le quiz de validation que les apprenants devront réussir pour obtenir leur attestation.
+            <strong class="quiz-intro-required">Au moins 1 question requise.</strong>
+          </p>
+
+          <!-- Paramètres -->
+          <div class="quiz-params-grid">
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Titre du quiz</label>
+              <input class="form-input" type="text" [(ngModel)]="adminQuizTitre" placeholder="Ex : Quiz de validation">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Seuil de réussite (%) <span class="quiz-seuil-val">{{ adminQuizSeuil }}%</span></label>
+              <input class="form-input quiz-range" type="range" [(ngModel)]="adminQuizSeuil" min="50" max="100" step="5">
+            </div>
+            <div class="quiz-param-item">
+              <label class="quiz-param-label">Nombre de tentatives max</label>
+              <input class="form-input" type="number" [(ngModel)]="adminQuizNbTentatives" min="1" max="10" style="max-width:100px">
+            </div>
+          </div>
+
+          <hr class="modal-divider">
+
+          <!-- Questions -->
+          <div class="quiz-questions-editor">
+            <div class="quiz-q-header">
+              <h6 class="programme-section-title">Questions <span class="module-count-chip">{{ adminQuizQuestions.length }}</span></h6>
+              <button class="btn-add-question" (click)="ajouterQuestionAdmin4()" [disabled]="adminQuizQuestions.length >= 20">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Ajouter une question
+              </button>
+            </div>
+
+            <div *ngIf="adminQuizQuestions.length === 0" class="module-empty quiz-empty-warn">
+              Ajoutez au moins 1 question pour pouvoir terminer la création.
+            </div>
+
+            <div class="quiz-question-block" *ngFor="let q of adminQuizQuestions; let qi = index">
+              <div class="quiz-q-top">
+                <span class="quiz-q-num">Q{{ qi + 1 }}</span>
+                <input class="form-input quiz-q-input" type="text" [(ngModel)]="q.question"
+                       placeholder="Saisir le texte de la question...">
+                <button class="btn-action red" (click)="supprimerQuestionAdmin4(qi)" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              </div>
+              <div class="quiz-reponses-list">
+                <div class="quiz-rep-row" *ngFor="let r of q.reponses; let ri = index">
+                  <label class="quiz-correct-radio" title="Bonne réponse">
+                    <input type="radio" [name]="'admin4-correct-' + qi" [checked]="r.est_correcte"
+                           (change)="marquerCorrecteAdmin4(qi, ri)">
+                    <span class="quiz-radio-dot" [class.correct]="r.est_correcte">
+                      <ng-container *ngIf="r.est_correcte"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                    </span>
+                  </label>
+                  <input class="form-input quiz-rep-input" type="text" [(ngModel)]="r.reponse"
+                         [placeholder]="'Réponse ' + (ri + 1)"
+                         [class.quiz-rep-correct]="r.est_correcte">
+                  <button class="btn-action red btn-xs" (click)="supprimerReponseAdmin4(qi, ri)"
+                          [disabled]="q.reponses.length <= 2" title="Supprimer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </div>
+                <button class="btn-add-rep" (click)="ajouterReponseAdmin4(qi)" [disabled]="q.reponses.length >= 4">
+                  + Ajouter une réponse
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="adminStep = 3">‹ Retour</button>
+          <button class="btn-finish-creation" (click)="terminerCreationAdmin()"
+                  [disabled]="adminQuizSaving || adminQuizQuestions.length === 0">
+            <span *ngIf="adminQuizSaving">Enregistrement...</span>
+            <span *ngIf="!adminQuizSaving">Terminer la création</span>
+          </button>
         </div>
       </ng-container>
 
@@ -992,8 +2211,11 @@
   <div class="modal-overlay" *ngIf="showFormateurForm" (click)="closeFormateurForm()">
     <div class="modal-box modal-box-sm" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h4 class="modal-title">{{ editFormateurMode ? '✏️ Modifier le formateur' : '➕ Nouveau formateur' }}</h4>
-        <button class="modal-close" (click)="closeFormateurForm()">✕</button>
+        <h4 class="modal-title">
+          <ng-container *ngIf="editFormateurMode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Modifier le formateur</ng-container>
+          <ng-container *ngIf="!editFormateurMode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nouveau formateur</ng-container>
+        </h4>
+        <button class="modal-close" (click)="closeFormateurForm()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="form-grid">
         <div class="form-group">
@@ -1021,7 +2243,7 @@
       <div class="modal-footer">
         <button class="btn-cancel" (click)="closeFormateurForm()">Annuler</button>
         <button class="btn-save" (click)="saveFormateur()" [disabled]="loading">
-          <span *ngIf="loading" class="spinner"></span> 💾 Enregistrer
+          <span *ngIf="loading" class="spinner"></span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Enregistrer
         </button>
       </div>
     </div>
@@ -1037,7 +2259,8 @@
           <span class="details-status-badge"
             [class.badge-pending]="formationDetails?.status === 'pending_approval'"
             [class.badge-accepted]="formationDetails?.status === 'accepted'">
-            {{ formationDetails?.status === 'pending_approval' ? '⏳ En attente' : '✅ Acceptée' }}
+            <ng-container *ngIf="formationDetails?.status === 'pending_approval'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En attente</ng-container>
+            <ng-container *ngIf="formationDetails?.status !== 'pending_approval'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Acceptée</ng-container>
           </span>
           <h3 class="details-title">{{ formationDetails?.titre }}</h3>
           <div class="details-formateur-line">
@@ -1047,7 +2270,7 @@
             <span *ngIf="formationDetails?.formateur_specialite" class="details-spec-chip">{{ formationDetails?.formateur_specialite }}</span>
           </div>
         </div>
-        <button class="details-close" (click)="fermerDetails()">✕</button>
+        <button class="details-close" (click)="fermerDetails()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <!-- LOADING -->
@@ -1064,10 +2287,10 @@
             <img [src]="'http://localhost:3000' + formationDetails.photo" class="details-photo" [alt]="formationDetails.titre">
           </div>
           <div class="details-photo-col details-photo-placeholder" *ngIf="!formationDetails?.photo">
-            <span>🖼️</span><p>Aucune photo</p>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><p>Aucune photo</p>
           </div>
           <div class="details-info-col">
-            <h6 class="details-section-title">📋 Informations générales</h6>
+            <h6 class="details-section-title">Informations générales</h6>
             <div class="details-info-grid">
               <div class="details-info-item">
                 <span class="dii-label">Description</span>
@@ -1077,34 +2300,26 @@
                 <span class="dii-label">Spécialité</span>
                 <span class="dii-value dii-chip">{{ formationDetails?.specialite || '—' }}</span>
               </div>
-              <div class="details-info-item">
-                <span class="dii-label">Places</span>
-                <span class="dii-value">{{ formationDetails?.nb_places || '—' }}</span>
-              </div>
-              <div class="details-info-item">
-                <span class="dii-label">Prix formateur</span>
-                <span class="dii-value">{{ formationDetails?.prix ? formationDetails.prix + ' EUR' : '—' }}</span>
-              </div>
             </div>
           </div>
         </div>
 
         <!-- PROGRAMME -->
         <div class="details-section" *ngIf="detailsProgramme">
-          <h6 class="details-section-title">📖 Programme</h6>
+          <h6 class="details-section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Programme</h6>
           <div class="details-prog-grid">
             <div class="details-prog-card" *ngIf="detailsProgramme.description_globale">
-              <div class="dpg-icon">📝</div>
+              <div class="dpg-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
               <div class="dpg-label">Description globale</div>
               <div class="dpg-value">{{ detailsProgramme.description_globale }}</div>
             </div>
             <div class="details-prog-card" *ngIf="detailsProgramme.objectifs">
-              <div class="dpg-icon">🎯</div>
+              <div class="dpg-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
               <div class="dpg-label">Objectifs pédagogiques</div>
               <div class="dpg-value">{{ detailsProgramme.objectifs }}</div>
             </div>
             <div class="details-prog-card" *ngIf="detailsProgramme.prerequis">
-              <div class="dpg-icon">📌</div>
+              <div class="dpg-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
               <div class="dpg-label">Prérequis</div>
               <div class="dpg-value">{{ detailsProgramme.prerequis }}</div>
             </div>
@@ -1114,18 +2329,18 @@
           </div>
         </div>
         <div class="details-section" *ngIf="!detailsProgramme">
-          <h6 class="details-section-title">📖 Programme</h6>
+          <h6 class="details-section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Programme</h6>
           <div class="details-no-prog">Aucun programme défini.</div>
         </div>
 
         <!-- MODULES -->
         <div class="details-section">
           <h6 class="details-section-title">
-            📦 Modules
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>Modules
             <span class="details-count-chip" [class.chip-warn]="detailsModules.length === 0">{{ detailsModules.length }}</span>
           </h6>
           <div *ngIf="detailsModules.length === 0" class="details-warn-box">
-            ⚠️ Aucun module défini. Au moins 1 module est requis pour accepter la formation.
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aucun module défini. Au moins 1 module est requis pour accepter la formation.
           </div>
           <div class="details-modules-list" *ngIf="detailsModules.length > 0">
             <div class="details-module-row" *ngFor="let m of detailsModules; let i = index">
@@ -1141,7 +2356,7 @@
         <!-- SUPPORTS -->
         <div class="details-section">
           <h6 class="details-section-title">
-            📎 Supports pédagogiques
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>Supports pédagogiques
             <span class="details-count-chip">{{ detailsSupports.length }}</span>
           </h6>
           <div *ngIf="detailsSupports.length === 0" class="details-no-prog">Aucun support ajouté.</div>
@@ -1156,17 +2371,98 @@
           </div>
         </div>
 
+        <!-- QUIZ -->
+        <div class="details-section">
+          <h6 class="details-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Quiz de validation
+            <span class="details-count-chip" [class.chip-warn]="!detailsQuiz">
+              {{ detailsQuiz ? detailsQuiz.questions?.length + ' question(s)' : 'Aucun' }}
+            </span>
+          </h6>
+
+          <div *ngIf="!detailsQuiz" class="details-warn-box" style="background:#fff8e1;border-color:#ffe082;color:#f57f17;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Aucun quiz défini par le formateur.
+          </div>
+
+          <div *ngIf="detailsQuiz" class="details-quiz-wrapper">
+            <!-- Paramètres du quiz -->
+            <div class="details-quiz-params">
+              <div class="dqp-item">
+                <span class="dqp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></span>
+                <span class="dqp-label">Titre</span>
+                <span class="dqp-val">{{ detailsQuiz.titre }}</span>
+              </div>
+              <div class="dqp-item">
+                <span class="dqp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                <span class="dqp-label">Seuil de réussite</span>
+                <span class="dqp-val">{{ detailsQuiz.seuil_reussite }}%</span>
+              </div>
+              <div class="dqp-item">
+                <span class="dqp-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
+                <span class="dqp-label">Tentatives max</span>
+                <span class="dqp-val">{{ detailsQuiz.nb_tentatives }}</span>
+              </div>
+            </div>
+
+            <!-- Questions -->
+            <div class="details-quiz-questions">
+              <div class="dqq-block" *ngFor="let q of detailsQuiz.questions; let qi = index">
+                <div class="dqq-header">
+                  <span class="dqq-num">Q{{ qi + 1 }}</span>
+                  <span class="dqq-text">{{ q.question }}</span>
+                </div>
+                <div class="dqq-reponses">
+                  <div class="dqq-rep" *ngFor="let r of q.reponses"
+                       [class.dqq-rep-correct]="r.est_correcte">
+                    <span class="dqq-rep-icon">
+                      <ng-container *ngIf="r.est_correcte"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                      <ng-container *ngIf="!r.est_correcte"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg></ng-container>
+                    </span>
+                    <span class="dqq-rep-text">{{ r.reponse }}</span>
+                    <span class="dqq-correct-tag" *ngIf="r.est_correcte">Bonne réponse</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTE D'ATTENTE -->
+        <div class="details-section" *ngIf="formationDetails?.nb_places">
+          <h6 class="details-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Liste d'attente
+            <span class="details-count-chip" [class.chip-warn]="detailsListeAttente.length > 0">
+              {{ detailsListeAttente.length }} personne(s)
+            </span>
+          </h6>
+
+          <div *ngIf="detailsListeAttente.length === 0" class="details-empty-attente">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Aucune personne en attente pour cette formation.
+          </div>
+
+          <div *ngIf="detailsListeAttente.length > 0" class="details-attente-list">
+            <div class="details-attente-row" *ngFor="let a of detailsListeAttente">
+              <div class="dat-pos">#{{ a.position }}</div>
+              <div class="dat-info">
+                <div class="dat-nom">{{ a.nom }}</div>
+                <div class="dat-email">{{ a.email }}</div>
+              </div>
+              <div class="dat-date">{{ a.date_ajout | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- FOOTER ACTIONS -->
       <div class="details-footer" *ngIf="!detailsLoading">
         <button class="btn-cancel" (click)="fermerDetails()">Fermer</button>
         <ng-container *ngIf="formationDetails?.status === 'pending_approval'">
-          <button class="btn-reject" (click)="rejeterDepuisDetails()">❌ Rejeter</button>
+          <button class="btn-reject" (click)="rejeterDepuisDetails()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Rejeter</button>
           <button class="btn-approve" [disabled]="detailsModules.length === 0"
                   [title]="detailsModules.length === 0 ? 'Impossible : aucun module défini' : 'Accepter la formation'"
                   (click)="accepterDepuisDetails()">
-            ✅ Accepter
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>Accepter
           </button>
         </ng-container>
       </div>
@@ -1185,7 +2481,7 @@
       <div class="quiz-mgr-subtitle">Quiz de validation</div>
       <h3 class="quiz-mgr-title">{{ quizManagFormationTitre }}</h3>
     </div>
-    <button class="quiz-mgr-close" (click)="fermerQuizModal()">✕</button>
+    <button class="quiz-mgr-close" (click)="fermerQuizModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 
   <div *ngIf="quizManagLoading" class="quiz-mgr-loading">Chargement...</div>
@@ -1219,13 +2515,13 @@
         <div class="quiz-mgr-q-header">
           <span class="quiz-mgr-q-num">Q{{ qi + 1 }}</span>
           <input [(ngModel)]="q.question" class="quiz-mgr-q-input" placeholder="Texte de la question...">
-          <button class="btn-del-q" (click)="supprimerQuestionAdmin(qi)" title="Supprimer">🗑️</button>
+          <button class="btn-del-q" (click)="supprimerQuestionAdmin(qi)" title="Supprimer"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
         <div class="quiz-mgr-reponses">
           <div class="quiz-mgr-rep" *ngFor="let r of q.reponses; let ri = index">
             <input type="radio" [name]="'correct_' + qi" [checked]="r.est_correcte" (change)="setCorrectAnswer(qi, ri)" title="Bonne réponse">
             <input [(ngModel)]="r.reponse" class="quiz-mgr-rep-input" placeholder="Réponse...">
-            <button class="btn-del-rep" (click)="supprimerReponseAdmin(qi, ri)" *ngIf="q.reponses.length > 2">✕</button>
+            <button class="btn-del-rep" (click)="supprimerReponseAdmin(qi, ri)" *ngIf="q.reponses.length > 2"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <button class="btn-add-rep" (click)="ajouterReponseAdmin(qi)">+ Réponse</button>
         </div>
@@ -1239,11 +2535,104 @@
   </div>
 
   <div class="quiz-mgr-footer" *ngIf="!quizManagLoading">
-    <button *ngIf="quizManagHasExisting" class="btn-del-quiz" (click)="supprimerQuizAdmin()">🗑️ Supprimer le quiz</button>
+    <button *ngIf="quizManagHasExisting" class="btn-del-quiz" (click)="supprimerQuizAdmin()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Supprimer le quiz</button>
     <div class="quiz-mgr-footer-right">
       <button class="btn-cancel" (click)="fermerQuizModal()">Annuler</button>
-      <button class="btn-save" (click)="sauvegarderQuiz()">💾 Sauvegarder</button>
+      <button class="btn-save" (click)="sauvegarderQuiz()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Sauvegarder</button>
     </div>
   </div>
 
+
+</div>
+
+<!-- ===== MODAL INSCRITS FORMATION (ADMIN) ===== -->
+<div class="modal-overlay" *ngIf="showInscritsFormationModal" (click)="fermerInscritsFormationModal()">
+  <div class="modal-box modal-box-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h4 class="modal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Inscrits — {{ inscritsFormationSelected?.titre }}</h4>
+      <button class="modal-close" (click)="fermerInscritsFormationModal()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+
+    <div class="inscr-summary" *ngIf="inscritsFormation.length > 0">
+      <span>{{ inscritsFormation.length }} participant(s)</span>
+      <span>·</span>
+      <span>{{ nbCandidatsInscritsAdmin }} candidat(s) ISET</span>
+      <span>·</span>
+      <span>{{ nbExternesInscritsAdmin }} externe(s)</span>
+    </div>
+
+    <div *ngIf="inscritsLoading" style="text-align:center;padding:32px;color:#888">Chargement...</div>
+
+    <div *ngIf="!inscritsLoading && inscritsFormation.length === 0" class="modal-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg><p>Aucun participant inscrit à cette formation.</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!inscritsLoading && inscritsFormation.length > 0">
+      <table class="pay-table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Type</th>
+            <th>Statut</th>
+            <th>Date inscription</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of inscritsFormation">
+            <td><strong>{{ e.nom }}</strong></td>
+            <td>{{ e.email }}</td>
+            <td>
+              <span class="pay-statut-badge"
+                    [style.background]="e.type_participant === 'candidat' ? '#e3f2fd' : '#e0f7fa'"
+                    [style.color]="e.type_participant === 'candidat' ? '#1565c0' : '#00838f'">
+                <ng-container *ngIf="e.type_participant === 'candidat'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Candidat ISET</ng-container>
+                <ng-container *ngIf="e.type_participant !== 'candidat'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Externe</ng-container>
+              </span>
+            </td>
+            <td>
+              <span class="pay-statut-badge"
+                    [style.background]="(e.statut === 'Inscrit' || e.statut === 'confirmé') ? '#e8f5e9' : e.statut === 'en_attente' ? '#fff8e1' : '#ffebee'"
+                    [style.color]="(e.statut === 'Inscrit' || e.statut === 'confirmé') ? '#2e7d32' : e.statut === 'en_attente' ? '#e65100' : '#c62828'">
+                {{ e.statut === 'confirmé' ? 'Confirmé' : e.statut === 'en_attente' ? 'En attente' : e.statut === 'refusé' ? 'Refusé' : 'Inscrit' }}
+              </span>
+            </td>
+            <td>{{ e.date_inscription | date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="fermerInscritsFormationModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL MOTIF DE REJET ===== -->
+<div class="modal-overlay rejet-overlay" *ngIf="showRejetModal" (click)="annulerRejet()">
+  <div class="modal-box rejet-modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h4 class="modal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Motif de rejet</h4>
+      <button class="modal-close" (click)="annulerRejet()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="rejet-modal-body">
+      <p class="rejet-modal-hint">Cette raison sera envoyée à l'utilisateur dans sa notification.</p>
+      <label class="rejet-label">Motif <span style="color:#e53935">*</span></label>
+      <textarea
+        class="rejet-textarea"
+        [(ngModel)]="rejetMotif"
+        (input)="rejetMotifError = ''"
+        placeholder="Ex : Dossier incomplet, formation déjà complète, profil ne correspond pas aux prérequis..."
+        rows="4"
+        maxlength="500">
+      </textarea>
+      <div class="rejet-char-count">{{ rejetMotif.length }}/500</div>
+      <div class="rejet-error" *ngIf="rejetMotifError">{{ rejetMotifError }}</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="annulerRejet()">Annuler</button>
+      <button class="btn-reject-confirm" (click)="confirmerRejet()">Confirmer le rejet</button>
+    </div>
+  </div>
 </div>

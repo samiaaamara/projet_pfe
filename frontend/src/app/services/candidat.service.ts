@@ -21,6 +21,10 @@ export class CandidatService {
     return this.http.get<any[]>(`${this.apiUrl}/mes-formations/${candidatId}`);
   }
 
+  getMesDemandes(candidatId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/mes-demandes/${candidatId}`);
+  }
+
   inscrire(candidatId: number, formationId: number) {
     return this.http.post<any>(`${this.apiUrl}/inscription`, {
       candidat_id: candidatId,
@@ -73,9 +77,6 @@ export class CandidatService {
     return this.http.get<any[]>(`${this.apiUrl}/en-attente/${candidatId}`);
   }
 
-  desinscrire(candidatId: number, formationId: number) {
-    return this.http.delete<any>(`${this.apiUrl}/inscription/${candidatId}/${formationId}`);
-  }
 
   soumettreJustificatif(candidatId: number, seanceId: number, motif: string) {
     return this.http.post<any>(`${this.apiUrl}/justificatifs`, { candidat_id: candidatId, seance_id: seanceId, motif });
@@ -103,5 +104,15 @@ export class CandidatService {
 
   soumettreQuiz(data: { candidat_id: number; quiz_id: number; reponses: { question_id: number; reponse_id: number }[] }) {
     return this.http.post<any>(`${this.apiUrl}/quiz/soumettre`, data);
+  }
+
+  getProgramme(formationId: number) {
+    return this.http.get<any>(`${environment.apiUrl}/externe/formations/${formationId}/programme`);
+  }
+
+  genererAttestation(candidatId: number, formationId: number) {
+    return this.http.get(`${this.apiUrl}/generer-attestation/${candidatId}/${formationId}`, {
+      responseType: 'blob'
+    });
   }
 }

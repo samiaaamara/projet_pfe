@@ -1,0 +1,146 @@
+@startuml Sprint4_Classes
+title Diagramme de Classes — Sprint 4
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+skinparam classAttributeFontColor Black
+skinparam classFontColor Black
+skinparam classAttributeIconSize 0
+skinparam nodesep 5
+skinparam ranksep 140
+
+class Utilisateur {
+    - id : int
+    - nom : string
+    - email : string
+}
+
+class CandidatISET {
+    - specialite : string
+    - niveau : string
+}
+
+class Externe {
+    - entreprise : string
+}
+
+class Formateur {
+    - specialite : string
+}
+
+class Admin {
+    - role : string
+}
+
+class ConversationIA {
+    - id : int
+    - question : string
+    - reponse : string
+    - date : datetime
+}
+
+class Quiz {
+    - id : int
+    - formation_id : int
+    - titre : string
+    - seuil_reussite : decimal
+    - tentatives_max : int
+    --
+    + getQuestions() : Question[]
+    + evaluer(reponses[]) : decimal
+}
+
+class Question {
+    - id : int
+    - intitule : string
+    - reponse_correcte : string
+    - choix : string[]
+    --
+    + verifier(reponse) : boolean
+}
+
+class TentativeQuiz {
+    - id : int
+    - score : decimal
+    - date_passage : datetime
+    - reussi : boolean
+    --
+    + calculerScore() : decimal
+}
+
+class Attestation {
+    - id : int
+    - formation_id : int
+    - date_generation : datetime
+    - taux_presence : decimal
+    --
+    + genererPDF() : void
+    + verifierEligibilite() : boolean
+}
+
+class Message {
+    - id : int
+    - expediteur_id : int
+    - destinataire_id : int
+    - contenu : string
+    - date_envoi : datetime
+    - lu : boolean
+    --
+    + marquerLu() : void
+}
+
+class Notification {
+    - id : int
+    - type : string
+    - message : string
+    - date : datetime
+    - lu : boolean
+    --
+    + marquerLue() : void
+}
+
+class Profil {
+    - id : int
+    - telephone : string
+    - specialite : string
+    - photo_path : string
+    - mot_de_passe : string
+    --
+    + updatePhoto(file) : void
+    + updateInfos() : void
+    + changerMotDePasse(ancien, nouveau) : boolean
+}
+
+CandidatISET --|> Utilisateur
+Externe      --|> Utilisateur
+Formateur    --|> Utilisateur
+Admin        --|> Utilisateur
+
+CandidatISET -[hidden]r- Externe
+Externe      -[hidden]r- Formateur
+Formateur    -[hidden]r- Admin
+
+Quiz         -[hidden]r- TentativeQuiz
+TentativeQuiz -[hidden]r- Attestation
+
+Message      -[hidden]r- Notification
+Notification -[hidden]r- Profil
+Profil       -[hidden]r- ConversationIA
+
+Quiz        "1"   *-- "1..*" Question       : contient
+Utilisateur "1"   --  "0..*" TentativeQuiz  : passe
+Quiz        "1"   --  "0..*" TentativeQuiz  : génère
+Utilisateur "1"   --  "0..*" Attestation    : obtient
+Utilisateur "1"   --  "0..*" Message        : échange
+Utilisateur "1"   --  "0..*" Notification   : reçoit
+Utilisateur "1"   --  "1"    Profil         : possède
+Attestation "0..*" --  "1"    Quiz           : validée par
+Formateur   "1"   --  "0..*" Quiz           : crée
+Admin       "1"   --  "0..*" Quiz           : gère
+Utilisateur "1"   --  "0..*" ConversationIA : interroge
+
+@enduml

@@ -1,0 +1,58 @@
+@startuml Sprint3_Sequence_InscriptionPaiement
+title Diagramme de Séquence — Inscription et Paiement (Utilisateur externe)
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor Black
+
+actor "Utilisateur externe" as EXT
+participant "Frontend\n(Angular)" as FE
+participant "Backend\n(Express)" as BE
+participant "Base de données\n(MySQL)" as DB
+participant "Stripe API" as STRIPE
+
+EXT -> FE : Sélectionner une formation\net cliquer "S'inscrire"
+FE -> BE : POST /api/inscriptions\n{formation_id, candidat_id}
+BE -> DB : Vérifier places disponibles
+DB --> BE : résultat disponibilité
+
+alt Places disponibles
+    BE -> DB : Créer DemandeInscription\n(statut = en_attente)
+    DB --> BE : inscription créée
+    BE --> FE : 201 Created {inscription_id}
+    FE --> EXT : "Demande envoyée —\nen attente d'approbation"
+
+    note over BE,DB : L'administrateur examine et approuve la demande
+
+    BE -> DB : Mettre à jour statut = approuvée
+    DB --> BE : ok
+    BE --> FE : Notification : "Inscription approuvée\n— Procédez au paiement"
+    FE --> EXT : Affichage bouton "Payer"
+
+    EXT -> FE : Cliquer "Payer"
+    FE -> BE : POST /api/paiements/session\n{inscription_id}
+    BE -> STRIPE : Créer Checkout Session\n{montant, formation, candidat}
+    STRIPE --> BE : {session_id, checkout_url}
+    BE --> FE : {checkout_url}
+    FE --> EXT : Redirection vers Stripe Checkout
+
+    EXT -> STRIPE : Saisir coordonnées bancaires\net confirmer
+    STRIPE --> EXT : Confirmation de paiement
+    STRIPE -> BE : Webhook POST /stripe/webhook\n{event: payment_intent.succeeded}
+    BE -> BE : Vérifier signature HMAC-SHA256
+    BE -> DB : Mettre à jour statut paiement = payé\nstatut inscription = payée
+    DB --> BE : ok
+    BE --> FE : Redirection success_url
+    FE --> EXT : "Paiement confirmé — Accès accordé\naux supports pédagogiques"
+
+else Places épuisées
+    BE -> DB : Ajouter à ListeAttente\n(position calculée)
+    DB --> BE : position dans la file
+    BE --> FE : "Places épuisées —\nvous êtes en liste d'attente (position N)"
+    FE --> EXT : Confirmation liste d'attente
+end
+
+@enduml

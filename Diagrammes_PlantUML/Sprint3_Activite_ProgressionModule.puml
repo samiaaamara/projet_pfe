@@ -1,0 +1,32 @@
+@startuml Sprint3_Activite_ProgressionModule
+title Diagramme d'Activité — Suivre la progression par module
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ActivityDiamondBorderColor Black
+skinparam ActivityArrowColor Black
+
+start
+
+:Formateur valide les présences\nd'une séance;
+:Système enregistre les présences\n(présent / absent / excusé);
+
+if (Toutes les séances\ndu module validées ?) then (oui)
+    :Statut module = terminé;
+else (non)
+    if (Au moins une séance\nvalidée ?) then (oui)
+        :Statut module = en_cours;
+    else (non)
+        :Statut module = non_commencé;
+    end if
+end if
+
+:Candidat consulte\nsa progression par module;
+
+stop
+
+@enduml

@@ -1,50 +1,58 @@
 @startuml Sprint1_Sequence_Inscription
-title Diagramme de Séquence — Inscription Utilisateur
+title Diagramme de Séquence — Inscription
 
-actor Utilisateur as User
-participant "Page Inscription\nFrontend" as Frontend
-participant "Backend\nExpress" as Backend
-database "Base de Données\nMySQL" as DB
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceMessageAlign left
+skinparam sequenceBoxBackgroundColor White
+skinparam sequenceBoxBorderColor Black
+skinparam participantBackgroundColor White
+skinparam participantBorderColor Black
+skinparam actorBackgroundColor White
+skinparam actorBorderColor Black
+skinparam databaseBackgroundColor White
+skinparam databaseBorderColor Black
 
-User -> Frontend: Sélectionne rôle (Étudiant/Formateur/Externe)
-activate Frontend
-Frontend --> User: Affiche formulaire adapté
-User -> Frontend: Remplit données\n(nom, email, pwd, spécialité...)
-activate Frontend
+actor "Utilisateur\n(Candidat / Externe)" as User
+participant "Interface" as UI
+participant "Système" as SYS
+database "Base de données" as DB
 
-Frontend -> Frontend: Validation frontend\n(champs requis, format email)
+User -> UI: Choisit son rôle (candidat ou externe)
+UI --> User: Affiche le formulaire adapté
+User -> UI: Remplit et soumet le formulaire
+UI -> SYS: Envoie les informations
+SYS -> SYS: Vérifie que tous les champs\nsont correctement remplis
 
-Frontend -> Backend: POST /api/auth/register\n{role, données}
-activate Backend
+alt Champs invalides
+    SYS --> UI: Affiche les erreurs par champ
+    UI --> User: Retour au formulaire
+else Champs valides
+    SYS -> DB: Vérifie si l'email existe déjà
+    DB --> SYS: Résultat
 
-Backend -> Backend: Validation données
-Backend -> DB: SELECT user WHERE email = ?
-activate DB
-DB --> Backend: null ou user_existant
-deactivate DB
+    alt Email déjà utilisé
+        SYS --> UI: "Email déjà utilisé"
+        UI --> User: Affiche le message d'erreur
+    else Email disponible
+        opt Rôle = Candidat
+            SYS -> DB: Vérifie si le CIN existe déjà
+            DB --> SYS: Résultat
 
-alt Email déjà utilisé
-    Backend --> Frontend: {error: "Email déjà utilisé"}
-    Frontend --> User: Message d'erreur
-else Email unique
-    Backend -> Backend: bcrypt.hash(mot_de_passe)
-    Backend -> DB: INSERT INTO users\n(nom, email, hashed_pwd, role)
-    activate DB
-    DB --> Backend: user_id
-    deactivate DB
-    
-    Backend -> DB: INSERT INTO [etudiants|formateurs|externes]\n(user_id, spécialité, ...)
-    activate DB
-    DB --> Backend: profile_id
-    deactivate DB
-    
-    Backend -> Backend: jwt.sign(payload)
-    Backend --> Frontend: {success, token, user}
-    deactivate Backend
-    
-    Frontend --> User: Redirection Login\nMessage confirmation
+            alt CIN déjà enregistré
+                SYS --> UI: "CIN déjà enregistré"
+                UI --> User: Affiche le message d'erreur
+            end
+        end
+
+        SYS -> SYS: Sécurise le mot de passe (bcrypt)
+        SYS -> DB: Enregistre le compte\net le profil utilisateur
+        DB --> SYS: Compte créé
+        SYS --> UI: Inscription réussie
+        UI --> User: Redirige vers la page de connexion
+    end
 end
-
-deactivate Frontend
 
 @enduml

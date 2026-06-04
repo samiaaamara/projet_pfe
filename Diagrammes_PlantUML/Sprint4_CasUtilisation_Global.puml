@@ -1,0 +1,73 @@
+@startuml Sprint4_CasUtilisation_Global
+title Diagramme de Cas d'Utilisation Global — Sprint 4 FormaPro
+
+left to right direction
+
+scale 900 width
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 40
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Utilisateur" as USER
+actor "Candidat ISET" as CISET
+actor "Utilisateur externe" as EXT
+actor "Formateur" as F
+actor "Administrateur" as ADMIN
+
+CISET --|> USER
+EXT   --|> USER
+ADMIN -[hidden]d- F
+ADMIN -[hidden]d- USER
+
+usecase "Passer le quiz" as UC1
+usecase "Consulter les résultats" as UC1_1
+usecase "Télécharger l'attestation" as UC2
+usecase "Vérifier éligibilité" as UC2_1
+usecase "Modifier le profil" as UC3
+usecase "Messagerie interne" as UC4
+usecase "Consulter les notifications" as UC5
+usecase "Utiliser l'assistant IA" as UC6
+usecase "Créer un quiz" as UC7
+usecase "Configurer les paramètres\n(titre, seuil, tentatives)" as UC7_2
+usecase "Ajouter des questions" as UC7_1
+usecase "Gérer les quiz" as UC8
+usecase "Modifier le quiz" as UC8_1
+usecase "Supprimer le quiz" as UC8_2
+
+USER  -- UC1
+USER  -- UC2
+USER  -- UC3
+USER  -- UC4
+USER  -- UC5
+USER  -- UC6
+F     -- UC7
+F     -- UC3
+F     -- UC4
+F     -- UC5
+ADMIN -- UC8
+ADMIN -- UC4
+ADMIN -- UC5
+
+UC1  ..> UC1_1 : <<include>>
+UC2  ..> UC2_1 : <<include>>
+UC7  ..> UC7_2 : <<include>>
+UC7  ..> UC7_1 : <<include>>
+UC8  ..> UC7   : <<extend>>
+UC8  ..> UC8_1 : <<extend>>
+UC8  ..> UC8_2 : <<extend>>
+
+@enduml

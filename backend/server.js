@@ -7,6 +7,8 @@ const db = require('./db');
 (async () => {
   try {
     await db.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS photo_profil VARCHAR(255) DEFAULT NULL');
+    await db.query('ALTER TABLE formations ADD COLUMN IF NOT EXISTS date_publication DATETIME DEFAULT NULL');
+    await db.query(`UPDATE formations SET date_publication = COALESCE(date_debut, NOW()) WHERE date_publication IS NULL AND status IN ('published','en_cours','terminée','archivée')`);
 
     // Quiz tables
     await db.query(`
@@ -18,7 +20,7 @@ const db = require('./db');
         nb_tentatives  INT NOT NULL DEFAULT 3,
         FOREIGN KEY (formation_id) REFERENCES formations(id) ON DELETE CASCADE
       )
-    `);
+ `);
     await db.query(`
       CREATE TABLE IF NOT EXISTS questions_quiz (
         id       INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +29,7 @@ const db = require('./db');
         ordre    INT DEFAULT 0,
         FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
       )
-    `);
+ `);
     await db.query(`
       CREATE TABLE IF NOT EXISTS reponses_quiz (
         id           INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,7 +38,7 @@ const db = require('./db');
         est_correcte BOOLEAN NOT NULL DEFAULT FALSE,
         FOREIGN KEY (question_id) REFERENCES questions_quiz(id) ON DELETE CASCADE
       )
-    `);
+ `);
     await db.query(`
       CREATE TABLE IF NOT EXISTS tentatives_quiz (
         id             INT AUTO_INCREMENT PRIMARY KEY,
@@ -47,6 +49,25 @@ const db = require('./db');
         reussi         BOOLEAN NOT NULL DEFAULT FALSE,
         date_tentative DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (quiz_id) REFERENCES quiz(id) ON DELETE CASCADE
+      )
+ `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS password_resets (
+        id         INT AUTO_INCREMENT PRIMARY KEY,
+        email      VARCHAR(255) NOT NULL,
+        token      VARCHAR(255) NOT NULL UNIQUE,
+        expires_at DATETIME NOT NULL,
+        INDEX idx_token (token),
+        INDEX idx_email (email)
+      )
+ `);
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS seance_modules (
+        seance_id INT NOT NULL,
+        module_id INT NOT NULL,
+        PRIMARY KEY (seance_id, module_id),
+        FOREIGN KEY (seance_id) REFERENCES seances(id) ON DELETE CASCADE,
+        FOREIGN KEY (module_id) REFERENCES modules_formation(id) ON DELETE CASCADE
       )
     `);
   } catch (err) {
@@ -81,7 +102,6 @@ app.use('/api/admin', require('./routes/admin.routes'));
 app.use('/api/notifications', require('./routes/notifications.routes'));
 app.use('/api/messages', require('./routes/messages.routes'));
 app.use('/api/externe', require('./routes/externe.routes'));
-app.use('/api/etudiant', require('./routes/candidat.routes'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));

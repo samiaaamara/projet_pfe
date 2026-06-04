@@ -1,0 +1,42 @@
+@startuml Sprint4_Activite_ModifierProfil
+title Diagramme d'Activité — Modifier le profil
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ActivityDiamondBorderColor Black
+skinparam ActivityArrowColor Black
+
+start
+
+:Utilisateur accède\nà son profil;
+
+:Modifier les informations\n(nom, email, téléphone, spécialité);
+
+if (Changer le mot de passe ?) then (oui)
+    :Saisir l'ancien mot de passe;
+    if (Ancien mot de passe correct ?) then (non)
+        :Afficher erreur;
+        stop
+    else (oui)
+        :Saisir le nouveau mot de passe;
+    end if
+else (non)
+end if
+
+if (Déposer une photo de profil ?) then (oui)
+    :Sélectionner une image\n(JPG/PNG, max 2 MB);
+    :Supprimer l'ancienne photo;
+    :Enregistrer la nouvelle photo;
+else (non)
+end if
+
+:Sauvegarder les modifications;
+:Profil mis à jour;
+
+stop
+
+@enduml

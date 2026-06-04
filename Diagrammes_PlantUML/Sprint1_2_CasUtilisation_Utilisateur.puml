@@ -1,56 +1,47 @@
 @startuml Sprint1_CasUtilisation_Utilisateur
-title Raffinement — Cas d'Utilisation Utilisateur (Étudiant/Formateur/Externe)
+title Diagramme de cas d'utilisation — Utilisateur (Candidat ISET / Formateur / Externe)
 
 left to right direction
-skinparam packageStyle rectangle
 
-actor Utilisateur
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
 
-rectangle FormaPro {
-    usecase "Accéder page inscription" as UC1
-    usecase "Remplir formulaire" as UC2
-    usecase "Valider données" as UC3
-    usecase "Créer compte" as UC4
-    usecase "Recevoir confirmation" as UC5
-    
-    usecase "Accéder page connexion" as UC6
-    usecase "Saisir identifiants" as UC7
-    usecase "Vérifier authentification" as UC8
-    usecase "Générer JWT token" as UC9
-    usecase "Rediriger dashboard" as UC10
-    
-    usecase "Consulter profil" as UC11
-    usecase "Modifier informations" as UC12
-    usecase "Valider modifications" as UC13
-    
-    usecase "Accéder changement MDP" as UC14
-    usecase "Saisir ancien MDP" as UC14b
-    usecase "Valider ancien MDP" as UC14c
-    usecase "Hacher nouveau MDP" as UC14d
-    usecase "Enregistrer nouveau MDP" as UC14e
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
 }
 
-Utilisateur --> UC1 : Inscription
-Utilisateur --> UC6 : Authentification
-Utilisateur --> UC11 : Gestion Profil
-Utilisateur --> UC14 : Changement MDP
+actor "Candidat ISET" as CISET
+actor "Utilisateur externe" as EXT
+actor "Formateur" as F
 
-UC1 --> UC2
-UC2 --> UC3
-UC3 --> UC4
-UC4 --> UC5
+usecase "S'inscrire" as UC1
+usecase "S'inscrire (Candidat ISET)" as UC1_1
+usecase "S'inscrire (Utilisateur externe)" as UC1_2
+usecase "S'authentifier" as UC2
+usecase "Réinitialiser le mot de passe" as UC3
 
-UC6 --> UC7
-UC7 --> UC8
-UC8 --> UC9
-UC9 --> UC10
+CISET -- UC1
+EXT   -- UC1
+CISET -- UC3
+EXT   -- UC3
+F     -- UC3
 
-UC11 --> UC12
-UC12 --> UC13
+UC1 ..> UC2 : <<include>>
+UC3 ..> UC2 : <<include>>
 
-UC14 --> UC14b
-UC14b --> UC14c
-UC14c --> UC14d
-UC14d --> UC14e
+UC1_1 ..> UC1 : <<extend>>
+UC1_2 ..> UC1 : <<extend>>
 
 @enduml

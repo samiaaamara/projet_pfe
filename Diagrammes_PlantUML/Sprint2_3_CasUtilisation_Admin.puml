@@ -1,0 +1,67 @@
+@startuml Sprint2_CasUtilisation_Admin
+title Diagramme de cas d'utilisation — Administrateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Administrateur" as ADMIN
+
+usecase "S'authentifier" as AUTH
+usecase "Administrer les formations" as UC1
+usecase "Créer et assigner une formation" as UC1_1
+usecase "Assigner un formateur" as UC1_1a
+usecase "Définir les places, le prix et la date" as UC1_1b
+usecase "Planifier les séances" as UC1_1c
+usecase "Créer une séance" as UC1_1c1
+usecase "Modifier une séance" as UC1_1c2
+usecase "Supprimer une séance" as UC1_1c3
+usecase "Modifier une formation" as UC1_2
+usecase "Supprimer une formation" as UC1_3
+usecase "Consulter toutes les formations" as UC1_4
+usecase "Gérer le processus d'approbation" as UC2
+usecase "Accepter une formation" as UC2_1
+usecase "Rejeter une formation" as UC2_2
+usecase "Publier une formation" as UC2_3
+
+ADMIN -- UC1
+ADMIN -- UC2
+
+UC1 ..> AUTH : <<include>>
+UC2 ..> AUTH : <<include>>
+
+UC1_1 ..> UC1 : <<extend>>
+UC1_2 ..> UC1 : <<extend>>
+UC1_3 ..> UC1 : <<extend>>
+UC1_4 ..> UC1 : <<extend>>
+
+UC1_1a ..> UC1_1 : <<extend>>
+UC1_1b ..> UC1_1 : <<extend>>
+UC1_1c ..> UC1_1 : <<extend>>
+
+UC1_1c1 ..> UC1_1c : <<extend>>
+UC1_1c2 ..> UC1_1c : <<extend>>
+UC1_1c3 ..> UC1_1c : <<extend>>
+
+UC2_1 ..> UC2 : <<extend>>
+UC2_2 ..> UC2 : <<extend>>
+UC2_3 ..> UC2 : <<extend>>
+
+@enduml

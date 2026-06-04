@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CandidatService } from '../../services/candidat.service';
-import { ExterneService } from '../../services/externe.service';
 import { Auth } from '../../services/auth';
 import { environment } from '../../../environments/environment';
 import { NotificationsService } from '../../services/notifications.service';
@@ -27,11 +26,12 @@ export class CandidatComponent implements OnInit, OnDestroy {
   page = 1;
   totalPages = 1;
   totalFormations = 0;
-  filtreSpecialite: string | null = null;
   specialites: string[] = [];
   recherche = '';
+  filtreSpecialite = '';
 
   mesFormations: any[] = [];
+  demandesEnAttente: any[] = [];
 
   supports: any[] = [];
   formationSelectionnee: any = null;
@@ -122,7 +122,6 @@ export class CandidatComponent implements OnInit, OnDestroy {
 
   constructor(
     private candidatService: CandidatService,
-    private externeService: ExterneService,
     private authService: Auth,
     private notifService: NotificationsService,
     private msgService: MessagesService,
@@ -142,14 +141,16 @@ export class CandidatComponent implements OnInit, OnDestroy {
     this.loadProfilComplet();
     this.loadFormations();
     this.loadMesFormations();
+    this.loadDemandesEnAttente();
     this.chargerProgression();
     this.loadEnAttente();
     this.loadUnreadCount();
+    this.loadUnreadMessages();
     this.authService.getSpecialites().subscribe({
       next: data => this.specialites = data.map(s => s.nom),
       error: () => {}
     });
-    this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
+    this.pollingInterval = setInterval(() => { this.loadUnreadCount(); this.loadUnreadMessages(); }, 30000);
   }
 
   ngOnDestroy() {
@@ -174,20 +175,20 @@ export class CandidatComponent implements OnInit, OnDestroy {
         this.formations = res.data;
         this.totalPages = res.pagination.pages;
         this.totalFormations = res.pagination.total;
-        this.filtreSpecialite = res.filtre_specialite || null;
         this.formations.forEach(f => this.chargerMaNote(f.id));
       },
       error: () => this.showMessage('Erreur chargement des formations', 'danger')
     });
   }
 
+  get specialitesDispo(): string[] {
+    const s = new Set(this.formations.map(f => f.specialite).filter(Boolean));
+    return Array.from(s).sort();
+  }
+
   get formationsFiltrees() {
-    return this.formations.filter(f => {
-      const matchRecherche = this.recherche
-        ? (f.titre + ' ' + f.description).toLowerCase().includes(this.recherche.toLowerCase())
-        : true;
-      return matchRecherche;
-    });
+    if (!this.filtreSpecialite) return this.formations;
+    return this.formations.filter(f => f.specialite === this.filtreSpecialite);
   }
 
   changerPage(p: number) {
@@ -219,10 +220,14 @@ export class CandidatComponent implements OnInit, OnDestroy {
 
   inscrire(formationId: number) {
     if (!this.candidatId) return;
+    if (this.aFormationActive) {
+      this.showMessage("Vous avez déjà une formation en cours. Terminez-la avant de vous inscrire à une autre.", 'danger');
+      return;
+    }
     this.candidatService.inscrire(this.candidatId, formationId).subscribe({
       next: () => {
         this.showMessage("Demande envoyée ! En attente d'approbation par l'administrateur.");
-        this.loadMesFormations();
+        this.loadDemandesEnAttente();
         this.loadFormations();
       },
       error: (err) => this.showMessage(err?.error?.message || "Erreur lors de l'inscription", 'danger')
@@ -230,10 +235,12 @@ export class CandidatComponent implements OnInit, OnDestroy {
   }
 
   estDejaInscrit(formationId: number): boolean {
-    return this.mesFormations.some(f => f.formation_id === formationId);
+    return this.mesFormations.some(f => f.formation_id === formationId) ||
+           this.demandesEnAttente.some(f => f.formation_id === formationId);
   }
 
   getStatutInscription(formationId: number): string | null {
+    if (this.demandesEnAttente.some(f => f.formation_id === formationId)) return 'en_attente';
     return this.mesFormations.find(f => f.formation_id === formationId)?.statut || null;
   }
 
@@ -241,7 +248,9 @@ export class CandidatComponent implements OnInit, OnDestroy {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return this.mesFormations.some(f => {
-      if (!f.date_fin) return true;
+      if (f.statut === 'Terminée') return false;
+      if (f.status === 'terminée' || f.status === 'archivée') return false;
+      if (!f.date_fin) return false;
       return new Date(f.date_fin) >= today;
     });
   }
@@ -258,6 +267,14 @@ export class CandidatComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadDemandesEnAttente() {
+    if (!this.candidatId) return;
+    this.candidatService.getMesDemandes(this.candidatId).subscribe({
+      next: data => this.demandesEnAttente = data,
+      error: () => {}
+    });
+  }
+
   loadEligibilites(formations: any[]) {
     if (!this.candidatId) return;
     formations.forEach(f => {
@@ -269,8 +286,32 @@ export class CandidatComponent implements OnInit, OnDestroy {
     });
   }
 
+  getStatutFormation(f: any): string {
+    if (f.statut === 'en_attente') return 'En attente';
+    if (f.status === 'en_cours')  return 'En cours';
+    if (f.status === 'terminée')  return 'Terminée';
+    if (f.status === 'published') return 'À venir';
+    if (!f.date_debut) return f.status || '—';
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const toLocal = (d: string) => new Date((typeof d === 'string' ? d.substring(0, 10) : new Date(d).toISOString().substring(0, 10)) + 'T00:00:00');
+    const debut = toLocal(f.date_debut);
+    const fin   = f.date_fin ? toLocal(f.date_fin) : null;
+    if (debut > today) return 'À venir';
+    if (fin && fin < today) return 'Terminée';
+    return 'En cours';
+  }
+
   getStatutBadge(statut: string): string {
-    const map: any = { 'Inscrit': 'bg-primary', 'en_attente': 'bg-warning', 'présent': 'bg-success', 'absent': 'bg-danger', 'Terminé': 'bg-secondary' };
+    const map: any = {
+      'Inscrit'   : 'bg-primary',
+      'en_attente': 'bg-warning',
+      'En attente': 'bg-warning',
+      'À venir'   : 'bg-info',
+      'En cours'  : 'bg-success',
+      'Terminée'  : 'bg-secondary',
+      'présent'   : 'bg-success',
+      'absent'    : 'bg-danger',
+    };
     return map[statut] || 'bg-secondary';
   }
 
@@ -358,6 +399,21 @@ export class CandidatComponent implements OnInit, OnDestroy {
 
   imprimerAttestation() { window.print(); }
 
+  telechargerAttestation(formationId: number) {
+    if (!this.candidatId) return;
+    this.candidatService.genererAttestation(this.candidatId, formationId).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `attestation_formation_${formationId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.showMessage('Erreur lors du téléchargement de l\'attestation', 'danger')
+    });
+  }
+
   getTodayStr(): string {
     return new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
@@ -420,8 +476,8 @@ export class CandidatComponent implements OnInit, OnDestroy {
     if (this.nouveauMdp !== this.confirmMdp) {
       this.showMessage('Les mots de passe ne correspondent pas', 'danger'); return;
     }
-    if (this.nouveauMdp.length < 6) {
-      this.showMessage('Mot de passe trop court (min 6 caractères)', 'danger'); return;
+    if (this.nouveauMdp.length < 8) {
+      this.showMessage('Mot de passe trop court (min 8 caractères)', 'danger'); return;
     }
     this.authService.changePassword({ ancien_mdp: this.ancienMdp, nouveau_mdp: this.nouveauMdp }).subscribe({
       next: () => {
@@ -437,6 +493,14 @@ export class CandidatComponent implements OnInit, OnDestroy {
     if (!this.user?.id) return;
     this.notifService.getUnreadCount(this.user.id).subscribe({
       next: data => this.unreadCount = data?.count || 0,
+      error: () => {}
+    });
+  }
+
+  loadUnreadMessages() {
+    if (!this.user?.id) return;
+    this.msgService.getUnreadCount(this.user.id).subscribe({
+      next: (data: any) => this.unreadMessages = data?.count || 0,
       error: () => {}
     });
   }
@@ -486,15 +550,11 @@ export class CandidatComponent implements OnInit, OnDestroy {
     });
   }
 
-  getNotifIcon(type: string): string {
-    const icons: any = {
-      'inscription': '📚',
-      'approbation': '✅',
-      'rejet': '❌',
-      'presence': '🏆',
-      'info': 'ℹ️'
-    };
-    return icons[type] || '🔔';
+  getNotifIcon(type: string): string { return type; }
+
+  stripNotifEmoji(msg: string): string {
+    if (!msg) return '';
+    return msg.replace(/^[\u{1F300}-\u{1F9FF}✅❌⚠️]️?\s*/u, '');
   }
 
   openNotifications() {
@@ -583,7 +643,8 @@ export class CandidatComponent implements OnInit, OnDestroy {
     this.programmeFormation = f;
     this.programmeData = null;
     this.programmeLoading = true;
-    this.externeService.getProgramme(f.id).subscribe({
+    const formationId = f.formation_id || f.id;
+    this.candidatService.getProgramme(formationId).subscribe({
       next: (res: any) => { this.programmeData = res; this.programmeLoading = false; },
       error: () => { this.programmeLoading = false; this.showMessage('Erreur chargement du programme', 'danger'); }
     });
@@ -650,17 +711,6 @@ export class CandidatComponent implements OnInit, OnDestroy {
     });
   }
 
-  desinscrire(formationId: number) {
-    if (!this.candidatId || !confirm('Se désinscrire de cette formation ?')) return;
-    this.candidatService.desinscrire(this.candidatId, formationId).subscribe({
-      next: () => {
-        this.showMessage('Désinscription effectuée');
-        this.loadMesFormations();
-        this.loadFormations();
-      },
-      error: () => this.showMessage('Erreur lors de la désinscription', 'danger')
-    });
-  }
 
   // ===== Justificatifs =====
   ouvrirJustificatif(seanceId: number) {
@@ -719,7 +769,7 @@ export class CandidatComponent implements OnInit, OnDestroy {
   nbQuizDisponibles(): number {
     return this.mesFormations.filter(f => {
       const e = this.eligibiliteMap[f.formation_id];
-      return e?.has_quiz && !e?.quiz_ok && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
+      return f.status === 'terminée' && e?.has_quiz && !e?.quiz_ok && e?.progression === 100 && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
     }).length;
   }
 

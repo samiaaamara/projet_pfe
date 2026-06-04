@@ -29,6 +29,11 @@ const registerSchema = Joi.object({
     then: Joi.string().min(4).max(20).required().messages({ 'any.required': 'Le CIN est obligatoire' }),
     otherwise: Joi.string().optional().allow('', null)
   }),
+  type_candidat: Joi.when('role', {
+    is: 'candidat',
+    then: Joi.string().valid('etudiant', 'enseignant').required().messages({ 'any.required': 'Veuillez sélectionner votre profil (étudiant ou enseignant)' }),
+    otherwise: Joi.string().optional().allow('', null)
+  }),
   niveau: Joi.string().max(50).optional().allow('', null),
   telephone: Joi.string().pattern(/^[0-9+\s\-]{6,20}$/).optional().allow('', null).messages({
     'string.pattern.base': 'Numéro de téléphone invalide'
@@ -53,7 +58,6 @@ const formationSchema = Joi.object({
   date_fin: Joi.date().min(Joi.ref('date_debut')).optional().allow('', null).messages({
     'date.min': 'La date de fin doit être après la date de début'
   }),
-  duree: Joi.number().positive().optional().allow('', null),
   specialite: Joi.string().min(1).max(100).required(),
   nb_places: Joi.number().integer().positive().optional().allow('', null),
   formateur_id: Joi.number().integer().positive().required(),

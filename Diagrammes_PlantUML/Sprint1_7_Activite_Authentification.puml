@@ -2,46 +2,49 @@
 title Diagramme d'Activité — Authentification et Redirection
 
 start
-:Utilisateur saisit email + mot de passe;
+:Utilisateur accède à la page de connexion;
+:Saisit email + mot de passe;
+:Soumet le formulaire;
 
-:Envoie requête login au serveur;
+:Vérification rate limiting\n(max 5 tentatives / minute);
 
-:Vérifier email en base de données;
+if (Limite dépassée ?) then (oui)
+    :Retour HTTP 429 — "Trop de tentatives.\nRéessayez dans 1 minute.";
+    :Affiche message d'erreur;
+    stop
+else (non)
+    :Recherche de l'email en base de données;
 
-if (Email trouvé?) then (non)
-    :Erreur: Email incorrect;
-    :Affiche message utilisateur;
-    end
-else (oui)
-    :Récupère hash du mot de passe;
-    
-    :Utilise bcrypt.compare();
-    
-    if (Mot de passe valide?) then (non)
-        :Erreur: Mot de passe incorrect;
-        :Affiche message utilisateur;
-        end
+    if (Email trouvé ?) then (non)
+        :Retour HTTP 401 — "Identifiants incorrects";
+        :Affiche message d'erreur;
+        stop
     else (oui)
-        :Génère JWT token;
-        
-        :Récupère rôle utilisateur;
-        
-        if (Rôle?) then (admin)
-            :Redirige vers Dashboard Admin;
-        else (formateur)
-            :Redirige vers Dashboard Formateur;
-        else (etudiant)
-            :Redirige vers Dashboard Étudiant;
-        else (externe)
-            :Redirige vers Dashboard Externe;
+        :Comparaison du mot de passe\navec bcrypt.compare();
+
+        if (Mot de passe valide ?) then (non)
+            :Retour HTTP 401 — "Identifiants incorrects";
+            :Affiche message d'erreur;
+            stop
+        else (oui)
+            :Génère token JWT\n(expiration 24h, contient userId + rôle);
+            :Stocke le token en localStorage;
+            :Récupère le rôle utilisateur;
+
+            if (Rôle ?) then (admin)
+                :Redirige vers Dashboard Administrateur;
+            else (formateur)
+                :Redirige vers Dashboard Formateur;
+            else (candidat)
+                :Redirige vers Dashboard Candidat ISET;
+            else (externe)
+                :Redirige vers Dashboard Utilisateur externe;
+            endif
+
+            :Affiche le dashboard personnalisé;
+            stop
         endif
-        
-        :Stocke token en localStorage;
-        :Affiche dashboard personnalisé;
-        end
     endif
 endif
-
-stop
 
 @enduml

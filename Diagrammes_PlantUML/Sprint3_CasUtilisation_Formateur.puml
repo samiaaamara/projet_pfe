@@ -1,0 +1,36 @@
+@startuml Sprint3_CasUtilisation_Formateur
+title Diagramme de Cas d'Utilisation — Sprint 3 : Formateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 25
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Formateur" as F
+
+usecase "Valider les présences par séance" as UC10
+usecase "Consulter la liste des inscrits" as UC10a
+usecase "Marquer présent / absent / excusé" as UC10_1
+
+F --> UC10
+
+UC10 ..> UC10a  : <<include>>
+UC10 ..> UC10_1 : <<include>>
+
+@enduml

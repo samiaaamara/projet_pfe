@@ -2,17 +2,39 @@
 
   <!-- GAUCHE -->
   <div class="auth-left">
+    <div class="auth-left-overlay"></div>
     <div class="auth-left-inner">
-      <a class="auth-brand" routerLink="/home">
-        <span>&#127891;</span> FormaPro
-      </a>
-      <h2 class="auth-left-title">Rejoignez notre communaute de formation</h2>
-      <p class="auth-left-sub">Creez votre compte en quelques instants et accedit a toutes les ressources pedagogiques de la plateforme.</p>
+
+      <h2 class="auth-left-title">Bienvenue sur la plateforme de formation de l'ISET Tozeur</h2>
+      <p class="auth-left-sub">Rejoignez des centaines d'apprenants et développez vos compétences avec des formations professionnelles certifiantes.</p>
+
       <div class="auth-left-features">
-        <div class="auth-feature"><span class="af-icon">&#9989;</span><span>Inscription instantanee et gratuite</span></div>
-        <div class="auth-feature"><span class="af-icon">&#128194;</span><span>Acces aux supports pedagogiques</span></div>
-        <div class="auth-feature"><span class="af-icon">&#127942;</span><span>Suivez et validez vos formations</span></div>
+        <div class="auth-feature">
+          <span class="af-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </span>
+          <span>Formations pour candidats ISET et participants externes</span>
+        </div>
+        <div class="auth-feature">
+          <span class="af-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </span>
+          <span>Suivi de progression module par module</span>
+        </div>
+        <div class="auth-feature">
+          <span class="af-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+          </span>
+          <span>Attestation PDF après validation du quiz</span>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -21,8 +43,15 @@
     <div class="auth-card">
 
       <div class="auth-card-header">
-        <div class="auth-avatar-icon green">&#9997;&#65039;</div>
-        <h3 class="auth-title">Creer un compte</h3>
+        <div class="auth-avatar-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/>
+            <line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+        </div>
+        <h3 class="auth-title">Créer un compte</h3>
         <p class="auth-subtitle">Remplissez le formulaire pour vous inscrire</p>
       </div>
 
@@ -33,26 +62,35 @@
           <div class="form-group">
             <label>Nom complet *</label>
             <div class="input-wrapper" [class.is-invalid]="nomRef.invalid && (nomRef.dirty || nomRef.touched)">
-              <span class="input-icon">&#128100;</span>
+              <span class="input-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
               <input type="text" [(ngModel)]="nom" name="nom" #nomRef="ngModel"
                      placeholder="Votre nom complet" required minlength="3" maxlength="100">
             </div>
             <div *ngIf="nomRef.invalid && (nomRef.dirty || nomRef.touched)" class="field-error">
               <span *ngIf="nomRef.errors?.['required']">Le nom complet est obligatoire.</span>
-              <span *ngIf="nomRef.errors?.['minlength']">Le nom doit contenir au moins 3 caracteres.</span>
+              <span *ngIf="nomRef.errors?.['minlength']">Au moins 3 caractères.</span>
             </div>
           </div>
 
           <div class="form-group">
             <label>Email *</label>
             <div class="input-wrapper" [class.is-invalid]="emailRef.invalid && (emailRef.dirty || emailRef.touched)">
-              <span class="input-icon">&#9993;&#65039;</span>
+              <span class="input-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </span>
               <input type="email" [(ngModel)]="email" name="email" #emailRef="ngModel"
                      placeholder="exemple@email.com" required email>
             </div>
             <div *ngIf="emailRef.invalid && (emailRef.dirty || emailRef.touched)" class="field-error">
               <span *ngIf="emailRef.errors?.['required']">L'adresse email est obligatoire.</span>
-              <span *ngIf="emailRef.errors?.['email']">Veuillez entrer une adresse email valide (ex: nom@domaine.com).</span>
+              <span *ngIf="emailRef.errors?.['email']">Adresse email invalide.</span>
             </div>
           </div>
         </div>
@@ -62,20 +100,31 @@
           <div class="form-group">
             <label>Mot de passe *</label>
             <div class="input-wrapper" [class.is-invalid]="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)">
-              <span class="input-icon">&#128273;</span>
+              <span class="input-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
               <input type="password" [(ngModel)]="password" name="password" #passwordRef="ngModel"
-                     placeholder="Au moins 8 caracteres" required minlength="8">
+                     placeholder="Au moins 8 caractères" required minlength="8">
             </div>
             <div *ngIf="passwordRef.invalid && (passwordRef.dirty || passwordRef.touched)" class="field-error">
               <span *ngIf="passwordRef.errors?.['required']">Le mot de passe est obligatoire.</span>
-              <span *ngIf="passwordRef.errors?.['minlength']">Le mot de passe doit contenir au moins 8 caracteres.</span>
+              <span *ngIf="passwordRef.errors?.['minlength']">Au moins 8 caractères.</span>
             </div>
           </div>
 
           <div class="form-group">
-            <label>Role *</label>
+            <label>Rôle *</label>
             <div class="input-wrapper select-wrapper">
-              <span class="input-icon">&#127917;</span>
+              <span class="input-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </span>
               <select [(ngModel)]="role" name="role" required>
                 <option value="candidat">Candidat</option>
                 <option value="externe">Utilisateur Externe</option>
@@ -87,44 +136,87 @@
         <!-- CHAMPS CANDIDAT -->
         <div *ngIf="role === 'candidat'" class="role-fields">
           <div class="role-fields-title">
-            <span class="role-chip blue">Candidat</span>
-            <span>Informations supplementaires</span>
+            <span class="role-chip blue">Candidat ISET</span>
+            <span>Informations supplémentaires</span>
+          </div>
+
+          <!-- TYPE CANDIDAT -->
+          <div class="form-group type-selector-group">
+            <label>Vous êtes *</label>
+            <div class="type-candidat-selector">
+              <div class="type-option" [class.selected]="type_candidat === 'etudiant'" (click)="type_candidat = 'etudiant'">
+                <span class="type-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+                <div class="type-option-info">
+                  <span class="type-option-label">Étudiant ISET</span>
+                  <span class="type-option-desc">Inscrit en formation initiale</span>
+                </div>
+                <span class="type-option-check" *ngIf="type_candidat === 'etudiant'">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+              </div>
+              <div class="type-option" [class.selected]="type_candidat === 'enseignant'" (click)="type_candidat = 'enseignant'">
+                <span class="type-option-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                <div class="type-option-info">
+                  <span class="type-option-label">Enseignant ISET</span>
+                  <span class="type-option-desc">Membre du corps enseignant</span>
+                </div>
+                <span class="type-option-check" *ngIf="type_candidat === 'enseignant'">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label>CIN *</label>
               <div class="input-wrapper" [class.is-invalid]="cinRef.invalid && (cinRef.dirty || cinRef.touched)">
-                <span class="input-icon">&#129370;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+                  </svg>
+                </span>
                 <input type="text" [(ngModel)]="cin" name="cin" #cinRef="ngModel"
                        placeholder="8 chiffres" required pattern="[0-9]{8}" maxlength="8">
               </div>
               <div *ngIf="cinRef.invalid && (cinRef.dirty || cinRef.touched)" class="field-error">
                 <span *ngIf="cinRef.errors?.['required']">Le CIN est obligatoire.</span>
-                <span *ngIf="cinRef.errors?.['pattern']">Le CIN doit contenir exactement 8 chiffres (ex: 12345678).</span>
+                <span *ngIf="cinRef.errors?.['pattern']">8 chiffres exactement.</span>
               </div>
             </div>
 
             <div class="form-group">
-              <label>Telephone</label>
+              <label>Téléphone</label>
               <div class="input-wrapper" [class.is-invalid]="telCandRef.invalid && (telCandRef.dirty || telCandRef.touched)">
-                <span class="input-icon">&#128222;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.61 4.41 2 2 0 0 1 3.6 2.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
                 <input type="text" [(ngModel)]="telephone" name="telephone_candidat" #telCandRef="ngModel"
                        placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
               </div>
               <div *ngIf="telCandRef.invalid && (telCandRef.dirty || telCandRef.touched)" class="field-error">
-                <span *ngIf="telCandRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
+                <span *ngIf="telCandRef.errors?.['pattern']">Numéro invalide (8 à 15 chiffres).</span>
               </div>
             </div>
           </div>
 
           <div class="form-row">
-            <div class="form-group">
+            <div class="form-group" *ngIf="type_candidat === 'etudiant'">
               <label>Niveau</label>
               <div class="input-wrapper select-wrapper">
-                <span class="input-icon">&#127891;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                  </svg>
+                </span>
                 <select [(ngModel)]="niveau" name="niveau">
-                  <option value="">-- Selectionnez un niveau --</option>
+                  <option value="">-- Sélectionnez un niveau --</option>
                   <option value="L1">L1</option>
                   <option value="L2">L2</option>
                   <option value="L3">L3</option>
@@ -137,7 +229,11 @@
             <div class="form-group">
               <label>Spécialité *</label>
               <div class="input-wrapper select-wrapper" [class.is-invalid]="specCandRef.invalid && (specCandRef.dirty || specCandRef.touched)">
-                <span class="input-icon">&#128161;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </span>
                 <select [(ngModel)]="specialite" name="specialite" #specCandRef="ngModel" required>
                   <option value="">-- Sélectionnez une spécialité --</option>
                   <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
@@ -151,23 +247,19 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Entreprise / Organisation</label>
-              <div class="input-wrapper">
-                <span class="input-icon">&#127970;</span>
-                <input type="text" [(ngModel)]="entreprise" name="entreprise_candidat"
-                       placeholder="Nom de votre entreprise (optionnel)" maxlength="150">
-              </div>
-            </div>
-
-            <div class="form-group">
               <label>Date de naissance</label>
               <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
-                <span class="input-icon">&#128197;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </span>
                 <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_candidat"
                        [attr.max]="today" (change)="validateDateNaissance()">
               </div>
               <div *ngIf="dateNaissanceError" class="field-error">
-                <span>La date de naissance doit etre dans le passe.</span>
+                <span>La date doit être dans le passé.</span>
               </div>
             </div>
           </div>
@@ -177,26 +269,35 @@
         <div *ngIf="role === 'externe'" class="role-fields">
           <div class="role-fields-title">
             <span class="role-chip teal">Externe</span>
-            <span>Informations supplementaires (optionnelles)</span>
+            <span>Informations supplémentaires (optionnelles)</span>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Telephone</label>
+              <label>Téléphone</label>
               <div class="input-wrapper" [class.is-invalid]="telExtRef.invalid && (telExtRef.dirty || telExtRef.touched)">
-                <span class="input-icon">&#128222;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.61 4.41 2 2 0 0 1 3.6 2.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.06 6.06l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </span>
                 <input type="text" [(ngModel)]="telephone" name="telephone" #telExtRef="ngModel"
                        placeholder="Ex: 21 234 567" pattern="^[+]?[0-9 \-]{8,15}$">
               </div>
               <div *ngIf="telExtRef.invalid && (telExtRef.dirty || telExtRef.touched)" class="field-error">
-                <span *ngIf="telExtRef.errors?.['pattern']">Numero de telephone invalide (8 a 15 chiffres).</span>
+                <span *ngIf="telExtRef.errors?.['pattern']">Numéro invalide (8 à 15 chiffres).</span>
               </div>
             </div>
 
             <div class="form-group">
               <label>Entreprise / Organisation</label>
               <div class="input-wrapper">
-                <span class="input-icon">&#127970;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    <polyline points="9 22 9 12 15 12 15 22"/>
+                  </svg>
+                </span>
                 <input type="text" [(ngModel)]="entreprise" name="entreprise"
                        placeholder="Nom de votre entreprise" maxlength="150">
               </div>
@@ -207,7 +308,11 @@
             <div class="form-group">
               <label>Spécialité *</label>
               <div class="input-wrapper select-wrapper" [class.is-invalid]="specExtRef.invalid && (specExtRef.dirty || specExtRef.touched)">
-                <span class="input-icon">&#128161;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  </svg>
+                </span>
                 <select [(ngModel)]="specialite" name="specialite_externe" #specExtRef="ngModel" required>
                   <option value="">-- Sélectionnez une spécialité --</option>
                   <option *ngFor="let s of specialites" [value]="s.nom">{{ s.nom }}</option>
@@ -221,12 +326,17 @@
             <div class="form-group">
               <label>Date de naissance</label>
               <div class="input-wrapper" [class.is-invalid]="dateNaissanceError">
-                <span class="input-icon">&#128197;</span>
+                <span class="input-icon">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                    <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                </span>
                 <input type="date" [(ngModel)]="dateNaissance" name="date_naissance_externe"
                        [attr.max]="today" (change)="validateDateNaissance()">
               </div>
               <div *ngIf="dateNaissanceError" class="field-error">
-                <span>La date de naissance doit etre dans le passe.</span>
+                <span>La date doit être dans le passé.</span>
               </div>
             </div>
           </div>
@@ -234,19 +344,37 @@
 
         <!-- MESSAGE GLOBAL -->
         <div *ngIf="message" class="auth-message"
-             [class.auth-success]="message.includes('succes')"
-             [class.auth-error]="!message.includes('succes')">
+             [class.auth-success]="message.includes('succès')"
+             [class.auth-error-msg]="!message.includes('succès')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
           {{ message }}
         </div>
 
-        <button type="submit" class="btn-submit">
-          Creer mon compte &#8594;
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          <span *ngIf="loading" class="spinner"></span>
+          <span *ngIf="!loading">Créer mon compte</span>
+          <span *ngIf="loading">Création en cours...</span>
+          <svg *ngIf="!loading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
         </button>
 
       </form>
 
       <div class="auth-footer">
-        Deja un compte ? <a routerLink="/login">Se connecter</a>
+        Déjà un compte ?
+        <a routerLink="/login">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Se connecter
+        </a>
       </div>
 
     </div>

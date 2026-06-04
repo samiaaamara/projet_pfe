@@ -5,7 +5,7 @@ const db = require('../db');
 router.get('/unread-count/:userId', async (req, res) => {
   try {
     const [results] = await db.query(
-      'SELECT COUNT(*) AS count FROM notifications WHERE user_id = ? AND lu = 0',
+ 'SELECT COUNT(*) AS count FROM notifications WHERE user_id = ? AND lu = 0',
       [parseInt(req.params.userId)]
     );
     res.json({ count: results[0].count });
@@ -17,7 +17,7 @@ router.get('/unread-count/:userId', async (req, res) => {
 router.get('/:userId', async (req, res) => {
   try {
     const [results] = await db.query(
-      'SELECT * FROM notifications WHERE user_id = ? ORDER BY date_creation DESC LIMIT 50',
+ 'SELECT * FROM notifications WHERE user_id = ? ORDER BY date_creation DESC LIMIT 50',
       [parseInt(req.params.userId)]
     );
     res.json(results);

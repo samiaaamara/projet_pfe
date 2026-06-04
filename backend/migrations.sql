@@ -65,9 +65,21 @@ CREATE TABLE IF NOT EXISTS inscriptions_externes (
 -- If table already exists, add payment_ref column:
 ALTER TABLE inscriptions_externes ADD COLUMN IF NOT EXISTS payment_ref VARCHAR(100) DEFAULT NULL;
 
--- Colonne module_id dans séances (rattacher une séance à un module)
+-- Type de candidat : étudiant ISET ou enseignant ISET
+ALTER TABLE candidats ADD COLUMN IF NOT EXISTS type_candidat ENUM('etudiant', 'enseignant') NOT NULL DEFAULT 'etudiant';
+
+-- Colonne module_id dans séances (rattacher une séance à un module) — legacy, remplacé par seance_modules
 ALTER TABLE seances ADD COLUMN IF NOT EXISTS module_id INT DEFAULT NULL,
   ADD FOREIGN KEY IF NOT EXISTS (module_id) REFERENCES modules_formation(id) ON DELETE SET NULL;
+
+-- Table de jointure séance ↔ modules (plusieurs modules par séance)
+CREATE TABLE IF NOT EXISTS seance_modules (
+  seance_id INT NOT NULL,
+  module_id INT NOT NULL,
+  PRIMARY KEY (seance_id, module_id),
+  FOREIGN KEY (seance_id) REFERENCES seances(id) ON DELETE CASCADE,
+  FOREIGN KEY (module_id) REFERENCES modules_formation(id) ON DELETE CASCADE
+);
 
 -- Programme de formation (description globale + objectifs + prérequis)
 CREATE TABLE IF NOT EXISTS programme_formations (
@@ -216,3 +228,47 @@ CREATE TABLE IF NOT EXISTS progression_candidats (
   FOREIGN KEY (formation_id) REFERENCES formations(id)        ON DELETE CASCADE,
   FOREIGN KEY (module_id)    REFERENCES modules_formation(id) ON DELETE CASCADE
 );
+
+-- ============================================================
+-- MIGRATION: correctifs finaux (à appliquer sur la base actuelle)
+-- ============================================================
+
+-- 1. Corriger la donnée corrompue : candidat_id=0 doit être NULL
+--    (une entrée externe avait été insérée avec candidat_id=0 au lieu de NULL)
+UPDATE liste_attente SET candidat_id = NULL WHERE candidat_id = 0;
+
+-- 2. Ajouter la FK manquante candidat_id → candidats(id)
+--    (fk_la_externe existe déjà, fk_la_candidat manque)
+ALTER TABLE liste_attente
+  ADD CONSTRAINT fk_la_candidat FOREIGN KEY (candidat_id) REFERENCES candidats(id) ON DELETE CASCADE;
+
+-- 3. Renommer notations.etudiant_id → candidat_id
+--    (le backend utilise candidat_id mais la colonne s'appelle encore etudiant_id en base)
+ALTER TABLE notations
+  CHANGE COLUMN etudiant_id candidat_id INT NOT NULL;
+
+-- ============================================================
+-- MIGRATION: support externes dans presences + progression
+-- ============================================================
+
+-- 4. Ajouter externe_id dans presences (pour les participants externes)
+ALTER TABLE presences
+  MODIFY COLUMN candidat_id INT DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS externe_id INT DEFAULT NULL;
+
+-- 5. Ajouter externe_id dans progression_candidats (pour les externes)
+ALTER TABLE progression_candidats
+  MODIFY COLUMN candidat_id INT DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS externe_id INT DEFAULT NULL;
+
+-- ============================================================
+-- MIGRATION: date_publication dans formations
+-- ============================================================
+ALTER TABLE formations ADD COLUMN IF NOT EXISTS date_publication DATETIME DEFAULT NULL;
+
+-- Backfill : pour les formations publiées sans date_publication,
+-- utiliser date_debut si disponible, sinon la date actuelle
+UPDATE formations
+SET date_publication = COALESCE(date_debut, NOW())
+WHERE date_publication IS NULL
+  AND status IN ('published', 'en_cours', 'terminée', 'archivée');

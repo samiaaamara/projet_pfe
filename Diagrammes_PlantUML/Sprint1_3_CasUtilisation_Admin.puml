@@ -1,53 +1,59 @@
 @startuml Sprint1_CasUtilisation_Admin
-title Raffinement — Cas d'Utilisation Administrateur
+title Diagramme de cas d'utilisation — Administrateur
 
 left to right direction
-skinparam packageStyle rectangle
 
-actor Admin
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
 
-rectangle FormaPro {
-    usecase "S'authentifier Admin" as UC1
-    usecase "Accéder Dashboard" as UC2
-    
-    usecase "Consulter utilisateurs" as UC3
-    usecase "Filtrer par rôle" as UC3a
-    usecase "Filtrer par spécialité" as UC3b
-    usecase "Supprimer utilisateur" as UC4
-    
-    usecase "Consulter formateurs" as UC5
-    usecase "Créer formateur" as UC6
-    usecase "Modifier formateur" as UC7
-    usecase "Supprimer formateur" as UC8
-    
-    usecase "Consulter statistiques" as UC9
-    usecase "Voir nombre étudiants" as UC9a
-    usecase "Voir nombre formateurs" as UC9b
-    usecase "Voir formations publiées" as UC9c
-    usecase "Voir formations en attente" as UC9d
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
 }
 
-Admin --> UC1
-UC1 --> UC2
+actor "Administrateur" as ADMIN
 
-Admin --> UC3 : Gestion Utilisateurs
-UC3 --> UC3a
-UC3 --> UC3b
-UC3 --> UC4
+usecase "S'authentifier" as AUTH
+usecase "Gérer les utilisateurs" as UC1
+usecase "Consulter la liste des utilisateurs" as UC1_1
+usecase "Supprimer un utilisateur" as UC1_2
+usecase "Gérer les formateurs" as UC2
+usecase "Créer un compte formateur" as UC2_1
+usecase "Modifier un compte formateur" as UC2_2
+usecase "Supprimer un formateur" as UC2_3
+usecase "Consulter la disponibilité des formateurs" as UC2_4
+usecase "Consulter le tableau de bord statistique" as UC3
+usecase "Consulter le nombre de candidats et formateurs" as UC3_1
+usecase "Consulter le nombre de formations publiées" as UC3_2
+usecase "Consulter les inscriptions en attente" as UC3_3
 
-Admin --> UC5 : Gestion Formateurs
-UC5 --> UC6
-UC5 --> UC7
-UC5 --> UC8
+ADMIN -- UC1
+ADMIN -- UC2
+ADMIN -- UC3
 
-Admin --> UC9 : Statistiques
-UC9 --> UC9a
-UC9 --> UC9b
-UC9 --> UC9c
-UC9 --> UC9d
+UC1 ..> AUTH : <<include>>
+UC2 ..> AUTH : <<include>>
+UC3 ..> AUTH : <<include>>
 
-UC2 --> UC3
-UC2 --> UC5
-UC2 --> UC9
+UC1_1 ..> UC1 : <<extend>>
+UC1_2 ..> UC1 : <<extend>>
+UC2_1 ..> UC2 : <<extend>>
+UC2_2 ..> UC2 : <<extend>>
+UC2_3 ..> UC2 : <<extend>>
+UC2_4 ..> UC2 : <<extend>>
+UC3_1 ..> UC3 : <<extend>>
+UC3_2 ..> UC3 : <<extend>>
+UC3_3 ..> UC3 : <<extend>>
 
 @enduml

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:11434/api/tags)",
+      "Bash(curl -s http://localhost:4200)",
+      "Bash(curl -s -X POST http://localhost:11434/api/chat -H \"Content-Type: application/json\" -d \"{\\\\\"model\\\\\":\\\\\"gemma3:1b\\\\\",\\\\\"stream\\\\\":false,\\\\\"messages\\\\\":[{\\\\\"role\\\\\":\\\\\"system\\\\\",\\\\\"content\\\\\":\\\\\"Tu es l assistant de FormaPro, plateforme de gestion de formations professionnelles de l ISET. Reponds en francais, de facon courte et claire.\\\\nATTESTATION : necessite DEUX conditions obligatoires ensemble : 1. Progression 100% \\(tous modules termines\\) 2. Quiz reussi \\(score >= seuil, ex: 70%\\). Sans l une des deux = pas d attestation.\\\\\"},{\\\\\"role\\\\\":\\\\\"user\\\\\",\\\\\"content\\\\\":\\\\\"Comment obtenir mon attestation ?\\\\\"}]}\")"
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+@startuml Sprint3_CasUtilisation_Admin
+title Diagramme de Cas d'Utilisation — Sprint 3 : Administrateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 25
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Administrateur" as ADMIN
+
+usecase "Gérer les demandes d'inscription" as UC11
+usecase "Approuver une inscription" as UC11_1
+usecase "Rejeter une inscription" as UC11_2
+usecase "Gérer la liste d'attente" as UC12
+usecase "Inscrire manuellement depuis la liste" as UC12_1
+usecase "Retirer de la liste d'attente" as UC12_2
+usecase "Consulter les paiements" as UC13
+
+ADMIN --> UC11
+ADMIN --> UC13
+
+UC11 ..> UC11_1 : <<extend>>
+UC11 ..> UC11_2 : <<extend>>
+UC11 ..> UC12   : <<extend>>
+UC12 ..> UC12_1 : <<extend>>
+UC12 ..> UC12_2 : <<extend>>
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml Sprint4_CasUtilisation_Admin
+title Diagramme de Cas d'Utilisation — Sprint 4 : Administrateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 25
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Administrateur" as ADMIN
+
+usecase "Gérer les quiz" as UC8
+usecase "Créer un quiz" as UC7
+usecase "Configurer les paramètres\n(titre, seuil, tentatives)" as UC7_2
+usecase "Ajouter des questions" as UC7_1
+usecase "Modifier le quiz" as UC8_1
+usecase "Supprimer le quiz" as UC8_2
+usecase "Messagerie interne" as UC4
+usecase "Consulter les notifications" as UC5
+
+ADMIN -- UC8
+ADMIN -- UC4
+ADMIN -- UC5
+
+UC8  ..> UC7   : <<extend>>
+UC8  ..> UC8_1 : <<extend>>
+UC8  ..> UC8_2 : <<extend>>
+UC7  ..> UC7_2 : <<include>>
+UC7  ..> UC7_1 : <<include>>
+
+@enduml

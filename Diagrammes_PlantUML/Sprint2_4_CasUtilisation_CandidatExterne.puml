@@ -1,0 +1,43 @@
+@startuml Sprint2_CasUtilisation_CandidatExterne
+title Diagramme de cas d'utilisation — Candidat ISET / Utilisateur externe
+
+left to right direction
+
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Candidat ISET / Externe" as USER
+
+usecase "S'authentifier" as AUTH
+usecase "Consulter le catalogue des formations" as UC1
+usecase "Filtrer par spécialité" as UC1_1
+usecase "Soumettre une demande d'inscription" as UC2
+usecase "Consulter mes formations inscrites" as UC3
+
+USER -- UC1
+USER -- UC2
+USER -- UC3
+
+UC1 ..> AUTH : <<include>>
+UC2 ..> AUTH : <<include>>
+UC3 ..> AUTH : <<include>>
+
+UC1_1 ..> UC1 : <<extend>>
+
+@enduml

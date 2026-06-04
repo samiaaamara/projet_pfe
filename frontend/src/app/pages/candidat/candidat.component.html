@@ -6,45 +6,64 @@
       <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="avatar avatar-img" alt="Photo de profil">
       <div *ngIf="!profilePhotoUrl" class="avatar">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
       <div class="sidebar-username">{{ user?.nom }}</div>
+      <div class="sidebar-email">{{ user?.email }}</div>
       <div class="sidebar-role">Candidat</div>
       <div class="sidebar-specialite" *ngIf="profileSpecialite">{{ profileSpecialite }}</div>
     </div>
 
     <nav class="sidebar-nav">
+      <span class="nav-group-label">Mon espace</span>
       <a class="nav-item" [class.active]="activeSection === 'accueil'" (click)="setSection('accueil')">
-        <span class="nav-icon">🏠</span> Accueil
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+        Accueil
       </a>
+      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        Mon profil
+      </a>
+
+      <span class="nav-group-label">Formations</span>
       <a class="nav-item" [class.active]="activeSection === 'formations'" (click)="setSection('formations')">
-        <span class="nav-icon">📚</span> Formations
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+        Formations
         <span class="nav-badge" *ngIf="totalFormations > 0">{{ totalFormations }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'mesFormations'" (click)="setSection('mesFormations')">
-        <span class="nav-icon">✅</span> Mes inscriptions
-        <span class="nav-badge" *ngIf="mesFormations.length > 0">{{ mesFormations.length }}</span>
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        Mes inscriptions
+        <span class="nav-badge" *ngIf="mesFormations.length + demandesEnAttente.length + enAttente.length > 0">{{ mesFormations.length + demandesEnAttente.length + enAttente.length }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'progression'" (click)="setSection('progression')">
-        <span class="nav-icon">📈</span> Ma progression
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+        Ma progression
       </a>
       <a class="nav-item" [class.active]="activeSection === 'quiz'" (click)="ouvrirSectionQuiz()">
-        <span class="nav-icon">📝</span> Mes Quiz
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        Mes Quiz
         <span class="nav-badge" *ngIf="nbQuizDisponibles() > 0">{{ nbQuizDisponibles() }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'attestation'" (click)="allerAuxAttestations()">
-        <span class="nav-icon">🏆</span> Attestations
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span>
+        Attestations
       </a>
-      <a class="nav-item" [class.active]="activeSection === 'profil'" (click)="setSection('profil')">
-        <span class="nav-icon">👤</span> Mon profil
-      </a>
+
+      <span class="nav-group-label">Communication</span>
       <a class="nav-item" [class.active]="activeSection === 'notifications'" (click)="openNotifications()">
-        <span class="nav-icon">🔔</span> Notifications
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+        Notifications
         <span class="nav-badge notif-badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
       </a>
       <a class="nav-item" [class.active]="activeSection === 'messages'" (click)="openMessages()">
-        <span class="nav-icon">💬</span> Messagerie
+        <span class="nav-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        Messagerie
         <span class="nav-badge notif-badge" *ngIf="unreadMessages > 0">{{ unreadMessages }}</span>
       </a>
     </nav>
-    <button class="logout-btn" (click)="logout()">🚪 Déconnexion</button>
+
+    <button class="logout-btn" (click)="logout()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Déconnexion
+    </button>
   </aside>
 
   <!-- CONTENU PRINCIPAL -->
@@ -55,62 +74,43 @@
     </div>
 
     <!-- ACCUEIL -->
-    <section *ngIf="activeSection === 'accueil'">
+    <section *ngIf="activeSection === 'accueil'" class="pay-section">
 
-      <!-- Bannière de bienvenue -->
-      <div class="welcome-banner">
-        <div class="welcome-left">
-          <div class="welcome-role-tag">🎓 Candidat · ISET Tozeur</div>
-          <div class="welcome-greeting">Bonjour, {{ user?.nom }} 👋</div>
-          <div class="welcome-sub">Explorez nos formations et développez vos compétences professionnelles</div>
-          <button class="btn-action-banner" (click)="setSection('formations')">Voir le catalogue →</button>
+      <div class="pay-section-header">
+        <div>
+          <div class="pay-section-title">Tableau de bord</div>
+          <div class="pay-section-sub">Bonjour, {{ user?.nom }} — Candidat · ISET Tozeur</div>
         </div>
-        <div class="welcome-stats-mini">
-          <div class="wsm-item">
-            <span class="wsm-val">{{ mesFormations.length }}</span>
-            <span class="wsm-lbl">Inscriptions</span>
-          </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ progression }}%</span>
-            <span class="wsm-lbl">Progression</span>
-          </div>
-          <div class="wsm-divider"></div>
-          <div class="wsm-item">
-            <span class="wsm-val">{{ formationsTerminees }}</span>
-            <span class="wsm-lbl">Terminées</span>
-          </div>
-        </div>
+        <button class="btn-primary" (click)="setSection('formations')" style="align-self:flex-start;font-size:13px;padding:8px 16px">Voir le catalogue →</button>
       </div>
 
-      <!-- Statistiques -->
-      <div class="stats-grid">
-        <div class="stat-card blue" (click)="setSection('formations')">
-          <div class="stat-icon">🎓</div>
-          <div class="stat-value">{{ totalFormations }}</div>
-          <div class="stat-label">Formations disponibles</div>
+      <div class="pay-stats-row">
+        <div class="pay-stat-card" (click)="setSection('formations')">
+          <div class="psc-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="psc-val">{{ totalFormations }}</div>
+          <div class="psc-lbl">Formations disponibles</div>
         </div>
-        <div class="stat-card green" (click)="setSection('mesFormations')">
-          <div class="stat-icon">📋</div>
-          <div class="stat-value">{{ mesFormations.length }}</div>
-          <div class="stat-label">Mes inscriptions</div>
+        <div class="pay-stat-card" (click)="setSection('mesFormations')">
+          <div class="psc-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div class="psc-val">{{ mesFormations.length }}</div>
+          <div class="psc-lbl">Mes inscriptions</div>
         </div>
-        <div class="stat-card orange" (click)="setSection('progression')">
-          <div class="stat-icon">📊</div>
-          <div class="stat-value">{{ progression }}%</div>
-          <div class="stat-label">Progression globale</div>
+        <div class="pay-stat-card" (click)="setSection('progression')">
+          <div class="psc-icon orange"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+          <div class="psc-val">{{ progression }}%</div>
+          <div class="psc-lbl">Progression globale</div>
         </div>
-        <div class="stat-card purple" (click)="ouvrirSectionQuiz()">
-          <div class="stat-icon">🏅</div>
-          <div class="stat-value">{{ formationsTerminees }}</div>
-          <div class="stat-label">Formations terminées</div>
+        <div class="pay-stat-card" (click)="ouvrirSectionQuiz()">
+          <div class="psc-icon purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+          <div class="psc-val">{{ formationsTerminees }}</div>
+          <div class="psc-lbl">Formations terminées</div>
         </div>
       </div>
 
       <!-- Accès rapide aux fonctionnalités -->
       <div class="feature-cards-row">
         <div class="feature-card-quick" (click)="setSection('formations')">
-          <div class="fcq-icon">🎓</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Catalogue formations</div>
             <div class="fcq-desc">Inscrivez-vous aux formations de l'ISET Tozeur</div>
@@ -118,7 +118,7 @@
           <div class="fcq-arrow">›</div>
         </div>
         <div class="feature-card-quick" (click)="ouvrirSectionQuiz()">
-          <div class="fcq-icon">📝</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Mes Quiz</div>
             <div class="fcq-desc">Validez vos acquis et débloquez vos attestations</div>
@@ -126,7 +126,7 @@
           <div class="fcq-arrow">›</div>
         </div>
         <div class="feature-card-quick" (click)="setSection('attestation')">
-          <div class="fcq-icon">🏆</div>
+          <div class="fcq-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
           <div class="fcq-body">
             <div class="fcq-title">Mes Attestations</div>
             <div class="fcq-desc">Téléchargez vos certificats de réussite officiels</div>
@@ -137,20 +137,20 @@
 
       <!-- Dernières inscriptions -->
       <div class="card-section">
-        <h5 class="section-title">📋 Dernières inscriptions</h5>
+        <h5 class="section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Dernières inscriptions</h5>
         <div *ngIf="mesFormations.length === 0" class="empty-state">
-          <span>📭</span>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
           <p>Aucune inscription pour le moment.</p>
           <button class="btn-primary" (click)="setSection('formations')">Découvrir les formations</button>
         </div>
         <div class="recent-list" *ngIf="mesFormations.length > 0">
           <div class="recent-item" *ngFor="let f of mesFormations.slice(0, 3)">
-            <div class="recent-icon">📘</div>
+            <div class="recent-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div class="recent-info">
               <div class="recent-title">{{ f.titre }}</div>
-              <div class="recent-date">📅 Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</div>
+              <div class="recent-date">Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</div>
             </div>
-            <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
+            <span class="badge-status" [ngClass]="getStatutBadge(getStatutFormation(f))">{{ getStatutFormation(f) }}</span>
           </div>
         </div>
       </div>
@@ -160,28 +160,27 @@
     <section *ngIf="activeSection === 'formations'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>📚 Formations disponibles</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Formations disponibles</h2>
         <div class="titre-sub-row">
           <p>{{ totalFormations }} formation(s) disponible(s) à venir</p>
-          <span *ngIf="filtreSpecialite" class="filtre-spec-badge">
-            🎯 Filtrées par spécialité : <strong>{{ filtreSpecialite }}</strong>
-          </span>
-          <span *ngIf="!filtreSpecialite" class="filtre-spec-badge filtre-all">
-            📋 Toutes spécialités — <a (click)="setSection('profil')" class="lien-profil">définir la vôtre</a>
-          </span>
         </div>
       </div>
 
       <div class="filters-bar">
-        <input class="search-input" type="text" [(ngModel)]="recherche"
-               placeholder="🔍 Rechercher une formation...">
+        <select class="filter-select" [(ngModel)]="filtreSpecialite">
+          <option value="">Toutes les spécialités</option>
+          <option *ngFor="let s of specialitesDispo" [value]="s">{{ s }}</option>
+        </select>
+        <button *ngIf="filtreSpecialite" class="btn-reset-filtres" (click)="filtreSpecialite = ''">
+          Toutes
+        </button>
       </div>
 
       <div class="formations-grid">
         <div class="formation-card" *ngFor="let f of formationsFiltrees">
           <div class="formation-card-img-wrapper">
             <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="formation-card-img" [alt]="f.titre">
-            <div *ngIf="!f.photo" class="formation-card-img-placeholder">📚</div>
+            <div *ngIf="!f.photo" class="formation-card-img-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
           </div>
           <div class="formation-header">
             <span class="formation-spec" *ngIf="f.specialite">{{ f.specialite }}</span>
@@ -195,37 +194,28 @@
           <p class="formation-desc">{{ f.description }}</p>
 
           <div class="formation-meta">
-            <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-            <span *ngIf="f.nb_places !== null">
-              <span [class.text-danger]="estComplet(f)">
-                👥 {{ placesRestantes(f) === 999 ? '∞' : placesRestantes(f) }} place(s)
-              </span>
-            </span>
+            <span *ngIf="f.date_debut"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+            <span *ngIf="f.date_fin"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
           </div>
 
           <div class="formation-footer">
-            <button class="btn-programme" (click)="voirProgramme(f)">📋 Programme</button>
+            <button class="btn-programme" (click)="voirProgramme(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Programme</button>
             <ng-container *ngIf="estDejaInscrit(f.id)">
-              <span *ngIf="getStatutInscription(f.id) === 'en_attente'" class="badge-attente-admin" title="Votre demande est en cours d'examen par l'administrateur.">⏳ En attente d'approbation</span>
-              <span *ngIf="getStatutInscription(f.id) !== 'en_attente'" class="badge-inscrit">✓ Inscrit</span>
+              <span *ngIf="getStatutInscription(f.id) === 'en_attente'" class="badge-attente-admin" title="Votre demande est en cours d'examen par l'administrateur."><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> En attente d'approbation</span>
+              <span *ngIf="getStatutInscription(f.id) !== 'en_attente'" class="badge-inscrit"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg> Inscrit</span>
             </ng-container>
             <ng-container *ngIf="!estDejaInscrit(f.id)">
-              <span *ngIf="aFormationActive" class="badge-formation-bloquee" title="Terminez votre formation en cours avant de vous inscrire à une autre.">
-                🔒 Formation en cours
-              </span>
-              <ng-container *ngIf="!aFormationActive">
-                <button *ngIf="!estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
-                  S'inscrire
+              <button *ngIf="!estComplet(f)" class="btn-inscrire" (click)="inscrire(f.id)">
+                S'inscrire
+              </button>
+              <ng-container *ngIf="estComplet(f)">
+                <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Liste d'attente
                 </button>
-                <ng-container *ngIf="estComplet(f)">
-                  <button *ngIf="!estEnAttente(f.id)" class="btn-attente" (click)="rejoindreListeAttente(f.id)">
-                    ⏳ Liste d'attente
-                  </button>
-                  <span *ngIf="estEnAttente(f.id)" class="badge-attente">
-                    ⏳ En attente #{{ positionAttente(f.id) }}
-                    <button class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste">✕</button>
-                  </span>
-                </ng-container>
+                <span *ngIf="estEnAttente(f.id)" class="badge-attente">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> En attente
+                  <button class="btn-quitter-attente" (click)="quitterListeAttente(f.id)" title="Quitter la liste"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                </span>
               </ng-container>
             </ng-container>
           </div>
@@ -233,7 +223,7 @@
       </div>
 
       <p *ngIf="formationsFiltrees.length === 0" class="empty-state">
-        <span>🔎</span><br>Aucune formation ne correspond à votre recherche.
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><br>Aucune formation ne correspond à votre recherche.
       </p>
 
       <div class="pagination" *ngIf="totalPages > 1">
@@ -247,12 +237,46 @@
     <section *ngIf="activeSection === 'mesFormations'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>✅ Mes inscriptions</h2>
-        <p>{{ mesFormations.length }} formation(s) inscrite(s)</p>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><polyline points="20 6 9 17 4 12"/></svg>Mes inscriptions</h2>
+        <p>{{ mesFormations.length }} formation(s) inscrite(s)<ng-container *ngIf="demandesEnAttente.length > 0"> · {{ demandesEnAttente.length }} demande(s) en attente</ng-container><ng-container *ngIf="enAttente.length > 0"> · {{ enAttente.length }} formation(s) en liste d'attente</ng-container></p>
       </div>
 
-      <div *ngIf="mesFormations.length === 0" class="empty-state">
-        <span>📭</span>
+      <!-- Demandes en attente d'approbation admin -->
+      <div *ngIf="demandesEnAttente.length > 0" class="demandes-attente-block">
+        <h5 class="demandes-attente-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Demandes en attente d'approbation</h5>
+        <div class="demandes-attente-list">
+          <div class="demande-attente-item" *ngFor="let d of demandesEnAttente">
+            <div class="demande-attente-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="demande-attente-info">
+              <div class="demande-attente-titre">{{ d.titre }}</div>
+              <div class="demande-attente-date" *ngIf="d.date_debut">{{ d.date_debut | date:'dd/MM/yyyy' }}</div>
+            </div>
+            <span class="demande-attente-badge">En attente d'approbation admin</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- En attente de place (formation complète) -->
+      <div *ngIf="enAttente.length > 0" class="attente-place-block">
+        <h5 class="attente-place-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>En liste d'attente — formation complète</h5>
+        <div class="attente-place-list">
+          <div class="attente-place-item" *ngFor="let a of enAttente">
+            <div class="attente-place-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="attente-place-info">
+              <div class="attente-place-titre">{{ a.titre }}</div>
+              <div class="attente-place-meta">
+                <span *ngIf="a.date_debut">{{ a.date_debut | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+            <div class="attente-place-right">
+              <button class="btn-quitter-attente-profil" (click)="quitterListeAttente(a.formation_id)" title="Quitter la liste d'attente"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Quitter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="mesFormations.length === 0 && demandesEnAttente.length === 0 && enAttente.length === 0" class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
         <p>Vous n'êtes inscrit à aucune formation.</p>
         <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
       </div>
@@ -261,16 +285,17 @@
         <div class="my-formation-card" *ngFor="let f of mesFormations">
           <div class="myf-photo-wrapper">
             <img *ngIf="f.photo" [src]="'http://localhost:3000' + f.photo" class="myf-photo" [alt]="f.titre">
-            <div *ngIf="!f.photo" class="myf-photo-placeholder">📚</div>
-            <span class="myf-status-badge" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
+            <div *ngIf="!f.photo" class="myf-photo-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+            <span class="myf-status-badge" [ngClass]="getStatutBadge(getStatutFormation(f))">{{ getStatutFormation(f) }}</span>
           </div>
           <div class="myf-body">
             <div class="myf-spec" *ngIf="f.specialite">{{ f.specialite }}</div>
             <div class="myf-title">{{ f.titre }}</div>
             <p class="myf-desc">{{ f.description }}</p>
             <div class="myf-meta">
-              <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-                <span *ngIf="f.formateur_nom">👤 {{ f.formateur_nom }}</span>
+              <span *ngIf="f.date_debut"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+              <span *ngIf="f.date_fin"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="f.formateur_nom"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> {{ f.formateur_nom }}</span>
             </div>
             <div class="myf-prog-wrap" *ngIf="eligibiliteMap[f.formation_id]">
               <div class="myf-prog-bar-track">
@@ -280,38 +305,32 @@
             </div>
             <div class="myf-elig-row" *ngIf="eligibiliteMap[f.formation_id]">
               <span class="elig-chip" [class.elig-ok]="eligibiliteMap[f.formation_id]?.progression === 100" [class.elig-ko]="eligibiliteMap[f.formation_id]?.progression < 100">
-                {{ eligibiliteMap[f.formation_id]?.progression === 100 ? '✅' : '🔄' }} Modules {{ eligibiliteMap[f.formation_id]?.progression }}%
+                <ng-container *ngIf="eligibiliteMap[f.formation_id]?.progression === 100"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                <ng-container *ngIf="eligibiliteMap[f.formation_id]?.progression !== 100"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></ng-container>
+                Modules {{ eligibiliteMap[f.formation_id]?.progression }}%
               </span>
               <span *ngIf="eligibiliteMap[f.formation_id]?.has_quiz" class="elig-chip"
                     [class.elig-ok]="eligibiliteMap[f.formation_id]?.quiz_ok"
                     [class.elig-ko]="!eligibiliteMap[f.formation_id]?.quiz_ok">
-                {{ eligibiliteMap[f.formation_id]?.quiz_ok ? '✅ Quiz réussi (' + eligibiliteMap[f.formation_id]?.quiz_score + '%)' : '📝 Quiz non passé' }}
+                <ng-container *ngIf="eligibiliteMap[f.formation_id]?.quiz_ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Quiz réussi ({{ eligibiliteMap[f.formation_id]?.quiz_score }}%)</ng-container>
+                <ng-container *ngIf="!eligibiliteMap[f.formation_id]?.quiz_ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Quiz non passé</ng-container>
               </span>
             </div>
-            <button *ngIf="eligibiliteMap[f.formation_id]?.has_quiz && !eligibiliteMap[f.formation_id]?.quiz_ok && eligibiliteMap[f.formation_id]?.progression === 100 && (eligibiliteMap[f.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[f.formation_id]?.nb_tentatives_max || 3)"
+            <button *ngIf="f.status === 'terminée' && eligibiliteMap[f.formation_id]?.has_quiz && !eligibiliteMap[f.formation_id]?.quiz_ok && eligibiliteMap[f.formation_id]?.progression === 100 && (eligibiliteMap[f.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[f.formation_id]?.nb_tentatives_max || 3)"
                     class="btn-passer-quiz" (click)="ouvrirQuiz(f)">
-              📝 Passer le quiz
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Passer le quiz
             </button>
-            <div class="myf-stars" (mouseleave)="clearNoteHover(f.formation_id)">
-              <span class="myf-stars-label">Évaluation :</span>
-              <span *ngFor="let s of [1,2,3,4,5]"
-                    class="myf-star"
-                    [class.filled]="s <= getNoteAffichee(f.formation_id)"
-                    (mouseenter)="setNoteHover(f.formation_id, s)"
-                    (click)="noterFormation(f.formation_id, s)">★</span>
-              <span class="myf-stars-hint" *ngIf="!mesNotes[f.formation_id] && !noteHover[f.formation_id]">Cliquez pour noter</span>
-            </div>
           </div>
           <div class="myf-footer">
             <span class="myf-date-inscr">Inscrit le {{ f.date_inscription | date:'dd/MM/yyyy' }}</span>
             <div class="myf-footer-actions">
-              <button class="myf-icon-btn" title="Supports pédagogiques" (click)="voirSupports(f)">📂</button>
+              <button class="myf-icon-btn" title="Supports pédagogiques" (click)="voirSupports(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
               <button class="myf-icon-btn myf-btn-gold" title="Télécharger l'attestation"
                       *ngIf="eligibiliteMap[f.formation_id]?.eligible"
-                      (click)="ouvrirAttestation(f)">🏆</button>
+                      (click)="ouvrirAttestation(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></button>
               <button class="myf-icon-btn myf-btn-locked" title="Attestation non disponible"
                       *ngIf="!eligibiliteMap[f.formation_id]?.eligible"
-                      disabled>🔒</button>
+                      disabled><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
             </div>
           </div>
         </div>
@@ -322,11 +341,11 @@
     <section *ngIf="activeSection === 'supports'">
       <div class="page-title">
         <button class="btn-back" (click)="setSection('mesFormations')">← Retour</button>
-        <h2>📂 Supports — {{ formationSelectionnee?.titre }}</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Supports — {{ formationSelectionnee?.titre }}</h2>
         <p>Ressources pédagogiques disponibles</p>
       </div>
       <div *ngIf="supports.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
         <p>Aucun support disponible pour cette formation.</p>
       </div>
       <div class="supports-grid" *ngIf="supports.length > 0">
@@ -346,63 +365,47 @@
     <section *ngIf="activeSection === 'progression'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>📈 Ma progression</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Ma progression</h2>
         <p>Suivez votre avancement dans chaque formation</p>
-      </div>
-      <div class="progression-global-card">
-        <div class="prog-global-label">Progression globale (tous modules)</div>
-        <div class="progression-bar-wrap">
-          <div class="progression-bar-track">
-            <div class="progression-bar-fill"
-                 [style.width.%]="progression"
-                 [style.background]="getProgressColor()"></div>
-          </div>
-          <span class="progression-pct">{{ progression }}%</span>
-        </div>
-        <div class="prog-global-legend">
-          <span *ngIf="progression < 40">🌱 Débutant</span>
-          <span *ngIf="progression >= 40 && progression < 75">📈 En progression</span>
-          <span *ngIf="progression >= 75">🚀 Avancé</span>
-        </div>
       </div>
       <div class="stats-grid">
         <div class="stat-card green">
-          <div class="stat-icon">🏆</div>
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
           <div class="stat-value">{{ formationsTerminees }}</div>
           <div class="stat-label">Formations terminées</div>
         </div>
         <div class="stat-card blue">
-          <div class="stat-icon">📖</div>
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
           <div class="stat-value">{{ formationsEnCours }}</div>
           <div class="stat-label">En cours</div>
         </div>
         <div class="stat-card orange">
-          <div class="stat-icon">📚</div>
+          <div class="stat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
           <div class="stat-value">{{ mesFormations.length }}</div>
           <div class="stat-label">Total inscriptions</div>
         </div>
       </div>
       <div *ngIf="mesFormations.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
         <p>Inscrivez-vous à une formation pour suivre votre progression.</p>
         <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
       </div>
       <div class="inscriptions-list" *ngIf="mesFormations.length > 0">
         <div class="inscription-card" *ngFor="let f of mesFormations">
           <div class="inscription-left">
-            <div class="inscription-icon">📘</div>
+            <div class="inscription-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div>
               <div class="inscription-title">{{ f.titre }}</div>
               <div class="inscription-meta">
-                <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-                <span *ngIf="f.date_fin"> — {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="f.date_debut"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="f.date_fin"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
           </div>
           <div class="inscription-right">
-            <span class="badge-status" [ngClass]="getStatutBadge(f.statut)">{{ f.statut }}</span>
-            <button class="btn-progression" (click)="voirProgressionFormation(f)">📈 Voir les modules</button>
-            <button class="btn-presences" (click)="voirMesPresences(f)">📋 Présences</button>
+            <span class="badge-status" [ngClass]="getStatutBadge(getStatutFormation(f))">{{ getStatutFormation(f) }}</span>
+            <button *ngIf="f.status !== 'published'" class="btn-progression" (click)="voirProgressionFormation(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Voir les modules</button>
+            <button *ngIf="f.status !== 'published'" class="btn-presences" (click)="voirMesPresences(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Présences</button>
           </div>
         </div>
       </div>
@@ -412,7 +415,7 @@
     <section *ngIf="activeSection === 'profil'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>👤 Mon profil</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil</h2>
         <p>Gérez vos informations personnelles</p>
       </div>
       <div class="profile-grid">
@@ -422,7 +425,7 @@
             <div class="profile-photo-wrapper" (click)="photoInput.click()" title="Changer la photo de profil">
               <img *ngIf="profilePhotoUrl" [src]="environment.baseUrl + profilePhotoUrl" class="profile-photo-img" alt="Photo de profil">
               <div *ngIf="!profilePhotoUrl" class="profile-photo-placeholder">{{ user?.nom?.charAt(0)?.toUpperCase() }}</div>
-              <div class="profile-photo-overlay">📷</div>
+              <div class="profile-photo-overlay"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
             </div>
             <input #photoInput type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" hidden (change)="onPhotoSelected($event)">
             <div>
@@ -434,31 +437,31 @@
           </div>
           <div class="form-group">
             <label>Nom complet</label>
-            <div class="input-wrap"><span class="input-prefix">👤</span><input type="text" [(ngModel)]="profileNom" placeholder="Votre nom"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><input type="text" [(ngModel)]="profileNom" placeholder="Votre nom"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Email</label>
-            <div class="input-wrap"><span class="input-prefix">✉️</span><input type="email" [(ngModel)]="profileEmail" placeholder="Votre email"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span><input type="email" [(ngModel)]="profileEmail" placeholder="Votre email"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>CIN</label>
-            <div class="input-wrap"><span class="input-prefix">🪪</span><input type="text" [(ngModel)]="profileCin" placeholder="Numéro CIN"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></span><input type="text" [(ngModel)]="profileCin" placeholder="Numéro CIN"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Téléphone</label>
-            <div class="input-wrap"><span class="input-prefix">📞</span><input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg></span><input type="text" [(ngModel)]="profileTelephone" placeholder="+216 XX XXX XXX"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Entreprise / Organisation</label>
-            <div class="input-wrap"><span class="input-prefix">🏢</span><input type="text" [(ngModel)]="profileEntreprise" placeholder="Nom de votre entreprise (optionnel)"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span><input type="text" [(ngModel)]="profileEntreprise" placeholder="Nom de votre entreprise (optionnel)"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Date de naissance</label>
-            <div class="input-wrap"><span class="input-prefix">📅</span><input type="date" [(ngModel)]="profileDateNaissance"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><input type="date" [(ngModel)]="profileDateNaissance"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Niveau</label>
-            <div class="input-wrap"><span class="input-prefix">🎓</span>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
               <select [(ngModel)]="profileNiveau" style="border:none;background:transparent;flex:1;padding:10px 10px 10px 0;font-size:13px;outline:none">
                 <option value="">-- Niveau --</option>
                 <option value="L1">L1</option>
@@ -472,30 +475,30 @@
           <div class="form-group" style="margin-top:14px">
             <label>Spécialité</label>
             <div class="input-wrap input-wrap-select">
-              <span class="input-prefix">💡</span>
+              <span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
               <select [(ngModel)]="profileSpecialite" class="input-select">
                 <option value="">-- Sélectionnez --</option>
                 <option *ngFor="let s of specialites" [value]="s">{{ s }}</option>
               </select>
             </div>
           </div>
-          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()">💾 Enregistrer</button>
+          <button class="btn-save" style="margin-top:20px" (click)="sauvegarderProfil()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Enregistrer</button>
         </div>
         <div class="form-card">
-          <h5 class="section-title">🔑 Changer le mot de passe</h5>
+          <h5 class="section-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Changer le mot de passe</h5>
           <div class="form-group">
             <label>Ancien mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔒</span><input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><input type="password" [(ngModel)]="ancienMdp" placeholder="Mot de passe actuel"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Nouveau mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">🔑</span><input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></span><input type="password" [(ngModel)]="nouveauMdp" placeholder="Nouveau mot de passe (min 6)"></div>
           </div>
           <div class="form-group" style="margin-top:14px">
             <label>Confirmer le mot de passe</label>
-            <div class="input-wrap"><span class="input-prefix">✅</span><input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le nouveau mot de passe"></div>
+            <div class="input-wrap"><span class="input-prefix"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span><input type="password" [(ngModel)]="confirmMdp" placeholder="Confirmer le nouveau mot de passe"></div>
           </div>
-          <button class="btn-save" style="margin-top:20px;background:#1976d2" (click)="changerMotDePasse()">🔄 Modifier le mot de passe</button>
+          <button class="btn-save" style="margin-top:20px;background:#1976d2" (click)="changerMotDePasse()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> Modifier le mot de passe</button>
         </div>
       </div>
     </section>
@@ -505,24 +508,31 @@
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
         <div>
-          <h2>🔔 Notifications</h2>
+          <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Notifications</h2>
           <p>{{ unreadCount }} non lue(s) · {{ notifications.length }} au total</p>
         </div>
         <button class="btn-mark-all" *ngIf="notifications.length > 0" (click)="marquerToutLu()">
-          ✅ Tout marquer comme lu
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>Tout marquer comme lu
         </button>
       </div>
       <div *ngIf="notifications.length === 0" class="empty-state">
-        <span>🔔</span>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0cfe0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <p>Aucune notification pour le moment.</p>
       </div>
       <div class="notifications-list" *ngIf="notifications.length > 0">
         <div class="notif-item" *ngFor="let n of notifications"
              [class.unread]="!n.lu" (click)="marquerLu(n)">
           <div class="notif-dot" *ngIf="!n.lu"></div>
-          <div class="notif-icon-wrap">{{ getNotifIcon(n.type) }}</div>
+          <div class="notif-icon-wrap">
+            <svg *ngIf="n.type==='inscription'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg *ngIf="n.type==='approbation'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <svg *ngIf="n.type==='rejet'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <svg *ngIf="n.type==='presence'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <svg *ngIf="n.type==='progression'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            <svg *ngIf="n.type!=='inscription' && n.type!=='approbation' && n.type!=='rejet' && n.type!=='presence' && n.type!=='progression'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </div>
           <div class="notif-body">
-            <div class="notif-message">{{ n.message }}</div>
+            <div class="notif-message">{{ stripNotifEmoji(n.message) }}</div>
             <div class="notif-time">{{ n.date_creation | date:'dd/MM/yyyy à HH:mm' }}</div>
           </div>
           <button class="notif-close" (click)="supprimerNotif(n.id, $event)">×</button>
@@ -534,14 +544,14 @@
     <section *ngIf="activeSection === 'quiz'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>📝 Mes Quiz</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Mes Quiz</h2>
         <p>Passez vos quiz de validation pour débloquer vos attestations</p>
       </div>
 
       <div *ngIf="quizSectionLoading" class="quiz-section-loading">Chargement...</div>
 
       <div *ngIf="!quizSectionLoading && mesFormations.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
         <p>Vous n'êtes inscrit à aucune formation.</p>
         <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
       </div>
@@ -551,12 +561,12 @@
 
           <div class="quiz-card-top">
             <div class="quiz-card-title">{{ f.titre }}</div>
-            <div class="quiz-card-formateur" *ngIf="f.formateur_nom">👤 {{ f.formateur_nom }}</div>
+            <div class="quiz-card-formateur" *ngIf="f.formateur_nom"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> {{ f.formateur_nom }}</div>
           </div>
 
           <div *ngIf="quizStatuts[f.formation_id] && !quizStatuts[f.formation_id]?.has_quiz"
                class="quiz-card-status quiz-no-quiz">
-            <span>📋</span> Aucun quiz pour cette formation
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Aucun quiz pour cette formation
           </div>
 
           <div *ngIf="!quizStatuts[f.formation_id]" class="quiz-card-status quiz-loading-inline">
@@ -565,11 +575,11 @@
 
           <ng-container *ngIf="quizStatuts[f.formation_id]?.has_quiz">
             <div *ngIf="quizStatuts[f.formation_id]?.reussi" class="quiz-card-status quiz-passed">
-              <span>✅</span> Quiz réussi — Score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;color:green"><polyline points="20 6 9 17 4 12"/></svg> Quiz réussi — Score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
             </div>
             <ng-container *ngIf="!quizStatuts[f.formation_id]?.reussi">
               <div class="quiz-card-status quiz-pending">
-                <span>📝</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                 <span *ngIf="quizStatuts[f.formation_id]?.tentatives === 0">Pas encore passé</span>
                 <span *ngIf="quizStatuts[f.formation_id]?.tentatives > 0">
                   Dernier score : <strong>{{ quizStatuts[f.formation_id]?.best_score }}%</strong>
@@ -580,14 +590,22 @@
                 Tentatives : {{ quizStatuts[f.formation_id]?.tentatives || 0 }} /
                 {{ quizStatuts[f.formation_id]?.nb_tentatives_max }}
               </div>
-              <div *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) >= quizStatuts[f.formation_id]?.nb_tentatives_max"
-                   class="quiz-card-no-more">
-                ❌ Tentatives épuisées
+              <div *ngIf="f.status !== 'terminée'" class="quiz-card-locked">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Le quiz sera accessible une fois la formation terminée
               </div>
-              <button *ngIf="(quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
+              <div *ngIf="f.status === 'terminée' && (eligibiliteMap[f.formation_id]?.progression || 0) < 100"
+                   class="quiz-card-locked">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Complétez 100% des modules pour accéder au quiz
+                ({{ eligibiliteMap[f.formation_id]?.progression || 0 }}% accompli)
+              </div>
+              <div *ngIf="f.status === 'terminée' && (quizStatuts[f.formation_id]?.tentatives || 0) >= quizStatuts[f.formation_id]?.nb_tentatives_max && (eligibiliteMap[f.formation_id]?.progression || 0) === 100"
+                   class="quiz-card-no-more">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Tentatives épuisées
+              </div>
+              <button *ngIf="f.status === 'terminée' && (eligibiliteMap[f.formation_id]?.progression || 0) === 100 && (quizStatuts[f.formation_id]?.tentatives || 0) < quizStatuts[f.formation_id]?.nb_tentatives_max"
                       class="btn-passer-quiz-card"
                       (click)="ouvrirQuiz(f)">
-                📝 Passer le quiz
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Passer le quiz
               </button>
             </ng-container>
           </ng-container>
@@ -607,32 +625,35 @@
     <section *ngIf="activeSection === 'attestation' && !formationAttestation">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>🏆 Attestations de réussite</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Attestations de réussite</h2>
         <p>Téléchargez vos attestations pour les formations complétées</p>
       </div>
       <div *ngIf="mesFormations.length === 0" class="empty-state">
-        <span>📭</span>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.35h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.13 6.13l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.04z"/></svg>
         <p>Aucune inscription pour le moment.</p>
         <button class="btn-primary" (click)="setSection('formations')">Voir les formations</button>
       </div>
       <div class="inscriptions-list" *ngIf="mesFormations.length > 0">
         <div class="inscription-card" *ngFor="let f of mesFormations">
           <div class="inscription-left">
-            <div class="inscription-icon">📘</div>
+            <div class="inscription-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
             <div>
               <div class="inscription-title">{{ f.titre }}</div>
               <div class="inscription-meta">
-                <span *ngIf="f.date_debut">📅 {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
-                <span *ngIf="f.date_fin"> — {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="f.date_debut"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Du {{ f.date_debut | date:'dd/MM/yyyy' }}</span>
+                <span *ngIf="f.date_fin"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Au {{ f.date_fin | date:'dd/MM/yyyy' }}</span>
               </div>
               <div class="myf-elig-row" style="margin-top:6px" *ngIf="eligibiliteMap[f.formation_id]">
                 <span class="elig-chip" [class.elig-ok]="eligibiliteMap[f.formation_id]?.progression === 100" [class.elig-ko]="eligibiliteMap[f.formation_id]?.progression < 100">
-                  {{ eligibiliteMap[f.formation_id]?.progression === 100 ? '✅' : '🔄' }} Modules {{ eligibiliteMap[f.formation_id]?.progression }}%
+                  <ng-container *ngIf="eligibiliteMap[f.formation_id]?.progression === 100"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+                  <ng-container *ngIf="eligibiliteMap[f.formation_id]?.progression !== 100"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></ng-container>
+                  Modules {{ eligibiliteMap[f.formation_id]?.progression }}%
                 </span>
                 <span *ngIf="eligibiliteMap[f.formation_id]?.has_quiz" class="elig-chip"
                       [class.elig-ok]="eligibiliteMap[f.formation_id]?.quiz_ok"
                       [class.elig-ko]="!eligibiliteMap[f.formation_id]?.quiz_ok">
-                  {{ eligibiliteMap[f.formation_id]?.quiz_ok ? '✅ Quiz réussi (' + eligibiliteMap[f.formation_id]?.quiz_score + '%)' : '📝 Quiz non passé' }}
+                  <ng-container *ngIf="eligibiliteMap[f.formation_id]?.quiz_ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg>Quiz réussi ({{ eligibiliteMap[f.formation_id]?.quiz_score }}%)</ng-container>
+                  <ng-container *ngIf="!eligibiliteMap[f.formation_id]?.quiz_ok"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Quiz non passé</ng-container>
                 </span>
               </div>
             </div>
@@ -640,12 +661,12 @@
           <div class="inscription-right">
             <button class="btn-attestation"
                     *ngIf="eligibiliteMap[f.formation_id]?.eligible"
-                    (click)="ouvrirAttestation(f)">🏆 Télécharger</button>
-            <button *ngIf="eligibiliteMap[f.formation_id]?.has_quiz && !eligibiliteMap[f.formation_id]?.quiz_ok && eligibiliteMap[f.formation_id]?.progression === 100 && (eligibiliteMap[f.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[f.formation_id]?.nb_tentatives_max || 3)"
-                    class="btn-passer-quiz" (click)="ouvrirQuiz(f)">📝 Passer le quiz</button>
+                    (click)="ouvrirAttestation(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg> Télécharger</button>
+            <button *ngIf="f.status === 'terminée' && eligibiliteMap[f.formation_id]?.has_quiz && !eligibiliteMap[f.formation_id]?.quiz_ok && eligibiliteMap[f.formation_id]?.progression === 100 && (eligibiliteMap[f.formation_id]?.quiz_tentatives || 0) < (eligibiliteMap[f.formation_id]?.nb_tentatives_max || 3)"
+                    class="btn-passer-quiz" (click)="ouvrirQuiz(f)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Passer le quiz</button>
             <span class="badge-non-eligible"
                   *ngIf="!eligibiliteMap[f.formation_id]?.eligible">
-              🔒 Non éligible
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Non éligible
             </span>
           </div>
         </div>
@@ -656,107 +677,57 @@
     <section *ngIf="activeSection === 'attestation' && formationAttestation">
       <div class="page-title no-print">
         <button class="btn-back" (click)="allerAuxAttestations()">← Retour aux attestations</button>
-        <h2>🏆 Attestation de présence</h2>
-        <button class="btn-primary" (click)="imprimerAttestation()" style="margin-left:auto">🖨️ Imprimer</button>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>Attestation de présence</h2>
+        <button class="btn-primary" (click)="imprimerAttestation()" style="margin-left:auto"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg> Imprimer / Télécharger PDF</button>
       </div>
       <div *ngIf="attestationLoading" class="attest-loading">Chargement...</div>
-      <div class="attestation-doc" *ngIf="!attestationLoading">
 
-        <!-- République -->
-        <div class="attest-republic-bar">
-          <span>الجمهورية التونسية</span>
-          <span class="attest-sep">⬥</span>
-          <span>République Tunisienne</span>
-          <span class="attest-sep">⬥</span>
-          <span>وزارة التعليم العالي والبحث العلمي</span>
-          <span class="attest-sep">⬥</span>
-          <span>Ministère de l'Enseignement Supérieur et de la Recherche Scientifique</span>
-        </div>
+      <div class="attest-doc" *ngIf="!attestationLoading && attestationData">
 
-        <!-- En-tête Institut -->
+        <!-- En-tête institution -->
         <div class="attest-header">
-          <img class="attest-logo"
-               src="https://isett.rnu.tn/images/social-networks-integrations/twitter_image_default.jpg"
-               alt="ISET Tozeur"
-               onerror="this.style.display='none'">
-          <div class="attest-header-center">
-            <div class="attest-institute-ar">المعهد العالي للدراسات التكنولوجية بتوزر</div>
-            <div class="attest-institute">Institut Supérieur des Études Technologiques de Tozeur</div>
-          </div>
-          <div class="attest-header-spacer"></div>
+          <img src="/images/iset_logo.png" class="attest-logo-img" alt="Logo ISET" />
+          <div class="attest-logo-sub">Institut Supérieur d'Enseignement Technologique</div>
         </div>
 
-        <!-- Bandeau titre -->
-        <div class="attest-title-band">
-          <span class="attest-star">✦</span>
-          <span class="attest-title-doc">ATTESTATION DE FORMATION</span>
-          <span class="attest-star">✦</span>
-        </div>
+        <!-- Date -->
+        <p class="attest-date">Tunis, le {{ getTodayStr() }}</p>
+
+        <!-- Titre -->
+        <h2 class="attest-title">ATTESTATION DE FORMATION</h2>
 
         <!-- Corps -->
-        <div class="attest-body">
-          <p class="attest-intro">Le Directeur de l'ISET de Tozeur certifie que :</p>
+        <p class="attest-para">Le Directeur de l'ISET atteste par la présente que :</p>
 
-          <div class="attest-participant">
-            <div class="attest-participant-label">Monsieur / Madame</div>
-            <div class="attest-name">{{ attestationData?.candidat_nom || user?.nom }}</div>
-            <div class="attest-email">{{ attestationData?.candidat_email || user?.email }}</div>
-          </div>
+        <p class="attest-name">{{ attestationData.candidat_nom }}</p>
 
-          <p class="attest-intro">a suivi et validé avec succès la formation intitulée :</p>
+        <p class="attest-para">
+          a suivi avec succès la formation <strong>« {{ attestationData.titre }} »</strong>
+          dispensée au sein de l'ISET durant la période suivante :
+        </p>
 
-          <div class="attest-formation-block">
-            <div class="attest-formation-title">{{ attestationData?.titre || formationAttestation?.titre }}</div>
-            <div class="attest-formation-spec" *ngIf="attestationData?.specialite">{{ attestationData.specialite }}</div>
-          </div>
+        <p class="attest-period">
+          Du {{ attestationData.date_debut ? (attestationData.date_debut | date:'dd/MM/yyyy') : '—' }}
+          au {{ attestationData.date_fin ? (attestationData.date_fin | date:'dd/MM/yyyy') : '—' }}
+        </p>
 
-          <div class="attest-details-grid">
-            <div class="attest-detail" *ngIf="attestationData?.date_debut">
-              <span class="attest-detail-label">Période</span>
-              <span class="attest-detail-val">
-                {{ attestationData.date_debut | date:'dd/MM/yyyy' }}
-                <span *ngIf="attestationData?.date_fin"> – {{ attestationData.date_fin | date:'dd/MM/yyyy' }}</span>
-              </span>
-            </div>
-            <div class="attest-detail" *ngIf="attestationData?.formateur_nom">
-              <span class="attest-detail-label">Formateur</span>
-              <span class="attest-detail-val">{{ attestationData.formateur_nom }}</span>
-            </div>
-            <div class="attest-detail" *ngIf="attestationData?.total_seances > 0">
-              <span class="attest-detail-label">Séances</span>
-              <span class="attest-detail-val">{{ attestationData.seances_presentes }} / {{ attestationData.total_seances }}</span>
-            </div>
-            <div class="attest-detail" *ngIf="attestationData?.taux !== null">
-              <span class="attest-detail-label">Taux de présence</span>
-              <span class="attest-detail-val attest-taux"
-                    [class.taux-good]="attestationData.taux >= 75"
-                    [class.taux-low]="attestationData.taux < 75">
-                {{ attestationData.taux }}%
-              </span>
-            </div>
-          </div>
+        <p class="attest-para" *ngIf="attestationData.taux !== null && attestationData.taux !== undefined">
+          avec un taux de présence de <strong>{{ attestationData.taux }}%</strong>.
+        </p>
 
-          <div class="attest-closing">
-            La présente attestation est délivrée pour servir et valoir ce que de droit.
-          </div>
-        </div>
+        <p class="attest-legal">
+          Cette attestation est délivrée à l'intéressé(e) pour servir et valoir ce que de droit.
+        </p>
 
-        <!-- Pied de page -->
-        <div class="attest-footer">
-          <div class="attest-footer-col">
-            <div class="attest-footer-label">Le Formateur</div>
-            <div class="attest-footer-sig-area"></div>
-            <div class="attest-footer-sig">{{ attestationData?.formateur_nom || '_______________' }}</div>
-          </div>
-          <div class="attest-footer-col attest-footer-col-mid">
-            <div class="attest-stamp-circle">
-              <div class="attest-stamp-inner">CACHET<br>OFFICIEL</div>
-            </div>
-          </div>
-          <div class="attest-footer-col attest-footer-col-right">
-            <div class="attest-footer-label">Tozeur, le {{ getTodayStr() }}</div>
-            <div class="attest-footer-sig-area"></div>
-            <div class="attest-footer-label">Le Directeur</div>
+        <!-- Séparateur -->
+        <hr class="attest-line"/>
+
+        <!-- Bas : réf + QR -->
+        <div class="attest-bottom">
+          <span class="attest-ref">Réf : {{ attestationData.ref_id }}</span>
+          <div class="attest-qr-block" *ngIf="attestationData.qr_data_url">
+            <img [src]="attestationData.qr_data_url" class="attest-qr-img" alt="QR" />
+            <p class="attest-qr-label">2D-DOC</p>
           </div>
         </div>
 
@@ -767,7 +738,7 @@
     <section *ngIf="activeSection === 'messages'">
       <button class="btn-back-dash" (click)="setSection('accueil')">&#8592; Retour au tableau de bord</button>
       <div class="page-title">
-        <h2>💬 Messagerie</h2>
+        <h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:7px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messagerie</h2>
         <p>Échangez des messages avec vos formateurs</p>
       </div>
       <div class="chat-container">
@@ -776,7 +747,7 @@
             <span class="contacts-count">{{ filteredCandidatContacts.length }}</span>
           </div>
           <div class="contacts-search-wrap">
-            <input class="contacts-search" type="text" [(ngModel)]="candidatContactSearch" placeholder="🔍 Rechercher un formateur…">
+            <input class="contacts-search" type="text" [(ngModel)]="candidatContactSearch" placeholder="Rechercher un formateur…">
           </div>
           <div class="contacts-list">
             <div *ngFor="let c of filteredCandidatContacts"
@@ -824,13 +795,13 @@
                       rows="2"
                       (keydown.enter)="$any($event).shiftKey ? null : envoyerMessage($event)"></textarea>
             <button class="btn-send-msg" (click)="envoyerMessage()" [disabled]="!nouveauMessage.trim()">
-              Envoyer ✉️
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Envoyer
             </button>
           </div>
         </div>
         <ng-template #noConvCand>
           <div class="no-conv-placeholder">
-            <div class="no-conv-icon">💬</div>
+            <div class="no-conv-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <p>Sélectionnez un formateur pour démarrer une conversation</p>
           </div>
         </ng-template>
@@ -844,8 +815,8 @@
 <div class="modal-overlay" *ngIf="showProgressionModal" (click)="fermerProgressionFormation()">
   <div class="modal-box modal-box-md" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h4 class="modal-title">📈 Progression — {{ formationProgressionSelectionnee?.titre }}</h4>
-      <button class="modal-close" (click)="fermerProgressionFormation()">✕</button>
+      <h4 class="modal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Progression — {{ formationProgressionSelectionnee?.titre }}</h4>
+      <button class="modal-close" (click)="fermerProgressionFormation()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="prog-detail-bar-wrap" style="margin-bottom:20px">
       <div class="prog-detail-track">
@@ -865,7 +836,9 @@
               [class.icon-nc]="m.statut === 'non_commence'"
               [class.icon-ec]="m.statut === 'en_cours'"
               [class.icon-t]="m.statut === 'termine'">
-          {{ m.statut === 'termine' ? '✅' : m.statut === 'en_cours' ? '🔄' : '⬜' }}
+          <ng-container *ngIf="m.statut === 'termine'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></ng-container>
+          <ng-container *ngIf="m.statut === 'en_cours'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></ng-container>
+          <ng-container *ngIf="m.statut !== 'termine' && m.statut !== 'en_cours'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg></ng-container>
         </span>
         <span class="prog-detail-mod-title">{{ m.titre }}</span>
       </div>
@@ -874,7 +847,7 @@
       Aucun module défini pour cette formation.
     </p>
     <div class="cert-banner-sm" *ngIf="progressionPourcentageFormation === 100">
-      🎓 Formation complétée à 100% !
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Formation complétée à 100% !
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" (click)="fermerProgressionFormation()">Fermer</button>
@@ -886,16 +859,16 @@
 <div class="modal-overlay" *ngIf="showPresencesModal" (click)="fermerPresences()">
   <div class="modal-box modal-box-md" (click)="$event.stopPropagation()">
     <div class="modal-header">
-      <h4 class="modal-title">📋 Mes présences — {{ presencesFormation?.titre }}</h4>
-      <button class="modal-close" (click)="fermerPresences()">✕</button>
+      <h4 class="modal-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Mes présences — {{ presencesFormation?.titre }}</h4>
+      <button class="modal-close" (click)="fermerPresences()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div *ngIf="!presencesData" class="modal-loading">Chargement...</div>
     <div *ngIf="presencesData">
       <div class="presence-box-header">
         <div class="presence-stats">
-          <span>📅 {{ presencesData.total }} séance(s)</span>
-          <span>✅ {{ presencesData.presents }} présent(s)</span>
-          <span>❌ {{ presencesData.total - presencesData.presents }} absent(s)</span>
+          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> {{ presencesData.total }} séance(s)</span>
+          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg> {{ presencesData.presents }} présent(s)</span>
+          <span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> {{ presencesData.total - presencesData.presents }} absent(s)</span>
         </div>
         <span class="taux-badge"
               [class.taux-good]="presencesData.taux >= 75"
@@ -907,11 +880,18 @@
       <div class="presence-seances-list" *ngIf="presencesData.seances?.length > 0" style="margin-top:16px">
         <div class="presence-seance-row" *ngFor="let s of presencesData.seances">
           <span class="seance-dt">{{ s.date_seance | date:'dd/MM/yyyy' }} {{ s.heure_debut }}</span>
-          <span *ngIf="s.salle" class="seance-room">🏫 {{ s.salle }}</span>
+          <span *ngIf="s.salle" class="seance-room"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> {{ s.salle }}</span>
           <span class="pres-badge" [ngClass]="getPresenceClass(s.statut_presence)">{{ s.statut_presence }}</span>
-          <button *ngIf="s.statut_presence === 'absent'" class="btn-justifier"
+          <span *ngIf="s.justif_statut === 'en_attente'" class="justif-badge justif-pending"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Justificatif en attente</span>
+          <span *ngIf="s.justif_statut === 'accepté'" class="justif-badge justif-ok"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><polyline points="20 6 9 17 4 12"/></svg> Justificatif accepté</span>
+          <span *ngIf="s.justif_statut === 'refusé'" class="justif-badge justif-ko"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Justificatif refusé</span>
+          <button *ngIf="s.statut_presence === 'absent' && !s.justif_statut" class="btn-justifier"
                   (click)="justifSeanceId === s.seance_id ? fermerJustificatif() : ouvrirJustificatif(s.seance_id)">
-            📝 {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Justifier' }}
+            {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Justifier' }}
+          </button>
+          <button *ngIf="s.statut_presence === 'absent' && s.justif_statut === 'refusé'" class="btn-justifier"
+                  (click)="justifSeanceId === s.seance_id ? fermerJustificatif() : ouvrirJustificatif(s.seance_id)">
+            {{ justifSeanceId === s.seance_id ? 'Annuler' : 'Re-justifier' }}
           </button>
           <div class="justif-form" *ngIf="justifSeanceId === s.seance_id">
             <textarea [(ngModel)]="justifMotif" placeholder="Motif de votre absence..." rows="3"></textarea>
@@ -934,7 +914,7 @@
   <div class="modal-programme" (click)="$event.stopPropagation()">
     <div class="modal-prog-header">
       <div>
-        <h3>📋 Programme de la formation</h3>
+        <h3><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Programme de la formation</h3>
         <p class="prog-formation-title">{{ programmeFormation?.titre }}</p>
       </div>
       <button class="modal-close" (click)="fermerProgramme()">×</button>
@@ -943,19 +923,19 @@
       <div *ngIf="programmeLoading" class="prog-loading">Chargement du programme...</div>
       <div *ngIf="!programmeLoading && programmeData">
         <div class="prog-block" *ngIf="programmeData.programme?.description_globale">
-          <h5 class="prog-block-title">📖 Description</h5>
+          <h5 class="prog-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Description</h5>
           <p class="prog-block-text">{{ programmeData.programme.description_globale }}</p>
         </div>
         <div class="prog-block" *ngIf="programmeData.programme?.objectifs">
-          <h5 class="prog-block-title">🎯 Objectifs pédagogiques</h5>
+          <h5 class="prog-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>Objectifs pédagogiques</h5>
           <p class="prog-block-text">{{ programmeData.programme.objectifs }}</p>
         </div>
         <div class="prog-block" *ngIf="programmeData.programme?.prerequis">
-          <h5 class="prog-block-title">✅ Prérequis</h5>
+          <h5 class="prog-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><polyline points="20 6 9 17 4 12"/></svg>Prérequis</h5>
           <p class="prog-block-text">{{ programmeData.programme.prerequis }}</p>
         </div>
         <div class="prog-block" *ngIf="programmeData.modules?.length > 0">
-          <h5 class="prog-block-title">📚 Contenu — {{ programmeData.modules.length }} module(s)</h5>
+          <h5 class="prog-block-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>Contenu — {{ programmeData.modules.length }} module(s)</h5>
           <div class="prog-modules-list">
             <div class="prog-module-item" *ngFor="let m of programmeData.modules; let i = index">
               <div class="prog-module-num">{{ i + 1 }}</div>
@@ -967,7 +947,7 @@
           </div>
         </div>
         <div class="prog-empty" *ngIf="!programmeData.programme && programmeData.modules?.length === 0">
-          <span>📋</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
           <p>Le programme de cette formation n'a pas encore été renseigné.</p>
         </div>
       </div>
@@ -981,7 +961,7 @@
 
   <div class="quiz-modal-header">
     <h3>{{ quizData?.titre || 'Quiz de validation' }}</h3>
-    <button class="quiz-close-btn" (click)="fermerQuizApresResultat()">✕</button>
+    <button class="quiz-close-btn" (click)="fermerQuizApresResultat()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
   </div>
 
   <div *ngIf="quizLoading" class="quiz-loading-state">
@@ -1021,7 +1001,10 @@
   <div *ngIf="!quizLoading && quizResultat" class="quiz-resultat-body">
     <div class="quiz-score-circle-wrap" [class.quiz-success]="quizResultat.reussi" [class.quiz-fail]="!quizResultat.reussi">
       <div class="quiz-score-big">{{ quizResultat.score }}%</div>
-      <div class="quiz-score-label">{{ quizResultat.reussi ? '🎉 Félicitations !' : '❌ Non réussi' }}</div>
+      <div class="quiz-score-label">
+        <ng-container *ngIf="quizResultat.reussi">Félicitations !</ng-container>
+        <ng-container *ngIf="!quizResultat.reussi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Non réussi</ng-container>
+      </div>
     </div>
     <div class="quiz-score-details">
       <p>{{ quizResultat.correct }} / {{ quizResultat.total }} bonnes réponses</p>

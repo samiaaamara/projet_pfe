@@ -1,0 +1,34 @@
+@startuml Sprint1_Activite_GererFormateurs
+title Diagramme d'Activité — Gérer les formateurs (Administrateur)
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam backgroundColor White
+skinparam activity {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam arrow {
+    Color Black
+    FontColor Black
+}
+
+start
+:L'administrateur accède à la section Formateurs;
+:Le système affiche la liste des formateurs;
+:L'administrateur clique sur « Ajouter un formateur »;
+:Remplit le formulaire (nom, email, mot de passe, spécialité);
+:Soumet le formulaire;
+
+if (Email déjà utilisé ?) then (oui)
+    :Affiche message d'erreur;
+    stop
+else (non)
+    :Hache le mot de passe (bcrypt);
+    :Crée le compte formateur;
+    :Affiche message de confirmation;
+    stop
+endif
+
+@enduml

@@ -1,0 +1,42 @@
+@startuml Sprint4_CasUtilisation_Formateur
+title Diagramme de Cas d'Utilisation — Sprint 4 : Formateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 300
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 25
+skinparam ranksep 8
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Formateur" as F
+
+usecase "Créer un quiz" as UC7
+usecase "Configurer les paramètres\n(titre, seuil, tentatives)" as UC7_2
+usecase "Ajouter des questions" as UC7_1
+usecase "Modifier le profil" as UC3
+usecase "Messagerie interne" as UC4
+usecase "Consulter les notifications" as UC5
+
+F -- UC7
+F -- UC3
+F -- UC4
+F -- UC5
+
+UC7 ..> UC7_2 : <<include>>
+UC7 ..> UC7_1 : <<include>>
+
+@enduml

@@ -23,20 +23,20 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/inscription', async (req, res) => {
-  const { etudiant_id, formation_id } = req.body;
+  const { candidat_id, formation_id } = req.body;
   try {
     const [rows] = await db.query(
-      'SELECT * FROM inscriptions WHERE etudiant_id = ? AND formation_id = ?',
-      [etudiant_id, formation_id]
+ 'SELECT * FROM inscriptions WHERE candidat_id = ? AND formation_id = ?',
+      [candidat_id, formation_id]
     );
     if (rows.length > 0) {
-      return res.status(400).json({ message: 'Vous êtes déjà inscrit à cette formation ❌' });
+      return res.status(400).json({ message: 'Vous êtes déjà inscrit à cette formation ' });
     }
     await db.query(
-      "INSERT INTO inscriptions (etudiant_id, formation_id, statut) VALUES (?, ?, 'en cours')",
-      [etudiant_id, formation_id]
+ "INSERT INTO inscriptions (candidat_id, formation_id, statut) VALUES (?, ?, 'en_attente')",
+      [candidat_id, formation_id]
     );
-    res.json({ message: 'Inscription réussie ✅' });
+    res.json({ message: 'Inscription réussie ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

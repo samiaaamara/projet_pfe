@@ -17,6 +17,7 @@ export class InscriptionComponent implements OnInit {
   email = '';
   password = '';
   role = 'candidat';
+  type_candidat = 'etudiant';
   cin = '';
   niveau = '';
   specialite = '';
@@ -24,6 +25,7 @@ export class InscriptionComponent implements OnInit {
   entreprise = '';
   dateNaissance = '';
   message = '';
+  loading = false;
   dateNaissanceError = false;
   today = new Date().toISOString().split('T')[0];
 
@@ -67,11 +69,11 @@ export class InscriptionComponent implements OnInit {
     };
 
     if (this.role === 'candidat') {
+      data.type_candidat = this.type_candidat;
       data.cin = this.cin;
-      data.niveau = this.niveau;
+      data.niveau = this.type_candidat === 'etudiant' ? this.niveau : '';
       data.specialite = this.specialite;
       data.telephone = this.telephone;
-      data.entreprise = this.entreprise;
       data.date_naissance = this.dateNaissance;
     }
 
@@ -82,13 +84,16 @@ export class InscriptionComponent implements OnInit {
       data.date_naissance = this.dateNaissance;
     }
 
+    this.loading = true;
     this.authService.register(data).subscribe({
       next: () => {
-        this.message = 'Compte cree avec succes';
+        this.loading = false;
+        this.message = 'Compte créé avec succès ! Redirection...';
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
-        this.message = err?.error?.message || 'Erreur lors de l inscription';
+        this.loading = false;
+        this.message = err?.error?.message || "Erreur lors de l'inscription.";
       }
     });
   }

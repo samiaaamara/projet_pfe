@@ -1,0 +1,45 @@
+@startuml Sprint1_Activite_Inscription
+title Diagramme d'Activité — Inscription d'un nouvel utilisateur
+
+start
+:L'utilisateur accède à la page d'inscription;
+:Sélection du rôle (Candidat ISET ou Externe);
+
+if (Rôle = Candidat ISET ?) then (oui)
+    :Formulaire : nom, email, mot de passe,\nCIN, téléphone, spécialité, niveau,\ndate de naissance, type_candidat;
+else (non — Externe)
+    :Formulaire : nom, email, mot de passe,\ntéléphone, entreprise;
+endif
+
+:Soumission du formulaire;
+
+if (Champs obligatoires remplis ?) then (non)
+    :Affichage des erreurs de validation;
+    :Retour au formulaire;
+    stop
+else (oui)
+    :Vérification unicité de l'email en base;
+    if (Email déjà utilisé ?) then (oui)
+        :Retour HTTP 400 — "Email déjà utilisé";
+        :Affichage du message d'erreur;
+        stop
+    else (non)
+        if (Candidat ISET — CIN déjà utilisé ?) then (oui)
+            :Retour HTTP 400 — "CIN déjà utilisé";
+            :Affichage du message d'erreur;
+            stop
+        else (non)
+            :Hachage du mot de passe (bcrypt, 10 rounds);
+            :INSERT INTO users (nom, email, mot_de_passe, role);
+            if (Candidat ISET ?) then (oui)
+                :INSERT INTO candidats\n(user_id, cin, type_candidat, spécialité, ...);
+            else (non)
+                :INSERT INTO externes\n(user_id, téléphone, entreprise, ...);
+            endif
+            :Redirection vers la page de connexion;
+            stop
+        endif
+    endif
+endif
+
+@enduml

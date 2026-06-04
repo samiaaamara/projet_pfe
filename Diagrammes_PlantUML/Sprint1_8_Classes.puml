@@ -1,111 +1,84 @@
 @startuml Sprint1_Classes
 title Diagramme de Classes — Sprint 1
 
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam backgroundColor White
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+skinparam classAttributeFontColor Black
+skinparam classFontColor Black
+skinparam classAttributeIconSize 0
+
 class User {
-    - id: int
-    - nom: string
-    - email: string
-    - mot_de_passe: string (hashed)
-    - role: enum {admin, formateur, etudiant, externe}
-    - date_creation: datetime
-    - date_modification: datetime
+    - id : int
+    - nom : string
+    - email : string
+    - mot_de_passe : string
+    - role : enum {admin, formateur, candidat, externe}
+    - created_at : datetime
     --
-    + login(email, mdp): Token
-    + register(data): User
-    + updateProfile(data): void
-    + changePassword(ancien_mdp, nouveau_mdp): void
-    + delete(): void
+    + login(email, mdp) : Token
+    + register(data) : User
+    + resetPasswordRequest(email) : void
+    + resetPassword(token, nouveau_mdp) : void
 }
 
-class Etudiant {
-    - id: int
-    - user_id: int (FK)
-    - specialite: string
-    - niveau: string
-    - cin: string
-    - telephone: string
-    - date_inscription: datetime
+class CandidatISET {
+    - type_candidat : enum {etudiant, enseignant}
+    - specialite : string
+    - niveau : string
+    - cin : string
+    - telephone : string
+    - date_naissance : date
     --
-    + getFormations(): Formation[]
-    + s_inscrire(formation_id): Inscription
+    + getProfil() : CandidatISET
 }
 
 class Formateur {
-    - id: int
-    - user_id: int (FK)
-    - specialite: string
-    - telephone: string
-    - statut: enum {actif, inactif}
-    - date_inscription: datetime
+    - specialite : string
+    - telephone : string
     --
-    + creerFormation(data): Formation
-    + consulterFormations(): Formation[]
-    + consulterEtudiants(): Etudiant[]
+    + getProfil() : Formateur
+    + isDisponible() : boolean
 }
 
 class Externe {
-    - id: int
-    - user_id: int (FK)
-    - specialite: string
-    - telephone: string
-    - organisation: string
-    - date_inscription: datetime
+    - telephone : string
+    - entreprise : string
+    - cin : string
+    - date_naissance : date
+    - specialite : string
     --
-    + consulterFormations(): Formation[]
-    + s_inscrire(formation_id): InscriptionExterne
+    + getProfil() : Externe
 }
 
 class Admin {
-    - id: int
-    - user_id: int (FK)
-    - date_nomination: datetime
     --
-    + manageUsers(): User[]
-    + deleteUser(user_id): void
-    + createFormateur(data): Formateur
-    + updateFormateur(formateur_id, data): void
-    + deleteFormateur(formateur_id): void
-    + getStatistics(): Statistics
+    + getUsers() : User[]
+    + deleteUser(id) : void
+    + createFormateur(data) : Formateur
+    + updateFormateur(id, data) : void
+    + deleteFormateur(id) : void
+    + getDashboardStats() : Stats
 }
 
-class Formation {
-    - id: int
-    - titre: string
-    - description: string
-    - formateur_id: int (FK)
+class PasswordReset {
+    - id : int
+    - email : string
+    - token : string
+    - expires_at : datetime
     --
-    + creer(): void
-    + modifier(data): void
+    + isExpired() : boolean
+    + invalidate() : void
 }
 
-class Statistics {
-    - nombre_etudiants: int
-    - nombre_formateurs: int
-    - nombre_formations_publiees: int
-    - nombre_formations_en_attente: int
-    --
-    + getGlobalStats(): void
-}
+CandidatISET --|> User
+Formateur    --|> User
+Externe      --|> User
+Admin        --|> User
 
-User <|-- Etudiant : héritage
-User <|-- Formateur : héritage
-User <|-- Externe : héritage
-User <|-- Admin : héritage
-
-User "1" -- "*" User : manages (Admin)
-Formateur "1" -- "*" Formation : crée
-Admin "1" -- "1" Statistics : consulte
-
-note right of User
-    Entité principale du système
-    Stockage sécurisé du mot de passe (bcrypt)
-    Rôle détermine les permissions
-end note
-
-note right of Admin
-    Accès complet au système
-    Gestion des utilisateurs et formateurs
-    Consultation des statistiques
-end note
+User "1" -- "0..1" PasswordReset : demande reset
+Admin "1" -- "0..*" Formateur : gère
 
 @enduml

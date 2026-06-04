@@ -12,7 +12,7 @@ router.get('/contacts/:userId', async (req, res) => {
     const role = userRows[0].role;
     let sql, params;
 
-    if (role === 'etudiant') {
+    if (role === 'candidat') {
       sql = `
         SELECT DISTINCT u.id, u.nom, u.role,
           (SELECT contenu FROM messages
@@ -25,12 +25,13 @@ router.get('/contacts/:userId', async (req, res) => {
         JOIN formations f ON i.formation_id = f.id
         JOIN formateurs fo ON f.formateur_id = fo.id
         JOIN users u ON fo.user_id = u.id
-        WHERE i.etudiant_id = (SELECT id FROM etudiants WHERE user_id = ?)
-      `;
+        WHERE i.candidat_id = (SELECT id FROM candidats WHERE user_id = ?)
+ `;
       params = [userId, userId, userId, userId];
     } else if (role === 'formateur') {
       sql = `
-        SELECT DISTINCT u.id, u.nom, u.role,
+        SELECT DISTINCT u.id, u.nom,
+          CASE WHEN u.role = 'candidat' THEN 'etudiant' ELSE u.role END AS role,
           (SELECT contenu FROM messages
            WHERE (expediteur_id = u.id AND destinataire_id = ?)
               OR (expediteur_id = ? AND destinataire_id = u.id)
@@ -39,9 +40,9 @@ router.get('/contacts/:userId', async (req, res) => {
            WHERE expediteur_id = u.id AND destinataire_id = ? AND lu = 0) AS non_lus
         FROM users u
         WHERE u.id IN (
-          SELECT e.user_id FROM inscriptions i
+          SELECT c.user_id FROM inscriptions i
           JOIN formations f ON i.formation_id = f.id
-          JOIN etudiants e ON i.etudiant_id = e.id
+          JOIN candidats c ON i.candidat_id = c.id
           WHERE f.formateur_id = (SELECT id FROM formateurs WHERE user_id = ?)
           UNION
           SELECT ex.user_id FROM inscriptions_externes ie
@@ -52,7 +53,7 @@ router.get('/contacts/:userId', async (req, res) => {
           UNION
           SELECT id FROM users WHERE role = 'admin'
         )
-      `;
+ `;
       params = [userId, userId, userId, userId, userId];
     } else if (role === 'admin') {
       sql = `
@@ -65,7 +66,7 @@ router.get('/contacts/:userId', async (req, res) => {
            WHERE expediteur_id = u.id AND destinataire_id = ? AND lu = 0) AS non_lus
         FROM formateurs fo
         JOIN users u ON fo.user_id = u.id
-      `;
+ `;
       params = [userId, userId, userId];
     } else if (role === 'externe') {
       sql = `
@@ -82,7 +83,7 @@ router.get('/contacts/:userId', async (req, res) => {
         JOIN users u ON fo.user_id = u.id
         WHERE ie.externe_id = (SELECT id FROM externes WHERE user_id = ?)
         AND ie.statut_paiement = 'payé'
-      `;
+ `;
       params = [userId, userId, userId, userId];
     } else {
       return res.json([]);
@@ -100,12 +101,12 @@ router.get('/conversation/:userId/:otherId', async (req, res) => {
   const otherId = parseInt(req.params.otherId);
   try {
     db.query(
-      'UPDATE messages SET lu = 1 WHERE expediteur_id = ? AND destinataire_id = ? AND lu = 0',
+ 'UPDATE messages SET lu = 1 WHERE expediteur_id = ? AND destinataire_id = ? AND lu = 0',
       [otherId, userId]
     ).catch(() => {});
 
     const [results] = await db.query(
-      `SELECT m.id, m.contenu, m.date_envoi, m.expediteur_id, m.lu, u.nom AS expediteur_nom
+ `SELECT m.id, m.contenu, m.date_envoi, m.expediteur_id, m.lu, u.nom AS expediteur_nom
        FROM messages m
        JOIN users u ON m.expediteur_id = u.id
        WHERE (m.expediteur_id = ? AND m.destinataire_id = ?)
@@ -123,10 +124,10 @@ router.post('/send', validate(messageSchema), async (req, res) => {
   const { expediteur_id, destinataire_id, contenu } = req.body;
   try {
     const [result] = await db.query(
-      'INSERT INTO messages (expediteur_id, destinataire_id, contenu) VALUES (?, ?, ?)',
+ 'INSERT INTO messages (expediteur_id, destinataire_id, contenu) VALUES (?, ?, ?)',
       [expediteur_id, destinataire_id, contenu.trim()]
     );
-    res.json({ id: result.insertId, message: 'Message envoyé ✉️' });
+    res.json({ id: result.insertId, message: 'Message envoyé ️' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -135,7 +136,7 @@ router.post('/send', validate(messageSchema), async (req, res) => {
 router.get('/unread-count/:userId', async (req, res) => {
   try {
     const [results] = await db.query(
-      'SELECT COUNT(*) AS count FROM messages WHERE destinataire_id = ? AND lu = 0',
+ 'SELECT COUNT(*) AS count FROM messages WHERE destinataire_id = ? AND lu = 0',
       [parseInt(req.params.userId)]
     );
     res.json({ count: results[0].count });

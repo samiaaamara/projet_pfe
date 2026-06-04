@@ -7,7 +7,8 @@ export class ExterneGuard implements CanActivate {
 
   canActivate(): boolean {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    let user: any = {};
+    try { user = JSON.parse(localStorage.getItem('user') || '{}'); } catch { user = {}; }
     if (token && user.role === 'externe') return true;
     this.router.navigate(['/login']);
     return false;

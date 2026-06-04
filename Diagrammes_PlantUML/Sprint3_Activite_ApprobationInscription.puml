@@ -1,0 +1,67 @@
+@startuml Sprint3_Activite_ApprobationInscription
+title Diagramme d'Activité — Processus d'approbation et paiement
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ActivityDiamondBorderColor Black
+skinparam ActivityArrowColor Black
+
+|Candidat / Externe|
+start
+:Consulter le catalogue;
+:Sélectionner une formation;
+:Soumettre une demande d'inscription;
+
+|Système|
+:Vérifier les places disponibles;
+
+if (Places disponibles ?) then (oui)
+    :Créer la demande\n(statut = en_attente);
+else (non)
+    :Ajouter à la liste d'attente;
+    |Candidat / Externe|
+    :Attendre notification\nde place disponible;
+    stop
+end if
+
+|Administrateur|
+:Consulter les demandes en attente;
+:Examiner le dossier du candidat;
+
+if (Approuver ?) then (oui)
+    :Mettre à jour statut = approuvée;
+    |Système|
+    :Notifier le candidat;
+
+    |Candidat / Externe|
+    if (Type de candidat ?) then (Utilisateur externe)
+        :Cliquer sur "Payer";
+        |Système|
+        :Créer session Stripe Checkout;
+        |Candidat / Externe|
+        :Saisir coordonnées bancaires\net confirmer le paiement;
+        |Système|
+        :Recevoir confirmation webhook\n(HMAC-SHA256);
+        :Mettre à jour statut = payée;
+        |Candidat / Externe|
+        :Accéder aux supports pédagogiques;
+    else (Candidat ISET)
+        :Accéder aux supports pédagogiques;
+    end if
+
+else (non)
+    :Mettre à jour statut = rejetée;
+    |Système|
+    :Notifier le candidat\navec motif de rejet;
+    |Candidat / Externe|
+    :Consulter le motif de rejet;
+    stop
+end if
+
+stop
+
+@enduml

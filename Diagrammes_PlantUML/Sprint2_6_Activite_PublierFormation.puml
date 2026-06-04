@@ -1,0 +1,36 @@
+@startuml Sprint2_Activite_PublierFormation
+title Diagramme d'Activité — Publier une formation (Administrateur)
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam activity {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam arrow {
+    Color Black
+    FontColor Black
+}
+
+start
+:L'administrateur consulte les formations acceptées;
+:Sélectionne une formation à publier;
+:Définit le nombre de places disponibles;
+:Définit le prix de la formation;
+:Définit la date de début et la date de fin;
+:Crée les séances (module, salle, date, durée);
+
+if (Données valides ?) then (non)
+    :Affiche message d'erreur;
+    stop
+else (oui)
+    :Met à jour le statut — publiée;
+    :La formation est visible dans le catalogue;
+    :Notifie le formateur de la publication;
+    stop
+endif
+
+@enduml

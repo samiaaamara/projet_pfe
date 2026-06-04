@@ -1,145 +1,161 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-content">
+    <span class="hero-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> ISET Tozeur — Plateforme officielle</span>
     <h1 class="hero-title">
-      Plateforme des formations de l'ISET Tozeur<br>
-      <span class="hero-accent">Apprendre, évoluer et réussir</span>
+      Gérez vos formations<br>
+      <span class="hero-accent">professionnelles en ligne</span>
     </h1>
     <p class="hero-subtitle">
-      Une plateforme dédiée aux étudiants, formateurs et participants externes pour découvrir et suivre des formations professionnelles et technologiques.
+      Inscriptions, suivi de progression et attestations — tout en un seul endroit.
     </p>
     <div class="hero-actions">
-      <a routerLink="/inscription" class="btn-hero-primary">Commencer →</a>
-      <a routerLink="/login" class="btn-hero-secondary">Se connecter</a>
+      <a routerLink="/inscription" class="btn-primary">Créer un compte →</a>
+      <a routerLink="/login" class="btn-secondary">Se connecter</a>
+    </div>
+    <div class="hero-stats-inline">
+      <div class="stat-inline"><strong>+120</strong> Formations</div>
+      <div class="stat-sep">·</div>
+      <div class="stat-inline"><strong>+850</strong> Participants</div>
     </div>
   </div>
 
-  <div class="hero-visual">
-    <div class="hero-card">
-      <div class="hc-icon">📚</div>
-      <div>
-        <div class="hc-title">Formations</div>
-        <div class="hc-value">+120</div>
-      </div>
-    </div>
+  <div class="hero-photos">
+    <img src="images/iset2.jpg" alt="ISET Tozeur" class="hero-photo" (error)="onImgError($event)">
+    <img src="images/iset3.jpg" alt="ISET Tozeur" class="hero-photo" (error)="onImgError($event)">
+  </div>
+</section>
 
-    <div class="hero-card">
-      <div class="hc-icon">👥</div>
-      <div>
-        <div class="hc-title">Étudiants</div>
-        <div class="hc-value">+850</div>
-      </div>
+<!-- COMMENT ÇA MARCHE -->
+<section class="how">
+  <div class="home-container">
+    <div class="section-header">
+      <h2 class="section-title">Comment ça marche ?</h2>
     </div>
-
-    <div class="hero-card">
-      <div class="hc-icon">🏆</div>
-      <div>
-        <div class="hc-title">Réussites</div>
-        <div class="hc-value">+340</div>
-      </div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><h3>Création</h3><p>Le formateur crée la formation et l'admin la valide.</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><div class="step-num">2</div><div class="step-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><h3>Inscription</h3><p>Gratuit pour les candidats ISET, payant pour les externes.</p></div>
+      <div class="step-arrow">→</div>
+      <div class="step"><div class="step-num">3</div><div class="step-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div><h3>Attestation</h3><p>Quiz réussi + modules complétés = attestation PDF.</p></div>
     </div>
   </div>
 </section>
 
-<!-- ABOUT ISET -->
-<section class="about-iset">
-  <div class="about-container">
-
-    <div class="about-images">
-      <img src="https://isett.rnu.tn/images/social-networks-integrations/twitter_image_default.jpg" alt="Logo ISET">
-      <img src="https://orientini.com/uploads/iset_touzeur.png" alt="ISET Tozeur">
+<!-- RÔLES -->
+<section class="roles">
+  <div class="home-container">
+    <div class="section-header">
+      <h2 class="section-title">Pour qui ?</h2>
     </div>
+    <div class="roles-grid">
 
-    <div class="about-content">
-      <h2 class="section-title">À propos de l’ISET Tozeur</h2>
-      <p class="about-text">
-        Cette plateforme est conçue pour gérer et promouvoir les formations proposées par l'ISET Tozeur.
-      </p>
-      <p class="about-text">
-        Elle permet aux étudiants ainsi qu’aux participants externes de s’inscrire facilement, suivre leur progression et développer leurs compétences.
-      </p>
+      <div class="role-card blue">
+        <div class="role-header"><span class="role-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span><div><h3 class="role-title">Candidat ISET</h3><span class="role-badge free">Gratuit</span></div></div>
+        <p class="role-desc">Inscription gratuite, suivi de progression, quiz et attestation PDF.</p>
+        <a routerLink="/inscription" class="role-cta">S'inscrire →</a>
+      </div>
+
+      <div class="role-card green">
+        <div class="role-header"><span class="role-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><div><h3 class="role-title">Participant externe</h3><span class="role-badge paid">Payant</span></div></div>
+        <p class="role-desc">Accès après paiement Stripe, mêmes fonctionnalités que le candidat.</p>
+        <a routerLink="/inscription" class="role-cta">S'inscrire →</a>
+      </div>
+
+      <div class="role-card purple">
+        <div class="role-header"><span class="role-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><div><h3 class="role-title">Formateur</h3><span class="role-badge manage">Gestion</span></div></div>
+        <p class="role-desc">Créer formations, gérer modules, séances, quiz et supports PDF.</p>
+        <a routerLink="/login" class="role-cta">Se connecter →</a>
+      </div>
+
+      <div class="role-card orange">
+        <div class="role-header"><span class="role-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><div><h3 class="role-title">Administrateur</h3><span class="role-badge admin">Admin</span></div></div>
+        <p class="role-desc">Approuver formations, gérer utilisateurs, paiements et statistiques.</p>
+        <a routerLink="/admin-login" class="role-cta">Accès admin →</a>
+      </div>
+
     </div>
-
   </div>
 </section>
 
 <!-- DOMAINES -->
 <section class="domains">
-  <div class="section-header">
-    <h2 class="section-title">Domaines de formation</h2>
-    <p class="section-sub">Des formations adaptées aux besoins du marché</p>
-  </div>
-
-  <div class="domains-grid">
-
-    <div class="domain-card">
-      <div class="domain-icon">💻</div>
-      <h3>Informatique</h3>
-      <p>Développement web, mobile, bases de données</p>
+  <div class="home-container">
+    <div class="section-header">
+      <h2 class="section-title">Domaines de formation</h2>
     </div>
-
-    <div class="domain-card">
-      <div class="domain-icon">📊</div>
-      <h3>Gestion</h3>
-      <p>Marketing, finance, management</p>
+    <div class="domains-grid">
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><span>Informatique</span></div>
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Réseaux</span></div>
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span>Cybersécurité</span></div>
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></span><span>Intelligence artificielle</span></div>
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span>Marketing</span></div>
+      <div class="domain-card"><span class="domain-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span>Génie électrique</span></div>
     </div>
-
-    <div class="domain-card">
-      <div class="domain-icon">⚙️</div>
-      <h3>Technologie</h3>
-      <p>Électronique, réseaux, maintenance</p>
-    </div>
-
-    <div class="domain-card">
-      <div class="domain-icon">🌐</div>
-      <h3>Compétences digitales</h3>
-      <p>Freelance, communication digitale</p>
-    </div>
-
   </div>
 </section>
-
-<!-- FEATURES -->
-<section class="features">
-  <div class="section-header">
-    <h2 class="section-title">Fonctionnalités principales</h2>
-    <p class="section-sub">Une plateforme pour tous</p>
-  </div>
-
-  <div class="features-grid">
-
-    <div class="feature-card">
-      <div class="feature-icon blue">🎓</div>
-      <h3 class="feature-title">Étudiants</h3>
-      <p class="feature-desc">Accédez aux formations et suivez votre progression.</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon green">👨‍🏫</div>
-      <h3 class="feature-title">Formateurs</h3>
-      <p class="feature-desc">Créez et gérez vos formations.</p>
-    </div>
-
-    <div class="feature-card">
-      <div class="feature-icon purple">🔧</div>
-      <h3 class="feature-title">Administrateurs</h3>
-      <p class="feature-desc">Supervisez toute la plateforme.</p>
-    </div>
-
-    <div class="feature-card">
-  <div class="feature-icon orange">🌍</div>
-  <h3 class="feature-title">Participants externes</h3>
- <p class="feature-desc">
-  Toute personne extérieure à l’ISET peut s’inscrire aux formations après paiement.</p>
-</div>
-
-  </div>
-</section>
-
 
 <!-- FOOTER -->
 <footer class="footer">
-  <div class="footer-inner">
-    <span class="footer-copy">© {{ currentYear }} ISET Tozeur</span>
+  <div class="footer-top">
+    <div class="footer-col footer-col-brand">
+      <div class="footer-logo-row">
+        <img src="images/iset_logo.png" alt="Logo ISET Tozeur" class="footer-logo">
+        <div>
+          <div class="footer-inst-name">Institut Supérieur des Etudes Technologiques de Tozeur</div>
+          <p class="footer-tagline">Plateforme officielle de gestion des formations</p>
+        </div>
+      </div>
+      <div class="footer-contact">
+        <div class="footer-contact-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Campus universitaire, route de Nefta, BP 150 – 2210 Tozeur
+        </div>
+        <div class="footer-contact-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          +216 76 473 777 / +216 76 472 777
+        </div>
+        <div class="footer-contact-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          contact&#64;isett.rnu.tn
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Plateforme</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/inscription">S'inscrire</a></li>
+        <li><a routerLink="/login">Se connecter</a></li>
+        <li><a routerLink="/admin-login">Accès admin</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Formations</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/candidat">Espace candidat</a></li>
+        <li><a routerLink="/externe">Espace externe</a></li>
+        <li><a routerLink="/formateur">Espace formateur</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-col-title">Suivez-nous</h4>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/isett.tozeur" target="_blank" class="social-btn" aria-label="Facebook">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+          Facebook
+        </a>
+        <a href="https://www.youtube.com/@isett" target="_blank" class="social-btn" aria-label="YouTube">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+          YouTube
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© {{ currentYear }} FormaPro — ISET Tozeur. Tous droits réservés.</span>
   </div>
 </footer>

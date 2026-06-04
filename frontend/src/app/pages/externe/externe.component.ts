@@ -29,9 +29,12 @@ export class ExterneComponent implements OnInit, OnDestroy {
   totalPages = 1;
   totalFormations = 0;
   recherche = '';
+  filtreSpecialite = '';
 
-  // Mes inscriptions
+  // Mes inscriptions (confirmées uniquement)
   mesInscriptions: any[] = [];
+  // Demandes en attente d'approbation admin
+  demandesEnAttente: any[] = [];
 
   // Supports
   supports: any[] = [];
@@ -140,12 +143,12 @@ export class ExterneComponent implements OnInit, OnDestroy {
     this.loadProfilComplet();
     this.loadFormations();
     this.loadMesInscriptions();
+    this.loadDemandesEnAttente();
     this.chargerProgression();
     this.loadEnAttente();
     this.loadUnreadCount();
-    this.pollingInterval = setInterval(() => this.loadUnreadCount(), 30000);
     this.loadUnreadMessages();
-    setInterval(() => this.loadUnreadMessages(), 30000);
+    this.pollingInterval = setInterval(() => { this.loadUnreadCount(); this.loadUnreadMessages(); }, 30000);
   }
 
   ngOnDestroy() {
@@ -169,16 +172,19 @@ export class ExterneComponent implements OnInit, OnDestroy {
         this.totalPages = res.pagination.pages;
         this.totalFormations = res.pagination.total;
         this.loadMesInscriptions();
+        this.loadDemandesEnAttente();
       },
       error: () => this.showMessage('Erreur chargement des formations', 'danger')
     });
   }
+  get specialitesDispo(): string[] {
+    const s = new Set(this.formations.map(f => f.specialite).filter(Boolean));
+    return Array.from(s).sort();
+  }
+
   get formationsFiltrees() {
-    return this.formations.filter(f => {
-      const matchRecherche = this.recherche
-        ? (f.titre + ' ' + (f.description || '')).toLowerCase().includes(this.recherche.toLowerCase())
-        : true;
-      return matchRecherche;});
+    if (!this.filtreSpecialite) return this.formations;
+    return this.formations.filter(f => f.specialite === this.filtreSpecialite);
   }
 
   changerPage(p: number) {
@@ -195,7 +201,58 @@ export class ExterneComponent implements OnInit, OnDestroy {
     return this.mesInscriptions.some(i =>
       Number(i.formation_id) === Number(formationId) &&
       (i.statut_paiement === 'payé' || i.statut_inscription === 'confirmé')
+    ) || this.demandesEnAttente.some(i => Number(i.formation_id) === Number(formationId));
+  }
+
+  get aFormationActive(): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.mesInscriptions.some(f => {
+      if (f.statut_inscription === 'Terminée') return false;
+      if (f.status === 'terminée' || f.status === 'archivée') return false;
+      if (!f.date_fin) return false;
+      return new Date(f.date_fin) >= today;
+    });
+  }
+
+  estEnAttenteApprobation(formationId: number): boolean {
+    return this.demandesEnAttente.some(i => Number(i.formation_id) === Number(formationId));
+  }
+
+  peutPayer(formationId: number): boolean {
+    return this.mesInscriptions.some(i =>
+      Number(i.formation_id) === Number(formationId) &&
+      i.statut_inscription === 'confirmé' &&
+      i.statut_paiement === 'en_attente' &&
+      Number(i.montant) > 0 &&
+      i.status !== 'en_cours' &&
+      i.status !== 'terminée' &&
+      i.status !== 'archivée'
     );
+  }
+
+  getInscriptionPourFormation(formationId: number): any {
+    return this.mesInscriptions.find(i => Number(i.formation_id) === Number(formationId));
+  }
+
+  payerMaintenant(formationId: number) {
+    const insc = this.getInscriptionPourFormation(formationId);
+    if (!insc) return;
+    this.paiementEnCours = true;
+    this.externeService.lancerPaiement(insc.id).subscribe({
+      next: (res: any) => {
+        this.paiementEnCours = false;
+        if (res.payUrl) {
+          window.location.href = res.payUrl;
+        } else {
+          this.showMessage('Erreur lors du lancement du paiement', 'danger');
+        }
+      },
+      error: (err) => {
+        this.paiementEnCours = false;
+        this.showMessage(err?.error?.message || 'Erreur lors du paiement', 'danger');
+      }
+    });
   }
 
   placesRestantes(f: any): number {
@@ -223,6 +280,10 @@ export class ExterneComponent implements OnInit, OnDestroy {
   paiementEnCours = false;
 
   ouvrirPaiement(formation: any) {
+    if (this.aFormationActive) {
+      this.showMessage("Vous avez déjà une formation en cours. Terminez-la avant de vous inscrire à une autre.", 'danger');
+      return;
+    }
     this.formationPaiement = formation;
     this.showPaiementModal = true;
   }
@@ -239,21 +300,17 @@ export class ExterneComponent implements OnInit, OnDestroy {
 
     this.externeService.initierPaiement(this.externeId, this.formationPaiement.id).subscribe({
       next: (res: any) => {
-        if (res.gratuit) {
-          // Formation gratuite : inscription directe
-          this.fermerModal();
-          this.showMessage('Inscription confirmée ✅');
-          this.loadMesInscriptions();
+        this.paiementEnCours = false;
+        this.fermerModal();
+        if (res.pending) {
+          this.showMessage('Demande envoyée ✅ — En attente d\'approbation par l\'administrateur.');
+          this.loadDemandesEnAttente();
           this.loadFormations();
-        } else if (res.payUrl) {
-          // Formation payante : rediriger vers Konnect
-          this.fermerModal();
-          window.location.href = res.payUrl;
         }
       },
       error: (err) => {
         this.paiementEnCours = false;
-        this.showMessage(err?.error?.message || 'Erreur lors du paiement', 'danger');
+        this.showMessage(err?.error?.message || 'Erreur lors de la demande d\'inscription', 'danger');
       }
     });
   }
@@ -265,6 +322,37 @@ export class ExterneComponent implements OnInit, OnDestroy {
       next: data => { this.mesInscriptions = data; this.loadEligibilites(data); },
       error: () => {}
     });
+  }
+
+  loadDemandesEnAttente() {
+    if (!this.externeId) return;
+    this.externeService.getMesDemandes(this.externeId).subscribe({
+      next: data => this.demandesEnAttente = data,
+      error: () => {}
+    });
+  }
+
+  getStatutFormation(i: any): string {
+    if (i.status === 'en_cours') return 'En cours';
+    if (i.status === 'terminée' || i.statut_inscription === 'Terminée') return 'Terminée';
+    if (i.status === 'published') return 'À venir';
+    if (!i.date_debut) return '';
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const toLocal = (d: string) => new Date(d.substring(0, 10) + 'T00:00:00');
+    const debut = toLocal(i.date_debut);
+    const fin = i.date_fin ? toLocal(i.date_fin) : null;
+    if (debut > today) return 'À venir';
+    if (fin && fin < today) return 'Terminée';
+    return 'En cours';
+  }
+
+  getStatutFormationBadge(statut: string): string {
+    const map: any = {
+      'À venir' : 'bg-info',
+      'En cours': 'bg-success',
+      'Terminée': 'bg-secondary'
+    };
+    return map[statut] || 'bg-secondary';
   }
 
   getStatutBadgeClass(statut: string): string {
@@ -418,6 +506,21 @@ export class ExterneComponent implements OnInit, OnDestroy {
 
   imprimerAttestation() { window.print(); }
 
+  telechargerAttestation(formationId: number) {
+    if (!this.externeId) return;
+    this.externeService.genererAttestation(this.externeId, formationId).subscribe({
+      next: (blob: Blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `attestation_formation_${formationId}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      error: () => this.showMessage('Erreur lors du téléchargement de l\'attestation', 'danger')
+    });
+  }
+
   getTodayStr(): string {
     return new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
@@ -543,8 +646,8 @@ export class ExterneComponent implements OnInit, OnDestroy {
     if (this.nouveauMdp !== this.confirmMdp) {
       this.showMessage('Les mots de passe ne correspondent pas', 'danger'); return;
     }
-    if (this.nouveauMdp.length < 6) {
-      this.showMessage('Mot de passe trop court (min 6 caractères)', 'danger'); return;
+    if (this.nouveauMdp.length < 8) {
+      this.showMessage('Mot de passe trop court (min 8 caractères)', 'danger'); return;
     }
     this.authService.changePassword({ ancien_mdp: this.ancienMdp, nouveau_mdp: this.nouveauMdp }).subscribe({
       next: () => {
@@ -608,9 +711,11 @@ export class ExterneComponent implements OnInit, OnDestroy {
     this.loadNotifications();
   }
 
-  getNotifIcon(type: string): string {
-    const icons: any = { 'inscription': '📚', 'approbation': '✅', 'rejet': '❌', 'info': 'ℹ️' };
-    return icons[type] || '🔔';
+  getNotifIcon(type: string): string { return type; }
+
+  stripNotifEmoji(msg: string): string {
+    if (!msg) return '';
+    return msg.replace(/^[\u{1F300}-\u{1F9FF}✅❌⚠️]️?\s*/u, '');
   }
 
   // ===== Messagerie =====
@@ -675,7 +780,8 @@ export class ExterneComponent implements OnInit, OnDestroy {
     this.programmeFormation = f;
     this.programmeData = null;
     this.programmeLoading = true;
-    this.externeService.getProgramme(f.id).subscribe({
+    const formationId = f.formation_id || f.id;
+    this.externeService.getProgramme(formationId).subscribe({
       next: (res: any) => { this.programmeData = res; this.programmeLoading = false; },
       error: () => { this.programmeLoading = false; this.showMessage('Erreur chargement du programme', 'danger'); }
     });
@@ -703,7 +809,7 @@ export class ExterneComponent implements OnInit, OnDestroy {
       .filter(i => i.statut_paiement === 'payé')
       .filter(f => {
         const e = this.eligibiliteMap[f.formation_id];
-        return e?.has_quiz && !e?.quiz_ok && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
+        return f.status === 'terminée' && e?.has_quiz && !e?.quiz_ok && e?.progression === 100 && (e?.quiz_tentatives || 0) < (e?.nb_tentatives_max || 3);
       }).length;
   }
 

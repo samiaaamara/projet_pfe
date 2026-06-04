@@ -1,0 +1,63 @@
+@startuml Sprint2_Sequence_SoumettreInscription
+title Diagramme de Séquence — Soumettre une demande d'inscription
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceMessageAlign left
+skinparam sequenceBoxBackgroundColor White
+skinparam sequenceBoxBorderColor Black
+skinparam participantBackgroundColor White
+skinparam participantBorderColor Black
+skinparam actorBackgroundColor White
+skinparam actorBorderColor Black
+skinparam databaseBackgroundColor White
+skinparam databaseBorderColor Black
+
+actor "Candidat ISET / Externe" as USER
+participant "Interface" as UI
+participant "Système" as SYS
+database "Base de données" as DB
+
+USER -> UI: Accède au catalogue des formations
+UI -> SYS: Récupère les formations publiées
+SYS -> DB: SELECT * FROM formations WHERE statut = 'publiee'
+DB --> SYS: Liste des formations
+SYS --> UI: Affiche le catalogue
+
+USER -> UI: Filtre par spécialité (optionnel)
+UI -> SYS: Applique le filtre
+SYS --> UI: Affiche les formations filtrées
+
+USER -> UI: Sélectionne une formation et consulte les détails
+UI -> SYS: Récupère les détails de la formation
+SYS -> DB: SELECT details, places_disponibles FROM formations WHERE id = ?
+DB --> SYS: Détails et nombre de places
+SYS --> UI: Affiche les détails de la formation
+
+USER -> UI: Clique sur « S'inscrire »
+UI -> SYS: Envoie la demande d'inscription
+
+SYS -> DB: Vérifie les places disponibles
+SYS -> DB: Vérifie absence d'inscription en cours
+
+alt Places disponibles = 0
+    DB --> SYS: Formation complète
+    SYS --> UI: Formation complète — liste d'attente disponible
+    UI --> USER: Propose de rejoindre la liste d'attente
+else Déjà inscrit à une formation en cours
+    DB --> SYS: Inscription existante trouvée
+    SYS --> UI: Erreur — déjà inscrit à une formation en cours
+    UI --> USER: Affiche le message d'erreur
+else Places disponibles > 0
+    DB --> SYS: Places disponibles confirmées
+    SYS -> DB: Enregistre la demande (statut : en attente d'approbation)
+    SYS -> DB: Notifie l'administrateur
+    DB --> SYS: Confirmation
+    SYS --> UI: Demande enregistrée avec succès
+    UI --> USER: Confirmation — demande en attente d'approbation
+end
+
+@enduml

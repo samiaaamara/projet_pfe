@@ -1,0 +1,50 @@
+@startuml Sprint2_CasUtilisation_Formateur
+title Diagramme de cas d'utilisation — Formateur
+
+left to right direction
+
+scale 0.7
+skinparam dpi 150
+skinparam actorStyle default
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam nodesep 20
+skinparam ranksep 25
+
+skinparam usecase {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+skinparam actor {
+    BackgroundColor White
+    BorderColor Black
+    FontColor Black
+}
+
+actor "Formateur" as F
+
+usecase "S'authentifier" as AUTH
+usecase "Gérer ses formations" as UC1
+usecase "Créer une formation" as UC1_1
+usecase "Modifier sa formation" as UC1_2
+usecase "Supprimer sa formation" as UC1_3
+usecase "Gérer les modules et le programme" as UC1_4
+usecase "Déposer des supports pédagogiques" as UC1_5
+usecase "Consulter la liste des inscrits" as UC1_6
+usecase "Soumettre à l'approbation" as UC2
+
+F -- UC1
+F -- UC2
+
+UC1 ..> AUTH : <<include>>
+UC2 ..> AUTH : <<include>>
+
+UC1_1 ..> UC1 : <<extend>>
+UC1_2 ..> UC1 : <<extend>>
+UC1_3 ..> UC1 : <<extend>>
+UC1_4 ..> UC1 : <<extend>>
+UC1_5 ..> UC1 : <<extend>>
+UC1_6 ..> UC1 : <<extend>>
+
+@enduml

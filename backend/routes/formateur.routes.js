@@ -43,7 +43,7 @@ router.get('/mes-formations/:formateurId', async (req, res) => {
   if (isNaN(formateurId)) return res.status(400).json({ error: 'Formateur ID invalide' });
   try {
     const [results] = await db.query(
-      `SELECT f.*,
+ `SELECT f.*,
               (SELECT COUNT(*) FROM modules_formation WHERE formation_id = f.id) AS module_count
        FROM formations f WHERE f.formateur_id = ?`,
       [formateurId]
@@ -60,7 +60,7 @@ router.get('/profil/:userId', async (req, res) => {
   if (isNaN(userId)) return res.status(400).json({ error: 'User ID invalide' });
   try {
     const [results] = await db.query(
-      `SELECT f.id, f.specialite, f.telephone, f.date_naissance, f.user_id, u.nom, u.email, u.role, u.photo_profil
+ `SELECT f.id, f.specialite, f.telephone, f.date_naissance, f.user_id, u.nom, u.email, u.role, u.photo_profil
        FROM formateurs f JOIN users u ON f.user_id = u.id WHERE f.user_id = ?`,
       [userId]
     );
@@ -89,6 +89,63 @@ router.get('/supports/:formationId', async (req, res) => {
   }
 });
 
+/* ─── GET /inscriptions-en-attente/:formateurId ─────────────────────────── */
+router.get('/inscriptions-en-attente/:formateurId', async (req, res) => {
+  const formateurId = parseInt(req.params.formateurId);
+  if (isNaN(formateurId)) return res.status(400).json({ error: 'Formateur ID invalide' });
+  const sql = `
+    SELECT i.id, i.date_inscription, f.titre AS formation_titre, f.id AS formation_id,
+           u.nom AS user_nom, u.email AS user_email,
+ 'candidat' AS type_utilisateur, NULL AS montant
+    FROM inscriptions i
+    JOIN formations f ON i.formation_id = f.id
+    JOIN candidats c ON i.candidat_id = c.id
+    JOIN users u ON c.user_id = u.id
+    WHERE f.formateur_id = ? AND i.statut = 'en_attente'
+
+    UNION ALL
+
+    SELECT ie.id, ie.date_inscription, f.titre AS formation_titre, f.id AS formation_id,
+           u.nom AS user_nom, u.email AS user_email,
+ 'externe' AS type_utilisateur, ie.montant
+    FROM inscriptions_externes ie
+    JOIN formations f ON ie.formation_id = f.id
+    JOIN externes ex ON ie.externe_id = ex.id
+    JOIN users u ON ex.user_id = u.id
+    WHERE f.formateur_id = ? AND ie.statut_inscription = 'en_attente'
+
+    ORDER BY date_inscription DESC
+ `;
+  try {
+    const [rows] = await db.query(sql, [formateurId, formateurId]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ─── GET /liste-attente/:formateurId ───────────────────────────────────── */
+router.get('/liste-attente/:formateurId', async (req, res) => {
+  const formateurId = parseInt(req.params.formateurId);
+  if (isNaN(formateurId)) return res.status(400).json({ error: 'Formateur ID invalide' });
+  const sql = `
+    SELECT la.id, la.date_ajout, f.titre AS formation_titre, f.id AS formation_id,
+           u.nom AS user_nom, u.email AS user_email
+    FROM liste_attente la
+    JOIN formations f ON la.formation_id = f.id
+    JOIN candidats c ON la.candidat_id = c.id
+    JOIN users u ON c.user_id = u.id
+    WHERE f.formateur_id = ?
+    ORDER BY la.date_ajout ASC
+ `;
+  try {
+    const [rows] = await db.query(sql, [formateurId]);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/inscriptions/:formationId', async (req, res) => {
   const formationId = parseInt(req.params.formationId);
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
@@ -102,7 +159,7 @@ router.get('/inscriptions/:formationId', async (req, res) => {
 
     UNION ALL
 
-    SELECT ie.id, u.nom, u.email, ie.date_inscription, COALESCE(ie.statut, 'Inscrit') AS statut,
+    SELECT ie.id, u.nom, u.email, ie.date_inscription, ie.statut_inscription AS statut,
            NULL AS candidat_id, ex.id AS externe_id, 'externe' AS type_participant
     FROM inscriptions_externes ie
     JOIN externes ex ON ie.externe_id = ex.id
@@ -110,7 +167,7 @@ router.get('/inscriptions/:formationId', async (req, res) => {
     WHERE ie.formation_id = ? AND ie.statut_paiement = 'payé'
 
     ORDER BY date_inscription DESC
-  `;
+ `;
   try {
     const [results] = await db.query(sql, [formationId, formationId]);
     res.json(results);
@@ -128,7 +185,7 @@ router.get('/stats/:formateurId', async (req, res) => {
       (SELECT COUNT(*) FROM inscriptions i JOIN formations f ON i.formation_id = f.id WHERE f.formateur_id = ?)
        + (SELECT COUNT(*) FROM inscriptions_externes ie JOIN formations f ON ie.formation_id = f.id WHERE f.formateur_id = ? AND ie.statut_paiement = 'payé') AS totalEtudiants,
       (SELECT COUNT(*) FROM seances s JOIN formations f ON s.formation_id = f.id WHERE f.formateur_id = ?) AS totalSeances
-  `;
+ `;
   try {
     const [result] = await db.query(statsSql, [formateurId, formateurId, formateurId, formateurId]);
     res.json({
@@ -152,11 +209,11 @@ router.post('/creer-formation', uploadImage.single('photo'), async (req, res) =>
 
   try {
     const [results] = await db.query(
-      `INSERT INTO formations (titre, description, specialite, nb_places, formateur_id, status, photo)
+ `INSERT INTO formations (titre, description, specialite, nb_places, formateur_id, status, photo)
        VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [titre, description, specialite || null, nb_places || null, formateur_id, 'draft', photo]
     );
-    res.json({ message: 'Formation créée avec succès ✅', id: results.insertId });
+    res.json({ message: 'Formation créée avec succès ', id: results.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -169,10 +226,27 @@ router.post('/supports', upload.single('fichier'), async (req, res) => {
   if (!fichier) return res.status(400).json({ error: 'Un fichier ou une URL est obligatoire' });
   try {
     const [results] = await db.query(
-      'INSERT INTO supports (formation_id, type, fichier) VALUES (?, ?, ?)',
+ 'INSERT INTO supports (formation_id, type, fichier) VALUES (?, ?, ?)',
       [formation_id, type, fichier]
     );
-    res.json({ message: 'Support ajouté ✅', id: results.insertId, fichier });
+    res.json({ message: 'Support ajouté ', id: results.insertId, fichier });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/supports/:id', async (req, res) => {
+  const supportId = parseInt(req.params.id);
+  if (isNaN(supportId)) return res.status(400).json({ error: 'Support ID invalide' });
+  try {
+    const [[sup]] = await db.query('SELECT fichier FROM supports WHERE id = ?', [supportId]);
+    if (!sup) return res.status(404).json({ error: 'Support introuvable' });
+    if (sup.fichier && sup.fichier.startsWith('/uploads/')) {
+      const filePath = path.join(__dirname, '..', sup.fichier);
+      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+    }
+    await db.query('DELETE FROM supports WHERE id = ?', [supportId]);
+    res.json({ message: 'Support supprimé ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -191,7 +265,7 @@ router.put('/formations/:id', uploadImage.single('photo'), async (req, res) => {
 
   try {
     const [checkResult] = await db.query(
-      'SELECT status FROM formations WHERE id = ? AND formateur_id = ?',
+ 'SELECT status FROM formations WHERE id = ? AND formateur_id = ?',
       [formationId, formateur_id]
     );
     if (checkResult.length === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
@@ -199,12 +273,12 @@ router.put('/formations/:id', uploadImage.single('photo'), async (req, res) => {
       return res.status(403).json({ error: "Impossible de modifier une formation publiée. Contactez l'administrateur." });
 
     const [result] = await db.query(
-      `UPDATE formations SET titre = ?, description = ?, specialite = ?, nb_places = ?, photo = ?
+ `UPDATE formations SET titre = ?, description = ?, specialite = ?, nb_places = ?, photo = ?
        WHERE id = ? AND formateur_id = ?`,
       [titre, description, specialite || null, nb_places || null, photo, formationId, formateur_id]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
-    res.json({ message: 'Formation mise à jour ✅' });
+    res.json({ message: 'Formation mise à jour ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -218,7 +292,7 @@ router.put('/formations/:id/submit-for-approval', async (req, res) => {
 
   try {
     const [checkResult] = await db.query(
-      'SELECT id, status, formateur_id, titre FROM formations WHERE id = ?',
+ 'SELECT id, status, formateur_id, titre FROM formations WHERE id = ?',
       [formationId]
     );
     if (checkResult.length === 0) return res.status(404).json({ error: 'Formation non trouvée' });
@@ -230,25 +304,25 @@ router.put('/formations/:id/submit-for-approval', async (req, res) => {
 
     // Vérifier qu'il y a au moins 1 module
     const [[moduleCount]] = await db.query(
-      'SELECT COUNT(*) AS cnt FROM modules_formation WHERE formation_id = ?',
+ 'SELECT COUNT(*) AS cnt FROM modules_formation WHERE formation_id = ?',
       [formationId]
     );
     if (moduleCount.cnt < 1)
       return res.status(400).json({ error: 'Vous devez ajouter au moins un module avant de soumettre la formation.' });
 
     const [result] = await db.query(
-      "UPDATE formations SET status = 'pending_approval' WHERE id = ? AND formateur_id = ? AND status = 'draft'",
+ "UPDATE formations SET status = 'pending_approval' WHERE id = ? AND formateur_id = ? AND status = 'draft'",
       [formationId, formateur_id]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation non trouvée ou déjà soumise' });
-    res.json({ message: "Formation soumise à l'admin pour approbation ✉️" });
+    res.json({ message: "Formation soumise à l'admin pour approbation ️" });
 
     // Notifier tous les admins (fire and forget)
     db.query('SELECT id FROM users WHERE role = "admin"').then(([admins]) => {
       admins.forEach(admin => {
         db.query(
-          'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-          [admin.id, `🔔 Nouvelle formation en attente d'approbation : « ${formation.titre} »`, 'approbation']
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+          [admin.id, `Nouvelle formation en attente d'approbation : « ${formation.titre} »`, 'approbation']
         ).catch(() => {});
       });
     }).catch(() => {});
@@ -265,7 +339,7 @@ router.delete('/formations/:id', async (req, res) => {
 
   try {
     const [checkResult] = await db.query(
-      'SELECT status FROM formations WHERE id = ? AND formateur_id = ?',
+ 'SELECT status FROM formations WHERE id = ? AND formateur_id = ?',
       [formationId, formateur_id]
     );
     if (checkResult.length === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
@@ -273,11 +347,11 @@ router.delete('/formations/:id', async (req, res) => {
       return res.status(403).json({ error: "Impossible de supprimer une formation publiée. Contactez l'administrateur." });
 
     const [result] = await db.query(
-      'DELETE FROM formations WHERE id = ? AND formateur_id = ?',
+ 'DELETE FROM formations WHERE id = ? AND formateur_id = ?',
       [formationId, formateur_id]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Formation non trouvée ou accès refusé' });
-    res.json({ message: 'Formation supprimée ❌' });
+    res.json({ message: 'Formation supprimée ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -297,7 +371,7 @@ router.put('/inscriptions/:inscriptionId/status', async (req, res) => {
   try {
     const [result] = await db.query(updateSql, [statut, inscriptionId]);
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Inscription non trouvée' });
-    res.json({ message: 'Statut mis à jour ✅' });
+    res.json({ message: 'Statut mis à jour ' });
 
     // Notifier le participant (fire and forget)
     if (statut === 'présent' || statut === 'absent') {
@@ -307,8 +381,8 @@ router.put('/inscriptions/:inscriptionId/status', async (req, res) => {
       db.query(notifSql, [inscriptionId]).then(([nr]) => {
         if (nr.length > 0) {
           const msg = statut === 'présent'
-            ? `🏆 Votre présence à la formation « ${nr[0].titre} » a été validée !`
-            : `📋 Votre absence à la formation « ${nr[0].titre} » a été enregistrée.`;
+            ? `Votre présence à la formation « ${nr[0].titre} » a été validée !`
+            : `Votre absence à la formation « ${nr[0].titre} » a été enregistrée.`;
           db.query('INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
             [nr[0].user_id, msg, 'presence']).catch(() => {});
         }
@@ -330,7 +404,7 @@ router.get('/progression/:formationId/:candidatId', async (req, res) => {
     LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.candidat_id = ? AND p.formation_id = ?
     WHERE m.formation_id = ?
     ORDER BY m.ordre ASC, m.id ASC
-  `;
+ `;
   try {
     const [modules] = await db.query(sql, [candidatId, formationId, formationId]);
     const total = modules.length;
@@ -349,8 +423,14 @@ router.put('/progression/:formationId/:candidatId/:moduleId', async (req, res) =
   if (!validStatuts.includes(statut)) return res.status(400).json({ message: 'Statut invalide.' });
 
   try {
+    const [[moduleCheck]] = await db.query(
+ 'SELECT id FROM modules_formation WHERE id = ? AND formation_id = ?',
+      [moduleId, formationId]
+    );
+    if (!moduleCheck) return res.status(404).json({ message: 'Module introuvable pour cette formation.' });
+
     await db.query(
-      `INSERT INTO progression_candidats (candidat_id, formation_id, module_id, statut)
+ `INSERT INTO progression_candidats (candidat_id, formation_id, module_id, statut)
        VALUES (?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE statut = VALUES(statut), date_maj = NOW()`,
       [candidatId, formationId, moduleId, statut]
@@ -361,7 +441,7 @@ router.put('/progression/:formationId/:candidatId/:moduleId', async (req, res) =
       (async () => {
         try {
           const [rows] = await db.query(
-            `SELECT (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total,
+ `SELECT (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total,
                     (SELECT COUNT(*) FROM progression_candidats WHERE candidat_id = ? AND formation_id = ? AND statut = 'termine') AS termines`,
             [formationId, candidatId, formationId]
           );
@@ -370,14 +450,70 @@ router.put('/progression/:formationId/:candidatId/:moduleId', async (req, res) =
             const [fRows] = await db.query('SELECT titre FROM formations WHERE id = ?', [formationId]);
             if (cRows.length > 0 && fRows.length > 0) {
               await db.query(
-                'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-                [cRows[0].user_id, `🎓 Félicitations ! Vous avez complété 100% de la formation "${fRows[0].titre}" !`, 'approbation']
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+                [cRows[0].user_id, `Félicitations ! Vous avez complété 100% de la formation "${fRows[0].titre}" !`, 'approbation']
               );
             }
           }
         } catch (_) {}
       })();
     }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ── GET progression externe ── */
+router.get('/progression-externe/:formationId/:externeId', async (req, res) => {
+  const { formationId, externeId } = req.params;
+  const sql = `
+    SELECT m.id, m.titre, m.ordre, m.duree_heures,
+           COALESCE(p.statut, 'non_commence') AS statut
+    FROM modules_formation m
+    LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
+    WHERE m.formation_id = ?
+    ORDER BY m.ordre ASC, m.id ASC
+ `;
+  try {
+    const [modules] = await db.query(sql, [externeId, formationId, formationId]);
+    const total = modules.length;
+    const termines = modules.filter(m => m.statut === 'termine').length;
+    const pourcentage = total > 0 ? Math.round((termines / total) * 100) : 0;
+    res.json({ modules, pourcentage, total, termines });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ── PUT progression externe ── */
+router.put('/progression-externe/:formationId/:externeId/:moduleId', async (req, res) => {
+  const { formationId, externeId, moduleId } = req.params;
+  const { statut } = req.body;
+  const validStatuts = ['non_commence', 'en_cours', 'termine'];
+  if (!validStatuts.includes(statut)) return res.status(400).json({ message: 'Statut invalide.' });
+  try {
+    const [[moduleCheck]] = await db.query(
+ 'SELECT id FROM modules_formation WHERE id = ? AND formation_id = ?',
+      [moduleId, formationId]
+    );
+    if (!moduleCheck) return res.status(404).json({ message: 'Module introuvable pour cette formation.' });
+
+    const [[existing]] = await db.query(
+ 'SELECT id FROM progression_candidats WHERE externe_id = ? AND formation_id = ? AND module_id = ?',
+      [externeId, formationId, moduleId]
+    );
+    if (existing) {
+      await db.query(
+ 'UPDATE progression_candidats SET statut = ?, date_maj = NOW() WHERE id = ?',
+        [statut, existing.id]
+      );
+    } else {
+      await db.query(
+ 'INSERT INTO progression_candidats (externe_id, formation_id, module_id, statut) VALUES (?, ?, ?, ?)',
+        [externeId, formationId, moduleId, statut]
+      );
+    }
+    res.json({ message: 'Progression mise à jour.' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -390,11 +526,11 @@ router.get('/formations/:id/programme', async (req, res) => {
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
   try {
     const [[prog]] = await db.query(
-      'SELECT * FROM programme_formations WHERE formation_id = ?',
+ 'SELECT * FROM programme_formations WHERE formation_id = ?',
       [formationId]
     );
     const [modules] = await db.query(
-      'SELECT id, titre, description, duree_heures, ordre FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC',
+ 'SELECT id, titre, description, duree_heures, ordre FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC',
       [formationId]
     );
     res.json({ programme: prog || null, modules });
@@ -409,14 +545,14 @@ router.put('/formations/:id/programme', async (req, res) => {
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
   try {
     await db.query(
-      `INSERT INTO programme_formations (formation_id, description_globale, objectifs, prerequis)
+ `INSERT INTO programme_formations (formation_id, description_globale, objectifs, prerequis)
        VALUES (?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE description_globale = VALUES(description_globale),
                                objectifs = VALUES(objectifs),
                                prerequis = VALUES(prerequis)`,
       [formationId, description_globale || null, objectifs || null, prerequis || null]
     );
-    res.json({ message: 'Programme sauvegardé ✅' });
+    res.json({ message: 'Programme sauvegardé ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -429,10 +565,10 @@ router.post('/formations/:id/modules', async (req, res) => {
   if (!titre || !titre.trim()) return res.status(400).json({ error: 'Le titre du module est obligatoire.' });
   try {
     const [result] = await db.query(
-      'INSERT INTO modules_formation (formation_id, titre, description, duree_heures, ordre) VALUES (?, ?, ?, ?, ?)',
+ 'INSERT INTO modules_formation (formation_id, titre, description, duree_heures, ordre) VALUES (?, ?, ?, ?, ?)',
       [formationId, titre.trim(), description || null, duree_heures || null, ordre || 0]
     );
-    res.json({ message: 'Module ajouté ✅', id: result.insertId });
+    res.json({ message: 'Module ajouté ', id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -446,11 +582,11 @@ router.put('/formations/:formationId/modules/:moduleId', async (req, res) => {
   if (!titre || !titre.trim()) return res.status(400).json({ error: 'Le titre du module est obligatoire.' });
   try {
     const [result] = await db.query(
-      'UPDATE modules_formation SET titre = ?, description = ?, duree_heures = ?, ordre = ? WHERE id = ? AND formation_id = ?',
+ 'UPDATE modules_formation SET titre = ?, description = ?, duree_heures = ?, ordre = ? WHERE id = ? AND formation_id = ?',
       [titre.trim(), description || null, duree_heures || null, ordre || 0, moduleId, formationId]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Module non trouvé' });
-    res.json({ message: 'Module mis à jour ✅' });
+    res.json({ message: 'Module mis à jour ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -462,11 +598,11 @@ router.delete('/formations/:formationId/modules/:moduleId', async (req, res) => 
   if (isNaN(formationId) || isNaN(moduleId)) return res.status(400).json({ error: 'IDs invalides' });
   try {
     const [result] = await db.query(
-      'DELETE FROM modules_formation WHERE id = ? AND formation_id = ?',
+ 'DELETE FROM modules_formation WHERE id = ? AND formation_id = ?',
       [moduleId, formationId]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Module non trouvé' });
-    res.json({ message: 'Module supprimé ✅' });
+    res.json({ message: 'Module supprimé ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -479,7 +615,7 @@ router.get('/formation-modules/:formationId', async (req, res) => {
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
   try {
     const [rows] = await db.query(
-      'SELECT id, titre, ordre, duree_heures FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC',
+ 'SELECT id, titre, ordre, duree_heures FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC',
       [formationId]
     );
     res.json(rows);
@@ -495,7 +631,7 @@ router.get('/seances/:formationId', async (req, res) => {
   if (isNaN(formationId)) return res.status(400).json({ error: 'Formation ID invalide' });
   try {
     const [rows] = await db.query(
-      `SELECT s.*, m.titre AS module_titre, m.ordre AS module_ordre
+ `SELECT s.*, m.titre AS module_titre, m.ordre AS module_ordre
        FROM seances s LEFT JOIN modules_formation m ON s.module_id = m.id
        WHERE s.formation_id = ? ORDER BY s.date_seance ASC, s.heure_debut ASC`,
       [formationId]
@@ -510,10 +646,10 @@ router.post('/seances', validate(seanceSchema), async (req, res) => {
   const { formation_id, date_seance, heure_debut, heure_fin, salle, module_id } = req.body;
   try {
     const [result] = await db.query(
-      'INSERT INTO seances (formation_id, date_seance, heure_debut, heure_fin, salle, module_id) VALUES (?, ?, ?, ?, ?, ?)',
+ 'INSERT INTO seances (formation_id, date_seance, heure_debut, heure_fin, salle, module_id) VALUES (?, ?, ?, ?, ?, ?)',
       [formation_id, date_seance, heure_debut, heure_fin, salle || null, module_id || null]
     );
-    res.json({ message: 'Séance créée ✅', id: result.insertId });
+    res.json({ message: 'Séance créée ', id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -525,11 +661,11 @@ router.put('/seances/:id', async (req, res) => {
   if (isNaN(seanceId)) return res.status(400).json({ error: 'Séance ID invalide' });
   try {
     const [result] = await db.query(
-      'UPDATE seances SET date_seance = ?, heure_debut = ?, heure_fin = ?, salle = ?, statut = ?, module_id = ? WHERE id = ?',
+ 'UPDATE seances SET date_seance = ?, heure_debut = ?, heure_fin = ?, salle = ?, statut = ?, module_id = ? WHERE id = ?',
       [date_seance, heure_debut, heure_fin, salle || null, statut || 'planifiée', module_id || null, seanceId]
     );
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Séance non trouvée' });
-    res.json({ message: 'Séance mise à jour ✅' });
+    res.json({ message: 'Séance mise à jour ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -541,7 +677,7 @@ router.delete('/seances/:id', async (req, res) => {
   try {
     const [result] = await db.query('DELETE FROM seances WHERE id = ?', [seanceId]);
     if (result.affectedRows === 0) return res.status(404).json({ error: 'Séance non trouvée' });
-    res.json({ message: 'Séance supprimée ✅' });
+    res.json({ message: 'Séance supprimée ' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -557,17 +693,131 @@ router.get('/presences/:seanceId', async (req, res) => {
     if (seanceRows.length === 0) return res.status(404).json({ error: 'Séance non trouvée' });
     const formationId = seanceRows[0].formation_id;
     const [rows] = await db.query(
-      `SELECT c.id AS candidat_id, u.nom, u.email,
-              COALESCE(p.statut, 'absent') AS statut
+ `SELECT c.id AS candidat_id, NULL AS externe_id, u.nom, u.email,
+              COALESCE(p.statut, 'absent') AS statut, 'candidat' AS type_participant
        FROM inscriptions i
        JOIN candidats c ON i.candidat_id = c.id
        JOIN users u ON c.user_id = u.id
        LEFT JOIN presences p ON p.seance_id = ? AND p.candidat_id = c.id
        WHERE i.formation_id = ?
-       ORDER BY u.nom ASC`,
-      [seanceId, formationId]
+
+       UNION ALL
+
+       SELECT NULL AS candidat_id, ex.id AS externe_id, u.nom, u.email,
+              COALESCE(pe.statut, 'absent') AS statut, 'externe' AS type_participant
+       FROM inscriptions_externes ie
+       JOIN externes ex ON ie.externe_id = ex.id
+       JOIN users u ON ex.user_id = u.id
+       LEFT JOIN presences pe ON pe.seance_id = ? AND pe.externe_id = ex.id
+       WHERE ie.formation_id = ? AND ie.statut_paiement = 'payé'
+
+       ORDER BY nom ASC`,
+      [seanceId, formationId, seanceId, formationId]
     );
     res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.put('/presences/:seanceId/externe/:externeId', async (req, res) => {
+  const seanceId = parseInt(req.params.seanceId);
+  const externeId = parseInt(req.params.externeId);
+  const { statut } = req.body;
+  const validStatuts = ['présent', 'absent', 'excusé'];
+  if (isNaN(seanceId) || isNaN(externeId)) return res.status(400).json({ error: 'IDs invalides' });
+  if (!validStatuts.includes(statut)) return res.status(400).json({ error: 'Statut invalide' });
+  try {
+    const [[existing]] = await db.query(
+ 'SELECT id FROM presences WHERE seance_id = ? AND externe_id = ?',
+      [seanceId, externeId]
+    );
+    if (existing) {
+      await db.query('UPDATE presences SET statut = ? WHERE id = ?', [statut, existing.id]);
+    } else {
+      await db.query(
+ 'INSERT INTO presences (seance_id, externe_id, statut) VALUES (?, ?, ?)',
+        [seanceId, externeId, statut]
+      );
+    }
+    res.json({ message: 'Présence enregistrée ' });
+
+    // Auto-progression externe (fire and forget)
+    (async () => {
+      try {
+        const [seanceRows] = await db.query('SELECT formation_id, module_id FROM seances WHERE id = ?', [seanceId]);
+        if (!seanceRows.length) return;
+        const { formation_id: formationId, module_id: moduleId } = seanceRows[0];
+
+        if (moduleId) {
+          const [cr] = await db.query(
+ `SELECT COUNT(s.id) AS total,
+                    SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS presents
+             FROM seances s
+             LEFT JOIN presences p ON p.seance_id = s.id AND p.externe_id = ?
+             WHERE s.module_id = ?`,
+            [externeId, moduleId]
+          );
+          const total = Number(cr[0].total);
+          const presents = Number(cr[0].presents);
+          const newStatut = presents === total && total > 0 ? 'termine'
+            : presents > 0 ? 'en_cours' : 'non_commence';
+
+          const [[existingProg]] = await db.query(
+ 'SELECT id FROM progression_candidats WHERE externe_id = ? AND formation_id = ? AND module_id = ?',
+            [externeId, formationId, moduleId]
+          );
+          if (existingProg) {
+            await db.query('UPDATE progression_candidats SET statut = ?, date_maj = NOW() WHERE id = ?', [newStatut, existingProg.id]);
+          } else {
+            await db.query(
+ 'INSERT INTO progression_candidats (externe_id, formation_id, module_id, statut) VALUES (?, ?, ?, ?)',
+              [externeId, formationId, moduleId, newStatut]
+            );
+          }
+
+          if (newStatut === 'termine') {
+            const [rows] = await db.query(
+ `SELECT (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total_m,
+                      (SELECT COUNT(*) FROM progression_candidats WHERE externe_id = ? AND formation_id = ? AND statut = 'termine') AS termines`,
+              [formationId, externeId, formationId]
+            );
+            if (rows[0].total_m > 0 && rows[0].total_m === rows[0].termines) {
+              const [eRows] = await db.query('SELECT user_id FROM externes WHERE id = ?', [externeId]);
+              const [fRows] = await db.query('SELECT titre FROM formations WHERE id = ?', [formationId]);
+              if (eRows.length > 0 && fRows.length > 0) {
+                await db.query(
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+                  [eRows[0].user_id, `Félicitations ! Vous avez complété 100% de la formation « ${fRows[0].titre} ». Votre attestation est disponible !`, 'progression']
+                );
+              }
+            }
+          }
+        }
+
+        const [tr] = await db.query(
+ `SELECT COUNT(*) AS total,
+                  SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS presents
+           FROM seances s
+           LEFT JOIN presences p ON p.seance_id = s.id AND p.externe_id = ?
+           WHERE s.formation_id = ?`,
+          [externeId, formationId]
+        );
+        if (tr[0] && tr[0].total > 0) {
+          const taux = Math.round((tr[0].presents / tr[0].total) * 100);
+          if (taux < 75) {
+            const [eRows] = await db.query('SELECT user_id FROM externes WHERE id = ?', [externeId]);
+            const [fRows] = await db.query('SELECT titre FROM formations WHERE id = ?', [formationId]);
+            if (eRows.length > 0 && fRows.length > 0) {
+              await db.query(
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+                [eRows[0].user_id, `Votre taux de présence pour « ${fRows[0].titre} » est de ${taux}%. Un taux minimum de 75% est requis.`, 'presence']
+              );
+            }
+          }
+        }
+      } catch (_) {}
+    })();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -577,18 +827,18 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
   const seanceId = parseInt(req.params.seanceId);
   const candidatId = parseInt(req.params.candidatId);
   const { statut } = req.body;
-  const validStatuts = ['présent', 'absent', 'retard', 'excusé'];
+  const validStatuts = ['présent', 'absent', 'excusé'];
   if (isNaN(seanceId) || isNaN(candidatId)) return res.status(400).json({ error: 'IDs invalides' });
   if (!validStatuts.includes(statut)) return res.status(400).json({ error: 'Statut invalide' });
 
   try {
     await db.query(
-      `INSERT INTO presences (seance_id, candidat_id, statut)
+ `INSERT INTO presences (seance_id, candidat_id, statut)
        VALUES (?, ?, ?)
        ON DUPLICATE KEY UPDATE statut = VALUES(statut)`,
       [seanceId, candidatId, statut]
     );
-    res.json({ message: 'Présence enregistrée ✅' });
+    res.json({ message: 'Présence enregistrée ' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -602,7 +852,7 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
 
       if (moduleId) {
         const [cr] = await db.query(
-          `SELECT COUNT(s.id) AS total,
+ `SELECT COUNT(s.id) AS total,
                   SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS presents
            FROM seances s
            LEFT JOIN presences p ON p.seance_id = s.id AND p.candidat_id = ?
@@ -615,7 +865,7 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
           : presents > 0 ? 'en_cours' : 'non_commence';
 
         await db.query(
-          `INSERT INTO progression_candidats (candidat_id, formation_id, module_id, statut)
+ `INSERT INTO progression_candidats (candidat_id, formation_id, module_id, statut)
            VALUES (?, ?, ?, ?)
            ON DUPLICATE KEY UPDATE statut = VALUES(statut), date_maj = NOW()`,
           [candidatId, formationId, moduleId, newStatut]
@@ -623,7 +873,7 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
 
         if (newStatut === 'termine') {
           const [rows] = await db.query(
-            `SELECT (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total_m,
+ `SELECT (SELECT COUNT(*) FROM modules_formation WHERE formation_id = ?) AS total_m,
                     (SELECT COUNT(*) FROM progression_candidats WHERE candidat_id = ? AND formation_id = ? AND statut = 'termine') AS termines`,
             [formationId, candidatId, formationId]
           );
@@ -632,8 +882,8 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
             const [fRows] = await db.query('SELECT titre FROM formations WHERE id = ?', [formationId]);
             if (cRows.length > 0 && fRows.length > 0) {
               await db.query(
-                'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-                [cRows[0].user_id, `🎓 Félicitations ! Vous avez complété 100% de la formation « ${fRows[0].titre} ». Votre attestation est disponible !`, 'progression']
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+                [cRows[0].user_id, `Félicitations ! Vous avez complété 100% de la formation « ${fRows[0].titre} ». Votre attestation est disponible !`, 'progression']
               );
             }
           }
@@ -642,8 +892,8 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
 
       // Alerte taux de présence < 75%
       const [tr] = await db.query(
-        `SELECT COUNT(*) AS total,
-                SUM(CASE WHEN p.statut IN ('présent','retard') THEN 1 ELSE 0 END) AS presents
+ `SELECT COUNT(*) AS total,
+                SUM(CASE WHEN p.statut IN ('présent','excusé') THEN 1 ELSE 0 END) AS presents
          FROM seances s
          LEFT JOIN presences p ON p.seance_id = s.id AND p.candidat_id = ?
          WHERE s.formation_id = ?`,
@@ -656,8 +906,8 @@ router.put('/presences/:seanceId/:candidatId', async (req, res) => {
           const [fRows] = await db.query('SELECT titre FROM formations WHERE id = ?', [formationId]);
           if (cRows.length > 0 && fRows.length > 0) {
             await db.query(
-              'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-              [cRows[0].user_id, `⚠️ Votre taux de présence pour « ${fRows[0].titre} » est de ${taux}%. Un taux minimum de 75% est requis.`, 'presence']
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+              [cRows[0].user_id, `Votre taux de présence pour « ${fRows[0].titre} » est de ${taux}%. Un taux minimum de 75% est requis.`, 'presence']
             );
           }
         }
@@ -681,7 +931,7 @@ router.get('/justificatifs/:formationId', async (req, res) => {
     JOIN users u ON c.user_id = u.id
     WHERE s.formation_id = ?
     ORDER BY j.date_soumission DESC
-  `;
+ `;
   try {
     const [rows] = await db.query(sql, [formationId]);
     res.json(rows);
@@ -697,7 +947,7 @@ router.put('/justificatifs/:id', async (req, res) => {
 
   try {
     await db.query('UPDATE justificatifs SET statut = ? WHERE id = ?', [statut, justifId]);
-    res.json({ message: `Justificatif ${statut} ✅` });
+    res.json({ message: `Justificatif ${statut} ` });
 
     // Traitement post-réponse (fire and forget)
     (async () => {
@@ -712,18 +962,22 @@ router.put('/justificatifs/:id', async (req, res) => {
 
         if (statut === 'accepté') {
           await db.query(
-            `INSERT INTO presences (seance_id, candidat_id, statut) VALUES (?, ?, 'excusé')
+ `INSERT INTO presences (seance_id, candidat_id, statut) VALUES (?, ?, 'excusé')
              ON DUPLICATE KEY UPDATE statut = 'excusé'`,
             [seance_id, candidat_id]
           );
           await db.query(
-            'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-            [cr[0].user_id, `✅ Votre justificatif d'absence pour la séance du ${d} a été accepté.`, 'presence']
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+            [cr[0].user_id, `Votre justificatif d'absence pour la séance du ${d} a été accepté.`, 'presence']
           );
         } else {
           await db.query(
-            'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-            [cr[0].user_id, `❌ Votre justificatif d'absence pour la séance du ${d} a été refusé.`, 'presence']
+ `UPDATE presences SET statut = 'absent' WHERE seance_id = ? AND candidat_id = ? AND statut = 'excusé'`,
+            [seance_id, candidat_id]
+          );
+          await db.query(
+ 'INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
+            [cr[0].user_id, `Votre justificatif d'absence pour la séance du ${d} a été refusé.`, 'presence']
           );
         }
       } catch (_) {}
@@ -742,18 +996,18 @@ router.post('/formations/:id/quiz', async (req, res) => {
   try {
     await db.query('DELETE FROM quiz WHERE formation_id = ?', [formationId]);
     const [result] = await db.query(
-      'INSERT INTO quiz (formation_id, titre, seuil_reussite, nb_tentatives) VALUES (?, ?, ?, ?)',
+ 'INSERT INTO quiz (formation_id, titre, seuil_reussite, nb_tentatives) VALUES (?, ?, ?, ?)',
       [formationId, titre, seuil_reussite, nb_tentatives]
     );
     const quizId = result.insertId;
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
       const [qResult] = await db.query(
-        'INSERT INTO questions_quiz (quiz_id, question, ordre) VALUES (?, ?, ?)', [quizId, q.question, i]
+ 'INSERT INTO questions_quiz (quiz_id, question, ordre) VALUES (?, ?, ?)', [quizId, q.question, i]
       );
       for (const r of (q.reponses || [])) {
         await db.query(
-          'INSERT INTO reponses_quiz (question_id, reponse, est_correcte) VALUES (?, ?, ?)',
+ 'INSERT INTO reponses_quiz (question_id, reponse, est_correcte) VALUES (?, ?, ?)',
           [qResult.insertId, r.reponse, r.est_correcte ? 1 : 0]
         );
       }
@@ -772,7 +1026,7 @@ router.get('/formations/:id/quiz', async (req, res) => {
     const [[quiz]] = await db.query('SELECT * FROM quiz WHERE formation_id = ?', [formationId]);
     if (!quiz) return res.json(null);
     const [questions] = await db.query(
-      'SELECT * FROM questions_quiz WHERE quiz_id = ? ORDER BY ordre ASC', [quiz.id]
+ 'SELECT * FROM questions_quiz WHERE quiz_id = ? ORDER BY ordre ASC', [quiz.id]
     );
     for (const q of questions) {
       const [reponses] = await db.query('SELECT * FROM reponses_quiz WHERE question_id = ?', [q.id]);

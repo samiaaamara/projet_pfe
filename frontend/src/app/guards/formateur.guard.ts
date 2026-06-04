@@ -9,7 +9,8 @@ export class FormateurGuard implements CanActivate {
 
   canActivate(): boolean {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    let user: any = {};
+    try { user = JSON.parse(localStorage.getItem('user') || '{}'); } catch { user = {}; }
 
     if (token && user.role === 'formateur') {
       return true;

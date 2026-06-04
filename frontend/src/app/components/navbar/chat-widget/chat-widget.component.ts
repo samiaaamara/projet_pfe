@@ -49,7 +49,7 @@ export class ChatWidgetComponent implements OnChanges {
 
   private initWelcome() {
     const roleLabel: Record<string, string> = {
-      etudiant: 'étudiant',
+      candidat: 'candidat ISET',
       formateur: 'formateur',
       admin: 'administrateur',
       externe: 'participant externe'

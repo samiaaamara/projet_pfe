@@ -1,0 +1,38 @@
+@startuml Sprint4_Activite_CreerQuiz
+title Diagramme d'Activité — Créer un quiz
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam ActivityBorderColor Black
+skinparam ActivityBackgroundColor White
+skinparam ActivityDiamondBorderColor Black
+skinparam ActivityArrowColor Black
+
+start
+
+:Formateur / Admin accède\nà la gestion du quiz;
+
+if (Quiz existant ?) then (oui)
+    :Modifier ou supprimer\nle quiz existant;
+    stop
+else (non)
+    :Saisir le titre du quiz;
+    :Définir le seuil de réussite (%);
+    :Définir le nombre\nde tentatives maximum;
+    :Ajouter une question\n(intitulé + 4 choix);
+    :Indiquer la bonne réponse;
+
+    if (Ajouter une autre question ?) then (oui)
+        :Ajouter une question\n(intitulé + 4 choix);
+        :Indiquer la bonne réponse;
+    else (non)
+    end if
+
+    :Sauvegarder le quiz;
+    :Quiz associé à la formation;
+    stop
+end if
+
+@enduml

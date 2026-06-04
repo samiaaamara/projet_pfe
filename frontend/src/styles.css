@@ -43,7 +43,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background-color: var(--iset-bg);
+  background: linear-gradient(160deg, #ffffff 0%, #eaf1fb 50%, #f0f4f8 100%);
+  background-attachment: fixed;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--iset-text);
   margin: 0;
@@ -273,4 +274,11 @@ a:hover { color: var(--iset-blue); }
   .welcome-stats-mini { flex-direction: row; width: 100%; }
   .wsm-item { flex: 1; }
   .feature-cards-row { grid-template-columns: 1fr; }
+}
+
+@media print {
+  app-chat-widget,
+  app-navbar,
+  .chat-fab,
+  .chat-window { display: none !important; }
 }

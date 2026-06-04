@@ -1,3 +1,7 @@
+@media print {
+  :host { display: none !important; }
+}
+
 /* ===== BOUTON FLOTTANT ===== */
 .chat-fab {
   position: fixed;

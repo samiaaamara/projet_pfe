@@ -5,6 +5,8 @@ const crypto = require('crypto');
 const db = require('../db');
 const validate = require('../middleware/validate');
 const { notationExterneSchema, justificatifExterneSchema } = require('../validators/schemas');
+const { genererAttestationPDF } = require('../attestationPdf');
+const syncFormationStatuses = require('../utils/syncFormationStatuses');
 
 /* ─── Helper : aplatir un objet en paramètres form-encoded Stripe ─────────── */
 function flattenParams(obj, prefix = '') {
@@ -41,8 +43,8 @@ function stripeRequest(method, path, data) {
       path: `/v1${path}`,
       method,
       headers: {
-        'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
+ 'Authorization': `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+ 'Content-Type': 'application/x-www-form-urlencoded',
       },
     };
     if (body) options.headers['Content-Length'] = Buffer.byteLength(body);
@@ -92,18 +94,11 @@ router.get('/formations', async (req, res) => {
   const externeId = parseInt(req.query.externeId) || null;
 
   try {
-    let specialite = null;
-    if (externeId) {
-      const [rows] = await db.query('SELECT specialite FROM externes WHERE id = ?', [externeId]);
-      specialite = rows[0]?.specialite || null;
-    }
-
-    const specFilter = specialite ? `AND f.specialite = ?` : '';
-    const baseParams = specialite ? [specialite] : [];
-
+    await syncFormationStatuses();
     const countSql = `
       SELECT COUNT(*) AS total FROM formations f
-      WHERE f.status = 'published' AND f.status != 'archivée' AND f.date_debut >= CURDATE() ${specFilter}
+      WHERE f.status = 'published'
+        AND (f.date_debut IS NULL OR f.date_debut > CURDATE())
     `;
     const dataSql = `
       SELECT f.*,
@@ -113,18 +108,18 @@ router.get('/formations', async (req, res) => {
       FROM formations f
       JOIN formateurs fo ON f.formateur_id = fo.id
       JOIN users u ON fo.user_id = u.id
-      WHERE f.status = 'published' AND f.status != 'archivée' AND f.date_debut >= CURDATE() ${specFilter}
-      ORDER BY f.date_debut ASC
+      WHERE f.status = 'published'
+        AND (f.date_debut IS NULL OR f.date_debut > CURDATE())
+      ORDER BY f.date_debut IS NULL ASC, f.date_debut ASC
       LIMIT ? OFFSET ?
     `;
 
-    const [countResult] = await db.query(countSql, baseParams);
+    const [countResult] = await db.query(countSql);
     const total = countResult[0].total;
-    const [results] = await db.query(dataSql, [...baseParams, limit, offset]);
+    const [results] = await db.query(dataSql, [limit, offset]);
     res.json({
       data: results,
-      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      filtre_specialite: specialite || null
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) }
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -135,15 +130,41 @@ router.get('/formations', async (req, res) => {
 router.get('/mes-inscriptions/:externeId', async (req, res) => {
   const { externeId } = req.params;
   const sql = `
-    SELECT ie.*, f.titre, f.description, f.date_debut, f.date_fin, f.duree, f.prix,
-           f.photo, f.specialite, u.nom AS formateur_nom
+    SELECT ie.id, ie.externe_id, ie.formation_id, ie.montant, ie.statut_paiement,
+           ie.date_inscription, ie.date_paiement, ie.payment_ref,
+           f.titre, f.description, f.date_debut, f.date_fin, f.prix,
+           f.photo, f.specialite, f.status, u.nom AS formateur_nom,
+           CASE
+             WHEN f.status IN ('archivée', 'terminée') OR (f.date_fin IS NOT NULL AND f.date_fin < CURDATE())
+             THEN 'Terminée'
+             ELSE ie.statut_inscription
+           END AS statut_inscription
     FROM inscriptions_externes ie
     JOIN formations f ON ie.formation_id = f.id
     JOIN formateurs fo ON f.formateur_id = fo.id
     JOIN users u ON fo.user_id = u.id
-    WHERE ie.externe_id = ?
+    WHERE ie.externe_id = ? AND ie.statut_inscription = 'confirmé'
     ORDER BY ie.date_inscription DESC
-  `;
+ `;
+  try {
+    const [results] = await db.query(sql, [externeId]);
+    res.json(results);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ─── GET /mes-demandes/:externeId ──────────────────────────────────────── */
+router.get('/mes-demandes/:externeId', async (req, res) => {
+  const { externeId } = req.params;
+  const sql = `
+    SELECT ie.id, ie.formation_id, ie.statut_inscription, ie.statut_paiement,
+           ie.montant, ie.date_inscription, f.titre, f.date_debut, f.date_fin, f.specialite
+    FROM inscriptions_externes ie
+    JOIN formations f ON ie.formation_id = f.id
+    WHERE ie.externe_id = ? AND ie.statut_inscription = 'en_attente'
+    ORDER BY ie.date_inscription DESC
+ `;
   try {
     const [results] = await db.query(sql, [externeId]);
     res.json(results);
@@ -161,12 +182,31 @@ router.post('/initier-paiement', async (req, res) => {
 
   try {
     const [existing] = await db.query(
-      'SELECT id, statut_paiement, payment_ref FROM inscriptions_externes WHERE externe_id = ? AND formation_id = ?',
+      'SELECT id, statut_paiement, statut_inscription, payment_ref FROM inscriptions_externes WHERE externe_id = ? AND formation_id = ?',
       [externe_id, formation_id]
     );
 
-    const deja = existing.find(r => r.statut_paiement === 'payé');
-    if (deja) return res.status(400).json({ message: 'Vous êtes déjà inscrit à cette formation.' });
+    const active = existing.find(r => r.statut_inscription !== 'annulé');
+    if (active) {
+      if (active.statut_paiement === 'payé')
+        return res.status(400).json({ message: 'Vous êtes déjà inscrit à cette formation.' });
+      if (active.statut_inscription === 'confirmé')
+        return res.status(400).json({ message: 'Votre inscription est confirmée. Procédez au paiement.' });
+      return res.status(400).json({ message: "Votre demande est déjà en attente d'approbation." });
+    }
+
+    const [activeExt] = await db.query(
+      `SELECT ie.id FROM inscriptions_externes ie
+       JOIN formations f ON ie.formation_id = f.id
+       WHERE ie.externe_id = ?
+         AND ie.statut_inscription = 'confirmé'
+         AND ie.statut_paiement = 'payé'
+         AND f.status NOT IN ('archivée', 'terminée')
+         AND (f.date_fin IS NULL OR f.date_fin >= CURDATE())`,
+      [externe_id]
+    );
+    if (activeExt.length > 0)
+      return res.status(400).json({ message: 'Vous êtes déjà inscrit à une formation en cours. Attendez sa fin pour vous inscrire à une autre.' });
 
     const [rows] = await db.query(
       `SELECT f.prix, f.nb_places, f.titre,
@@ -182,66 +222,58 @@ router.post('/initier-paiement', async (req, res) => {
       return res.status(400).json({ message: 'Cette formation est complète.' });
 
     const montant = parseFloat(prix) || 0;
-    const pendingRow = existing.find(r => r.statut_paiement === 'en_attente');
+    const annule = existing.find(r => r.statut_inscription === 'annulé');
 
-    /* ── Formation GRATUITE ── */
-    if (montant === 0) {
-      if (pendingRow) {
-        await db.query(
-          "UPDATE inscriptions_externes SET statut_paiement='payé', statut_inscription='confirmé', date_paiement=NOW() WHERE id=?",
-          [pendingRow.id]
-        );
-      } else {
-        await db.query(
-          "INSERT INTO inscriptions_externes (externe_id, formation_id, montant, statut_paiement, statut_inscription, date_paiement) VALUES (?, ?, 0, 'payé', 'confirmé', NOW())",
-          [externe_id, formation_id]
-        );
-      }
-      envoyerNotif(externe_id, `Inscription confirmée pour la formation "${titre}" ✅`);
-      return res.json({ gratuit: true, message: 'Inscription confirmée ✅' });
+    if (annule) {
+      await db.query(
+        "UPDATE inscriptions_externes SET statut_inscription = 'en_attente', statut_paiement = 'en_attente', montant = ?, date_inscription = NOW() WHERE id = ?",
+        [montant, annule.id]
+      );
+    } else {
+      await db.query(
+        "INSERT INTO inscriptions_externes (externe_id, formation_id, montant, statut_paiement, statut_inscription) VALUES (?, ?, ?, 'en_attente', 'en_attente')",
+        [externe_id, formation_id, montant]
+      );
     }
+    return res.json({ pending: true, message: "Demande d'inscription envoyée. En attente d'approbation par l'administrateur." });
+  } catch (err) {
+    console.error('Erreur inscription externe:', err.message);
+    res.status(500).json({ message: 'Erreur serveur.', detail: err.message });
+  }
+});
 
-    /* ── Formation PAYANTE : Stripe Checkout ── */
+/* ─── POST /lancer-paiement/:id ─────────────────────────────────────────── */
+router.post('/lancer-paiement/:id', async (req, res) => {
+  const inscriptionId = parseInt(req.params.id);
+  try {
+    const [[insc]] = await db.query(
+ "SELECT * FROM inscriptions_externes WHERE id = ? AND statut_inscription = 'confirmé' AND statut_paiement = 'en_attente'",
+      [inscriptionId]
+    );
+    if (!insc) return res.status(400).json({ message: 'Inscription introuvable ou non approuvée.' });
+
+    const [[form]] = await db.query('SELECT titre, status FROM formations WHERE id = ?', [insc.formation_id]);
+    if (!form || ['en_cours', 'terminée', 'archivée'].includes(form.status))
+      return res.status(400).json({ message: 'Le paiement n\'est plus possible : cette formation a déjà commencé ou est terminée.' });
     const appUrl = process.env.APP_URL || 'http://localhost:4200';
     const currency = (process.env.STRIPE_CURRENCY || 'eur').toLowerCase();
 
     const sessionPayload = {
       payment_method_types: ['card'],
-      line_items: [{
-        price_data: {
-          currency,
-          unit_amount: Math.round(montant * 100),
-          product_data: { name: `Inscription : ${titre}` },
-        },
-        quantity: 1,
-      }],
+      line_items: [{ price_data: { currency, unit_amount: Math.round(insc.montant * 100), product_data: { name: `Inscription : ${form.titre}` } }, quantity: 1 }],
       mode: 'payment',
       success_url: `${appUrl}/paiement-retour?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/paiement-retour?status=echec`,
-      metadata: { externe_id: String(externe_id), formation_id: String(formation_id) },
+      metadata: { externe_id: String(insc.externe_id), formation_id: String(insc.formation_id) },
     };
 
     const stripeRes = await stripeRequest('POST', '/checkout/sessions', sessionPayload);
-    if (stripeRes.status !== 200 || !stripeRes.data.url) {
-      console.error('Stripe session error:', stripeRes.data);
-      return res.status(502).json({ message: 'Erreur initialisation paiement Stripe.', detail: stripeRes.data });
-    }
+    if (stripeRes.status !== 200 || !stripeRes.data.url)
+      return res.status(502).json({ message: 'Erreur paiement Stripe.', detail: stripeRes.data });
 
-    const sessionId = stripeRes.data.id;
-    const payUrl = stripeRes.data.url;
-
-    if (pendingRow) {
-      await db.query('UPDATE inscriptions_externes SET payment_ref=?, montant=? WHERE id=?',
-        [sessionId, montant, pendingRow.id]);
-    } else {
-      await db.query(
-        "INSERT INTO inscriptions_externes (externe_id, formation_id, montant, statut_paiement, payment_ref) VALUES (?, ?, ?, 'en_attente', ?)",
-        [externe_id, formation_id, montant, sessionId]
-      );
-    }
-    res.json({ payUrl, paymentRef: sessionId });
+    await db.query('UPDATE inscriptions_externes SET payment_ref=? WHERE id=?', [stripeRes.data.id, inscriptionId]);
+    res.json({ payUrl: stripeRes.data.url, paymentRef: stripeRes.data.id });
   } catch (err) {
-    console.error('Stripe connexion error:', err.message);
     res.status(502).json({ message: 'Impossible de joindre Stripe.', detail: err.message });
   }
 });
@@ -261,22 +293,22 @@ router.get('/confirmer-paiement', async (req, res) => {
       return res.json({ success: false, status: session.payment_status, message: 'Paiement non complété.' });
 
     await db.query(
-      "UPDATE inscriptions_externes SET statut_paiement='payé', statut_inscription='confirmé', date_paiement=NOW() WHERE payment_ref=?",
+ "UPDATE inscriptions_externes SET statut_paiement='payé', statut_inscription='confirmé', date_paiement=NOW() WHERE payment_ref=?",
       [payment_ref]
     );
 
     db.query(
-      `SELECT ie.externe_id, ie.montant, f.titre
+ `SELECT ie.externe_id, ie.montant, f.titre
        FROM inscriptions_externes ie JOIN formations f ON ie.formation_id = f.id
        WHERE ie.payment_ref = ?`,
       [payment_ref]
     ).then(([nr]) => {
       if (nr.length > 0) {
-        envoyerNotif(nr[0].externe_id, `Paiement de ${nr[0].montant} EUR confirmé pour "${nr[0].titre}" ✅`);
+        envoyerNotif(nr[0].externe_id, `Paiement de ${nr[0].montant} EUR confirmé pour "${nr[0].titre}" `);
       }
     }).catch(() => {});
 
-    res.json({ success: true, message: 'Paiement confirmé ✅' });
+    res.json({ success: true, message: 'Paiement confirmé ' });
   } catch (err) {
     console.error('Stripe confirm error:', err.message);
     res.status(500).json({ message: 'Erreur vérification paiement.', detail: err.message });
@@ -306,18 +338,18 @@ router.post('/webhook-stripe', express.raw({ type: 'application/json' }), (req, 
 
   const sessionId = session.id;
   db.query(
-    "UPDATE inscriptions_externes SET statut_paiement='payé', statut_inscription='confirmé', date_paiement=NOW() WHERE payment_ref=? AND statut_paiement='en_attente'",
+ "UPDATE inscriptions_externes SET statut_paiement='payé', statut_inscription='confirmé', date_paiement=NOW() WHERE payment_ref=? AND statut_paiement='en_attente'",
     [sessionId]
   ).then(([result]) => {
     if (result.affectedRows === 0) return;
     db.query(
-      `SELECT ie.externe_id, ie.montant, f.titre
+ `SELECT ie.externe_id, ie.montant, f.titre
        FROM inscriptions_externes ie JOIN formations f ON ie.formation_id = f.id
        WHERE ie.payment_ref = ?`,
       [sessionId]
     ).then(([nr]) => {
       if (nr.length > 0) {
-        envoyerNotif(nr[0].externe_id, `Paiement de ${nr[0].montant} EUR confirmé pour "${nr[0].titre}" ✅`);
+        envoyerNotif(nr[0].externe_id, `Paiement de ${nr[0].montant} EUR confirmé pour "${nr[0].titre}" `);
       }
     }).catch(() => {});
   }).catch(() => {});
@@ -328,7 +360,7 @@ router.get('/supports/:externeId/:formationId', async (req, res) => {
   const { externeId, formationId } = req.params;
   try {
     const [access] = await db.query(
-      "SELECT * FROM inscriptions_externes WHERE externe_id = ? AND formation_id = ? AND statut_paiement = 'payé'",
+ "SELECT * FROM inscriptions_externes WHERE externe_id = ? AND formation_id = ? AND statut_paiement = 'payé'",
       [externeId, formationId]
     );
     if (access.length === 0) return res.status(403).json({ message: 'Accès refusé : paiement requis.' });
@@ -344,7 +376,7 @@ router.get('/profil/:userId', async (req, res) => {
   const sql = `
     SELECT u.id, u.nom, u.email, u.role, ex.id AS externeId, ex.telephone, ex.entreprise
     FROM users u JOIN externes ex ON ex.user_id = u.id WHERE u.id = ?
-  `;
+ `;
   try {
     const [results] = await db.query(sql, [req.params.userId]);
     if (results.length === 0) return res.status(404).json({ message: 'Introuvable.' });
@@ -360,7 +392,7 @@ router.get('/formations/:id/programme', async (req, res) => {
   try {
     const [progRows] = await db.query('SELECT * FROM programme_formations WHERE formation_id = ?', [id]);
     const [modules] = await db.query(
-      'SELECT * FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC', [id]
+ 'SELECT * FROM modules_formation WHERE formation_id = ? ORDER BY ordre ASC, id ASC', [id]
     );
     res.json({ programme: progRows[0] || null, modules });
   } catch (err) {
@@ -377,9 +409,9 @@ router.get('/progression/:externeId', async (req, res) => {
     FROM inscriptions_externes ie
     JOIN formations f ON ie.formation_id = f.id
     JOIN modules_formation m ON m.formation_id = f.id
-    LEFT JOIN progression_etudiants p ON p.module_id = m.id AND p.externe_id = ?
+    LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.externe_id = ?
     WHERE ie.externe_id = ? AND ie.statut_paiement = 'payé'
-  `;
+ `;
   try {
     const [rows] = await db.query(sql, [externeId, externeId]);
     const { total_modules, modules_termines } = rows[0];
@@ -397,10 +429,10 @@ router.get('/progression-modules/:externeId/:formationId', async (req, res) => {
     SELECT m.id, m.titre, m.ordre, m.duree_heures,
            COALESCE(p.statut, 'non_commence') AS statut
     FROM modules_formation m
-    LEFT JOIN progression_etudiants p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
+    LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
     WHERE m.formation_id = ?
     ORDER BY m.ordre ASC, m.id ASC
-  `;
+ `;
   try {
     const [modules] = await db.query(sql, [externeId, formationId, formationId]);
     const total = modules.length;
@@ -417,18 +449,18 @@ router.post('/notation', validate(notationExterneSchema), async (req, res) => {
   const { externe_id, formation_id, note, commentaire } = req.body;
   try {
     const [existing] = await db.query(
-      'SELECT id FROM notations WHERE externe_id = ? AND formation_id = ?',
+ 'SELECT id FROM notations WHERE externe_id = ? AND formation_id = ?',
       [externe_id, formation_id]
     );
     if (existing.length > 0) {
       await db.query(
-        'UPDATE notations SET note = ?, commentaire = ? WHERE externe_id = ? AND formation_id = ?',
+ 'UPDATE notations SET note = ?, commentaire = ? WHERE externe_id = ? AND formation_id = ?',
         [note, commentaire || null, externe_id, formation_id]
       );
       res.json({ message: 'Note mise à jour' });
     } else {
       await db.query(
-        'INSERT INTO notations (externe_id, formation_id, note, commentaire, date_notation) VALUES (?, ?, ?, ?, NOW())',
+ 'INSERT INTO notations (externe_id, formation_id, note, commentaire, date_notation) VALUES (?, ?, ?, ?, NOW())',
         [externe_id, formation_id, note, commentaire || null]
       );
       res.json({ message: 'Formation notée avec succès' });
@@ -443,7 +475,7 @@ router.get('/notation/:externeId/:formationId', async (req, res) => {
   const { externeId, formationId } = req.params;
   try {
     const [results] = await db.query(
-      'SELECT note, commentaire FROM notations WHERE externe_id = ? AND formation_id = ?',
+ 'SELECT note, commentaire FROM notations WHERE externe_id = ? AND formation_id = ?',
       [externeId, formationId]
     );
     res.json(results[0] || null);
@@ -457,16 +489,18 @@ router.get('/mes-presences/:externeId/:formationId', async (req, res) => {
   const { externeId, formationId } = req.params;
   const sql = `
     SELECT s.id AS seance_id, s.date_seance, s.heure_debut, s.heure_fin, s.salle, s.statut AS statut_seance,
-           COALESCE(p.statut, 'absent') AS statut_presence
+           COALESCE(p.statut, 'absent') AS statut_presence,
+           j.statut AS justif_statut
     FROM seances s
     LEFT JOIN presences p ON p.seance_id = s.id AND p.externe_id = ?
+    LEFT JOIN justificatifs j ON j.seance_id = s.id AND j.externe_id = ?
     WHERE s.formation_id = ?
     ORDER BY s.date_seance ASC, s.heure_debut ASC
-  `;
+ `;
   try {
-    const [rows] = await db.query(sql, [externeId, formationId]);
+    const [rows] = await db.query(sql, [externeId, externeId, formationId]);
     const total = rows.length;
-    const presents = rows.filter(r => r.statut_presence === 'présent' || r.statut_presence === 'retard').length;
+    const presents = rows.filter(r => r.statut_presence === 'présent' || r.statut_presence === 'excusé').length;
     const taux = total > 0 ? Math.round((presents / total) * 100) : null;
     res.json({ seances: rows, total, presents, taux });
   } catch (err) {
@@ -479,15 +513,15 @@ router.post('/justificatifs', validate(justificatifExterneSchema), async (req, r
   const { externe_id, seance_id, motif } = req.body;
   try {
     await db.query(
-      `INSERT INTO justificatifs (externe_id, seance_id, motif)
+ `INSERT INTO justificatifs (externe_id, seance_id, motif)
        VALUES (?, ?, ?)
        ON DUPLICATE KEY UPDATE motif = VALUES(motif), statut = 'en_attente', date_soumission = NOW()`,
       [externe_id, seance_id, motif]
     );
-    res.json({ message: 'Justificatif soumis ✅' });
+    res.json({ message: 'Justificatif soumis ' });
 
     db.query(
-      `SELECT f.titre, fo.user_id AS formateur_uid, u.nom AS externe_nom, s.date_seance
+ `SELECT f.titre, fo.user_id AS formateur_uid, u.nom AS externe_nom, s.date_seance
        FROM seances s
        JOIN formations f ON s.formation_id = f.id
        JOIN formateurs fo ON f.formateur_id = fo.id
@@ -499,7 +533,7 @@ router.post('/justificatifs', validate(justificatifExterneSchema), async (req, r
       if (nr.length > 0) {
         const d = nr[0].date_seance ? new Date(nr[0].date_seance).toLocaleDateString('fr-FR') : '';
         db.query('INSERT INTO notifications (user_id, message, type) VALUES (?, ?, ?)',
-          [nr[0].formateur_uid, `📋 ${nr[0].externe_nom} a soumis un justificatif d'absence pour la séance du ${d} (${nr[0].titre})`, 'presence']
+          [nr[0].formateur_uid, `${nr[0].externe_nom} a soumis un justificatif d'absence pour la séance du ${d} (${nr[0].titre})`, 'presence']
         ).catch(() => {});
       }
     }).catch(() => {});
@@ -518,7 +552,7 @@ router.get('/mes-justificatifs/:externeId', async (req, res) => {
     JOIN formations f ON s.formation_id = f.id
     WHERE j.externe_id = ?
     ORDER BY j.date_soumission DESC
-  `;
+ `;
   try {
     const [rows] = await db.query(sql, [req.params.externeId]);
     res.json(rows);
@@ -534,16 +568,16 @@ router.get('/eligibilite-attestation/:externeId/:formationId', async (req, res) 
     SELECT COUNT(m.id) AS total_modules,
            SUM(CASE WHEN COALESCE(p.statut,'non_commence') = 'termine' THEN 1 ELSE 0 END) AS modules_termines
     FROM modules_formation m
-    LEFT JOIN progression_etudiants p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
+    LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
     WHERE m.formation_id = ?
-  `;
+ `;
   try {
     const [progRows] = await db.query(progressionSql, [externeId, formationId, formationId]);
     const prog = progRows[0];
     const progression = prog.total_modules > 0 ? Math.round((prog.modules_termines / prog.total_modules) * 100) : 0;
 
     const [[quiz]] = await db.query(
-      'SELECT id, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
+ 'SELECT id, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
     );
     let has_quiz = false, quiz_ok = true, quiz_score = null, quiz_tentatives = 0;
     let nb_tentatives_max = null, seuil_reussite = null;
@@ -552,7 +586,7 @@ router.get('/eligibilite-attestation/:externeId/:formationId', async (req, res) 
       nb_tentatives_max = quiz.nb_tentatives;
       seuil_reussite = quiz.seuil_reussite;
       const [tentatives] = await db.query(
-        'SELECT score, reussi FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ? ORDER BY score DESC',
+ 'SELECT score, reussi FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ? ORDER BY score DESC',
         [externeId, quiz.id]
       );
       quiz_tentatives = tentatives.length;
@@ -575,12 +609,15 @@ router.get('/eligibilite-attestation/:externeId/:formationId', async (req, res) 
 router.get('/quiz/:formationId', async (req, res) => {
   const { formationId } = req.params;
   try {
+    const [[formation]] = await db.query('SELECT status FROM formations WHERE id = ?', [formationId]);
+    if (!formation || formation.status !== 'terminée')
+      return res.status(403).json({ message: 'Le quiz est accessible uniquement une fois la formation terminée.' });
     const [[quiz]] = await db.query(
-      'SELECT id, titre, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
+ 'SELECT id, titre, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
     );
     if (!quiz) return res.json(null);
     const [questions] = await db.query(
-      'SELECT id, question, ordre FROM questions_quiz WHERE quiz_id = ? ORDER BY ordre ASC', [quiz.id]
+ 'SELECT id, question, ordre FROM questions_quiz WHERE quiz_id = ? ORDER BY ordre ASC', [quiz.id]
     );
     for (const q of questions) {
       const [reponses] = await db.query('SELECT id, reponse FROM reponses_quiz WHERE question_id = ?', [q.id]);
@@ -596,11 +633,11 @@ router.get('/quiz-score/:externeId/:formationId', async (req, res) => {
   const { externeId, formationId } = req.params;
   try {
     const [[quiz]] = await db.query(
-      'SELECT id, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
+ 'SELECT id, seuil_reussite, nb_tentatives FROM quiz WHERE formation_id = ?', [formationId]
     );
     if (!quiz) return res.json({ has_quiz: false });
     const [tentatives] = await db.query(
-      'SELECT score, reussi FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ? ORDER BY score DESC',
+ 'SELECT score, reussi FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ? ORDER BY score DESC',
       [externeId, quiz.id]
     );
     res.json({
@@ -623,7 +660,7 @@ router.post('/quiz/soumettre', async (req, res) => {
     if (!quiz) return res.status(404).json({ error: 'Quiz introuvable.' });
 
     const [existingTentatives] = await db.query(
-      'SELECT id FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ?', [externe_id, quiz_id]
+ 'SELECT id FROM tentatives_quiz WHERE externe_id = ? AND quiz_id = ?', [externe_id, quiz_id]
     );
     if (existingTentatives.length >= quiz.nb_tentatives)
       return res.status(400).json({ error: 'Nombre maximum de tentatives atteint.' });
@@ -632,7 +669,7 @@ router.post('/quiz/soumettre', async (req, res) => {
     let correct = 0;
     for (const rep of reponses) {
       const [[r]] = await db.query(
-        'SELECT est_correcte FROM reponses_quiz WHERE id = ? AND question_id = ?',
+ 'SELECT est_correcte FROM reponses_quiz WHERE id = ? AND question_id = ?',
         [rep.reponse_id, rep.question_id]
       );
       if (r && r.est_correcte) correct++;
@@ -640,7 +677,7 @@ router.post('/quiz/soumettre', async (req, res) => {
     const score = allQuestions.length > 0 ? Math.round((correct / allQuestions.length) * 100) : 0;
     const reussi = score >= quiz.seuil_reussite;
     await db.query(
-      'INSERT INTO tentatives_quiz (externe_id, quiz_id, score, reussi) VALUES (?, ?, ?, ?)',
+ 'INSERT INTO tentatives_quiz (externe_id, quiz_id, score, reussi) VALUES (?, ?, ?, ?)',
       [externe_id, quiz_id, score, reussi ? 1 : 0]
     );
     res.json({
@@ -654,14 +691,14 @@ router.post('/quiz/soumettre', async (req, res) => {
 router.get('/attestation-data/:externeId/:formationId', async (req, res) => {
   const { externeId, formationId } = req.params;
   const sql = `
-    SELECT f.titre, f.date_debut, f.date_fin, f.duree, f.specialite,
+    SELECT f.titre, f.date_debut, f.date_fin, f.specialite,
            u_form.nom AS formateur_nom,
            u_ex.nom AS etudiant_nom, u_ex.email AS etudiant_email,
            ie.date_inscription,
            (SELECT COUNT(*) FROM seances WHERE formation_id = f.id) AS total_seances,
            (SELECT COUNT(*) FROM seances s
             JOIN presences p ON p.seance_id = s.id
-            WHERE s.formation_id = f.id AND p.externe_id = ? AND p.statut IN ('présent','retard')
+            WHERE s.formation_id = f.id AND p.externe_id = ? AND p.statut IN ('présent','excusé')
            ) AS seances_presentes
     FROM inscriptions_externes ie
     JOIN formations f ON ie.formation_id = f.id
@@ -670,13 +707,93 @@ router.get('/attestation-data/:externeId/:formationId', async (req, res) => {
     JOIN externes ex ON ie.externe_id = ex.id
     JOIN users u_ex ON ex.user_id = u_ex.id
     WHERE ie.externe_id = ? AND ie.formation_id = ? AND ie.statut_paiement = 'payé'
-  `;
+ `;
   try {
     const [rows] = await db.query(sql, [externeId, externeId, formationId]);
     if (!rows.length) return res.status(404).json({ error: 'Inscription introuvable' });
     const d = rows[0];
     const taux = d.total_seances > 0 ? Math.round((d.seances_presentes / d.total_seances) * 100) : null;
-    res.json({ ...d, taux });
+    const refId = `ATT-E${externeId}-F${formationId}`;
+    const dateGen = new Date().toLocaleDateString('fr-FR');
+    const QRCode = require('qrcode');
+    const qrContent = [
+ `REF: ${refId}`,
+ `Titulaire : ${d.etudiant_nom}`,
+ `Formation : ${d.titre}`,
+ `Taux présence : ${taux ?? 'N/A'}%`,
+ `Délivré : ${dateGen}`,
+    ].join('\n');
+    const qr_data_url = await QRCode.toDataURL(qrContent, { width: 150, margin: 1, color: { dark: '#003366' } });
+    res.json({ ...d, taux, ref_id: refId, qr_data_url });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* ─── GET /generer-attestation/:externeId/:formationId ──────────────────── */
+router.get('/generer-attestation/:externeId/:formationId', async (req, res) => {
+  const { externeId, formationId } = req.params;
+  try {
+    // 1. Vérifier l'éligibilité
+    const [inscRows] = await db.query(
+ "SELECT id FROM inscriptions_externes WHERE externe_id = ? AND formation_id = ? AND statut_paiement = 'payé'",
+      [externeId, formationId]
+    );
+    if (!inscRows.length) return res.status(404).json({ error: 'Inscription introuvable' });
+
+    const [[progRow]] = await db.query(`
+      SELECT COUNT(m.id) AS total,
+             SUM(CASE WHEN COALESCE(p.statut,'non_commence') = 'termine' THEN 1 ELSE 0 END) AS termines
+      FROM modules_formation m
+      LEFT JOIN progression_candidats p ON p.module_id = m.id AND p.externe_id = ? AND p.formation_id = ?
+      WHERE m.formation_id = ?
+ `, [externeId, formationId, formationId]);
+
+    const progression = progRow.total > 0 ? Math.round((progRow.termines / progRow.total) * 100) : 0;
+
+    const [[quizRow]] = await db.query(`
+      SELECT COUNT(*) AS quiz_reussi FROM tentatives_quiz tq
+      JOIN quiz q ON tq.quiz_id = q.id
+      WHERE q.formation_id = ? AND tq.externe_id = ? AND tq.reussi = 1
+ `, [formationId, externeId]);
+
+    if (progression < 100) return res.status(403).json({ error: 'Progression insuffisante' });
+    if (!quizRow.quiz_reussi) return res.status(403).json({ error: 'Quiz non réussi' });
+
+    // 2. Récupérer les données
+    const [rows] = await db.query(`
+      SELECT f.titre, f.date_debut, f.date_fin, f.specialite,
+             u_form.nom AS formateur_nom,
+             u_ex.nom AS candidat_nom,
+             (SELECT COUNT(*) FROM seances WHERE formation_id = f.id) AS total_seances,
+             (SELECT COUNT(*) FROM seances s JOIN presences p ON p.seance_id = s.id
+              WHERE s.formation_id = f.id AND p.externe_id = ? AND p.statut IN ('présent','excusé')
+             ) AS seances_presentes
+      FROM inscriptions_externes ie
+      JOIN formations f ON ie.formation_id = f.id
+      JOIN formateurs fo ON f.formateur_id = fo.id
+      JOIN users u_form ON fo.user_id = u_form.id
+      JOIN externes ex ON ie.externe_id = ex.id
+      JOIN users u_ex ON ex.user_id = u_ex.id
+      WHERE ie.externe_id = ? AND ie.formation_id = ?
+ `, [externeId, externeId, formationId]);
+
+    if (!rows.length) return res.status(404).json({ error: 'Données introuvables' });
+    const d = rows[0];
+    const taux = d.total_seances > 0 ? Math.round((d.seances_presentes / d.total_seances) * 100) : 100;
+
+    // 3. Générer le PDF
+    await genererAttestationPDF(res, {
+      candidat_nom : d.candidat_nom,
+      titre        : d.titre,
+      specialite   : d.specialite,
+      formateur_nom: d.formateur_nom,
+      date_debut   : d.date_debut ? new Date(d.date_debut).toLocaleDateString('fr-FR') : '—',
+      date_fin     : d.date_fin   ? new Date(d.date_fin).toLocaleDateString('fr-FR')   : '—',
+      taux,
+      dateGen      : new Date().toLocaleDateString('fr-FR'),
+      refId        : `ATT-E${externeId}-F${formationId}`,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -688,8 +805,8 @@ router.post('/liste-attente', async (req, res) => {
   if (!externe_id || !formation_id) return res.status(400).json({ error: 'Champs manquants' });
   try {
     const [rows] = await db.query(
-      `SELECT nb_places,
-              (SELECT COUNT(*) FROM inscriptions WHERE formation_id = ?) +
+ `SELECT nb_places,
+              (SELECT COUNT(*) FROM inscriptions WHERE formation_id = ? AND statut = 'Inscrit') +
               (SELECT COUNT(*) FROM inscriptions_externes WHERE formation_id = ? AND statut_paiement = 'payé') AS inscrits,
               (SELECT COUNT(*) FROM liste_attente WHERE externe_id = ? AND formation_id = ?) AS deja
        FROM formations WHERE id = ? AND status = 'published'`,
@@ -701,7 +818,7 @@ router.post('/liste-attente', async (req, res) => {
     if (nb_places === null || inscrits < nb_places)
       return res.status(400).json({ error: 'Des places sont disponibles, inscrivez-vous directement' });
     await db.query('INSERT INTO liste_attente (externe_id, formation_id) VALUES (?, ?)', [externe_id, formation_id]);
-    res.json({ message: "Vous avez rejoint la liste d'attente ✅" });
+    res.json({ message: "Vous avez rejoint la liste d'attente " });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -732,7 +849,7 @@ router.get('/en-attente/:externeId', async (req, res) => {
     JOIN formations f ON la.formation_id = f.id
     WHERE la.externe_id = ?
     ORDER BY la.date_ajout ASC
-  `;
+ `;
   try {
     const [rows] = await db.query(sql, [externeId]);
     res.json(rows);

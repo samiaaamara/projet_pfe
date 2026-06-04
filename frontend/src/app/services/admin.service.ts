@@ -5,9 +5,6 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  approveAndPublishFormation(_formationId: number) {
-    throw new Error('Method not implemented.');
-  }
 
   private apiUrl = `${environment.apiUrl}/admin`;
 
@@ -31,6 +28,10 @@ export class AdminService {
 
   getFormations(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/formations`);
+  }
+
+  getInscritsFormation(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/formations/${formationId}/inscrits`);
   }
 
   addFormation(data: any): Observable<any> {
@@ -61,7 +62,7 @@ export class AdminService {
     return this.http.put(`${this.apiUrl}/formations/${formationId}/accept`, {});
   }
 
-  publishAcceptedFormation(formationId: number, config: { date_debut: string; date_fin?: string; prix?: number }): Observable<any> {
+  publishAcceptedFormation(formationId: number, config: { date_debut: string; date_fin?: string; prix?: number; nb_places: number }): Observable<any> {
     return this.http.put(`${this.apiUrl}/formations/${formationId}/publish-accepted`, config);
   }
 
@@ -87,6 +88,10 @@ export class AdminService {
 
   getFormateurs(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/formateurs`);
+  }
+
+  getFormateursDisponibilite(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/formateurs/disponibilite`);
   }
 
   addFormateur(data: any): Observable<any> {
@@ -137,6 +142,22 @@ export class AdminService {
   // QUIZ
   // ======================
 
+  getListeAttenteGlobale(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/liste-attente`);
+  }
+
+  retirerListeAttente(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/liste-attente/${id}`);
+  }
+
+  inscrireDepuisAttente(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/liste-attente/${id}/inscrire`, {});
+  }
+
+  getFormationListeAttente(formationId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/formations/${formationId}/liste-attente`);
+  }
+
   getFormationQuiz(formationId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/formations/${formationId}/quiz`);
   }
@@ -149,12 +170,24 @@ export class AdminService {
     return this.http.delete(`${this.apiUrl}/formations/${formationId}/quiz`);
   }
 
+  getQuizStats(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/quiz/stats`);
+  }
+
+  getAttestationStats(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/attestation/stats`);
+  }
+
   addFormationSupport(formationId: number, data: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/formations/${formationId}/supports`, data);
   }
 
   deleteFormationSupport(supportId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/supports/${supportId}`);
+  }
+
+  getPaiementsExternes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/paiements-externes`);
   }
 
   // ======================
@@ -169,7 +202,15 @@ export class AdminService {
     return this.http.put(`${this.apiUrl}/inscriptions/${id}/approve`, {});
   }
 
-  rejeterInscription(id: number): Observable<any> {
-    return this.http.put(`${this.apiUrl}/inscriptions/${id}/reject`, {});
+  rejeterInscription(id: number, raison: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/inscriptions/${id}/reject`, { raison });
+  }
+
+  approuverInscriptionExterne(id: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/inscriptions-externes/${id}/approve`, {});
+  }
+
+  rejeterInscriptionExterne(id: number, raison: string): Observable<any> {
+    return this.http.put(`${this.apiUrl}/inscriptions-externes/${id}/reject`, { raison });
   }
 }

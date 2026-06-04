@@ -1,34 +1,51 @@
 @startuml Sprint1_Sequence_Authentification
 title Diagramme de Séquence — Authentification
 
-actor Utilisateur as User
-participant "Page Login\nFrontend" as Frontend
-participant "Backend\nExpress" as Backend
-database "Base de Données\nMySQL" as DB
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceMessageAlign left
+skinparam sequenceBoxBackgroundColor White
+skinparam sequenceBoxBorderColor Black
+skinparam participantBackgroundColor White
+skinparam participantBorderColor Black
+skinparam actorBackgroundColor White
+skinparam actorBorderColor Black
+skinparam databaseBackgroundColor White
+skinparam databaseBorderColor Black
+skinparam noteBackgroundColor White
+skinparam noteBorderColor Black
 
-User -> Frontend: Email + Mot de passe
-activate Frontend
+actor "Utilisateur" as User
+participant "Interface" as UI
+participant "Système" as SYS
+database "Base de données" as DB
 
-Frontend -> Backend: POST /api/auth/login\n{email, mot_de_passe}
-activate Backend
+User -> UI: Saisit email et mot de passe
+User -> UI: Clique sur "Se connecter"
+UI -> SYS: Envoie les informations de connexion
 
-Backend -> DB: SELECT user WHERE email = ?
-activate DB
-DB --> Backend: user_object
-deactivate DB
+SYS -> DB: Recherche l'utilisateur par email
+DB --> SYS: Retourne le résultat
 
-Backend -> Backend: bcrypt.compare(\nmot_de_passe,\nhashed_password)
-alt Mot de passe valide
-    Backend -> Backend: jwt.sign(payload)
-    Backend --> Frontend: {success, token, user}
-    deactivate Backend
-    Frontend --> User: Redirection Dashboard\navec token stocké
-else Mot de passe invalide
-    Backend --> Frontend: {error: "Identifiants incorrects"}
-    deactivate Backend
-    Frontend --> User: Message d'erreur
+alt Utilisateur introuvable
+    SYS --> UI: "Identifiants incorrects"
+    UI --> User: Affiche le message d'erreur
+else Utilisateur trouvé
+    SYS -> SYS: Vérifie le mot de passe (bcrypt)
+
+    alt Mot de passe incorrect
+        SYS --> UI: "Identifiants incorrects"
+        UI --> User: Affiche le message d'erreur
+    else Mot de passe correct
+        SYS -> DB: Récupère le profil utilisateur
+        DB --> SYS: Profil trouvé
+        SYS -> SYS: Génère le token JWT (24h)
+        SYS --> UI: Connexion réussie + token JWT
+        UI -> UI: Redirige selon le rôle\n(candidat / formateur / externe )
+        UI --> User: Affiche le tableau de bord
+    end
 end
-
-deactivate Frontend
 
 @enduml

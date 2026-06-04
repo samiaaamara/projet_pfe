@@ -1,0 +1,38 @@
+@startuml Sprint3_Sequence_ValidationPresences
+title Diagramme de Séquence — Validation des présences (Formateur)
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 150
+skinparam backgroundColor White
+skinparam sequenceArrowThickness 1
+skinparam sequenceParticipantBorderColor Black
+
+actor "Formateur" as F
+participant "Frontend\n(Angular)" as FE
+participant "Backend\n(Express)" as BE
+participant "Base de données\n(MySQL)" as DB
+
+F -> FE : Accéder à la séance\net cliquer "Valider présences"
+FE -> BE : GET /api/seances/{seance_id}/inscrits
+BE -> DB : Récupérer liste des inscrits\npour la séance
+DB --> BE : liste candidats inscrits
+BE --> FE : {candidats[]}
+FE --> F : Afficher liste des participants
+
+loop Pour chaque candidat
+    F -> FE : Cocher présent / absent
+end
+
+F -> FE : Cliquer "Enregistrer"
+FE -> BE : POST /api/presences\n{seance_id, presences[{candidat_id, present}]}
+BE -> DB : Enregistrer présences\n(présent/absent par candidat)
+DB --> BE : ok
+BE -> DB : Recalculer taux de présence\net progression par module
+DB --> BE : progression mise à jour
+BE --> FE : 200 OK {taux_presence}
+FE --> F : "Présences enregistrées (taux : X%)"
+
+note over DB : La progression de chaque candidat\nest mise à jour automatiquement
+
+@enduml

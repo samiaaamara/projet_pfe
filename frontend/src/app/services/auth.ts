@@ -10,6 +10,8 @@ export class Auth {
 
   login(data: any) { return this.http.post(`${this.apiUrl}/login`, data); }
   register(data: any) { return this.http.post(`${this.apiUrl}/register`, data); }
+  forgotPassword(email: string) { return this.http.post(`${this.apiUrl}/forgot-password`, { email }); }
+  resetPassword(token: string, nouveau_mdp: string) { return this.http.post(`${this.apiUrl}/reset-password`, { token, nouveau_mdp }); }
   getSpecialites() { return this.http.get<{id: number; nom: string}[]>(`${this.apiUrl}/specialites`); }
   logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('role'); }
 

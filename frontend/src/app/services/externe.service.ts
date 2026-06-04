@@ -17,6 +17,10 @@ export class ExterneService {
     return this.http.get<any[]>(`${this.apiUrl}/mes-inscriptions/${externeId}`);
   }
 
+  getMesDemandes(externeId: number) {
+    return this.http.get<any[]>(`${this.apiUrl}/mes-demandes/${externeId}`);
+  }
+
   initierPaiement(externeId: number, formationId: number) {
     return this.http.post<any>(`${this.apiUrl}/initier-paiement`, {
       externe_id: externeId,
@@ -88,6 +92,10 @@ export class ExterneService {
     return this.http.get<any[]>(`${this.apiUrl}/en-attente/${externeId}`);
   }
 
+  lancerPaiement(inscriptionId: number) {
+    return this.http.post<any>(`${this.apiUrl}/lancer-paiement/${inscriptionId}`, {});
+  }
+
   getQuiz(formationId: number) {
     return this.http.get<any>(`${this.apiUrl}/quiz/${formationId}`);
   }
@@ -98,5 +106,11 @@ export class ExterneService {
 
   soumettreQuiz(body: { externe_id: number; quiz_id: number; reponses: { question_id: number; reponse_id: number }[] }) {
     return this.http.post<any>(`${this.apiUrl}/quiz/soumettre`, body);
+  }
+
+  genererAttestation(externeId: number, formationId: number) {
+    return this.http.get(`${this.apiUrl}/generer-attestation/${externeId}/${formationId}`, {
+      responseType: 'blob'
+    });
   }
 }

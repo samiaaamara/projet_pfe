@@ -6,7 +6,6 @@ import { environment } from '../../environments/environment';
 export interface Formation {
   titre: string;
   description: string;
-  duree?: number;
   specialite?: string;
   nb_places?: number;
   status?: 'draft' | 'pending_approval' | 'accepted' | 'published';
@@ -37,6 +36,14 @@ export class FormateurService {
   // 🔹 Récupérer les inscriptions pour une formation
   getInscriptions(formationId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/inscriptions/${formationId}`);
+  }
+
+  getInscriptionsEnAttente(formateurId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/inscriptions-en-attente/${formateurId}`);
+  }
+
+  getListeAttenteFormateur(formateurId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/liste-attente/${formateurId}`);
   }
 
   // 🔹 Récupérer les supports d'une formation
@@ -111,6 +118,14 @@ export class FormateurService {
     return this.http.put(`${this.api}/progression/${formationId}/${etudiantId}/${moduleId}`, { statut });
   }
 
+  getProgressionExterne(formationId: number, externeId: number): Observable<any> {
+    return this.http.get<any>(`${this.api}/progression-externe/${formationId}/${externeId}`);
+  }
+
+  updateProgressionExterne(formationId: number, externeId: number, moduleId: number, statut: string): Observable<any> {
+    return this.http.put(`${this.api}/progression-externe/${formationId}/${externeId}/${moduleId}`, { statut });
+  }
+
   // 🔹 Modules d'une formation (pour le sélecteur dans le formulaire séance)
   getFormationModules(formationId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.api}/formation-modules/${formationId}`);
@@ -136,6 +151,9 @@ export class FormateurService {
   }
   enregistrerPresence(seanceId: number, etudiantId: number, statut: string): Observable<any> {
     return this.http.put(`${this.api}/presences/${seanceId}/${etudiantId}`, { statut });
+  }
+  enregistrerPresenceExterne(seanceId: number, externeId: number, statut: string): Observable<any> {
+    return this.http.put(`${this.api}/presences/${seanceId}/externe/${externeId}`, { statut });
   }
 
   // Justificatifs

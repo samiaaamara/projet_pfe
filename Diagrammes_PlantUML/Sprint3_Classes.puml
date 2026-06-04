@@ -1,0 +1,110 @@
+@startuml Sprint3_Classes
+title Diagramme de Classes — Sprint 3
+
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam dpi 300
+skinparam backgroundColor White
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+skinparam classAttributeFontColor Black
+skinparam classFontColor Black
+skinparam classAttributeIconSize 0
+
+class Candidat {
+    - id : int
+    - nom : string
+    - email : string
+    --
+    + soumettreInscription() : DemandeInscription
+    + consulterProgression() : Progression[]
+}
+
+class CandidatISET {
+    - specialite : string
+    - niveau : string
+}
+
+class Externe {
+    - entreprise : string
+    - cin : string
+}
+
+class Formateur {
+    - id : int
+    - specialite : string
+    --
+    + validerPresences(seance_id) : void
+}
+
+class Admin {
+    - id : int
+    --
+    + approuverInscription(id) : void
+    + rejeterInscription(id, motif) : void
+    + gererListeAttente() : void
+    + consulterPaiements() : Paiement[]
+}
+
+class DemandeInscription {
+    - id : int
+    - statut : en_attente | approuvee | rejetee | liste_attente | payee
+    - date_demande : date
+    - motif_rejet : string
+    --
+    + approuver() : void
+    + rejeter(motif) : void
+}
+
+class ListeAttente {
+    - id : int
+    - position : int
+    - date_ajout : date
+    --
+    + promouvoir() : DemandeInscription
+    + seDesinscrire() : void
+}
+
+class Paiement {
+    - id : int
+    - montant : decimal
+    - statut : en_attente | paye | echoue
+    - stripe_session_id : string
+    - date_paiement : datetime
+    --
+    + creerSession() : string
+    + verifierWebhook(signature) : boolean
+    + confirmer() : void
+}
+
+class Presence {
+    - id : int
+    - statut : présent | absent | excusé
+    - date_validation : datetime
+    --
+    + enregistrer() : void
+}
+
+class Progression {
+    - id : int
+    - statut_module : non_commencé | en_cours | terminé
+    - taux_presence : decimal
+    - modules_completes : int
+    - total_modules : int
+    --
+    + calculer() : void
+    + getPourcentage() : decimal
+}
+
+CandidatISET --|> Candidat
+Externe      --|> Candidat
+
+Candidat  "1"    --   "0..*" DemandeInscription : soumet
+Admin     "1"    --   "0..*" DemandeInscription : traite
+DemandeInscription "1" *-- "0..1" Paiement    : génère
+Candidat  "1"    --   "0..*" ListeAttente      : rejoint
+Candidat  "1"    *--  "0..*" Presence          : a
+Formateur "1"    o--  "0..*" Presence          : valide
+Candidat  "1"    *--  "0..*" Progression       : suit
+
+@enduml
